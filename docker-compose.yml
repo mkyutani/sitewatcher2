@@ -32,11 +32,11 @@ services:
     user: "${UID}:${GID}"
     environment:
       - "PORT=${API_PORT}"
-      - "PGUSER=${PG_USER}"
-      - "PGPASSWORD=${PG_PASSWORD}"
-      - "PGSERVER=pg"
-      - "PGDATABASE=${PG_DATABASE}"
-      - "PGPORT=${PG_PORT}"
+      - "PG_USER=${PG_USER}"
+      - "PG_PASSWORD=${PG_PASSWORD}"
+      - "PG_SERVER=pg"
+      - "PG_DATABASE=${PG_DATABASE}"
+      - "PG_PORT=${PG_PORT}"
     ports:
       - '${API_EX_PORT}:${API_PORT}'
     volumes:

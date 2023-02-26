@@ -25,6 +25,7 @@ else
 
     echo "PG_USER=$(id -un)" >>${ENV_FILE}
     echo "PG_PASSWORD=postgres" >>${ENV_FILE}
+    echo "PG_SERVER=pg" >>${ENV_FILE}
     echo "PG_DATABASE=sitewatcher" >>${ENV_FILE}
     echo "PG_PORT=5432" >>${ENV_FILE}
 
@@ -51,3 +52,7 @@ if [ ${CREATED} = 1 ]; then
 else
     echo " already exist."
 fi
+
+echo -n "Creating simbolic links to ${ENV_FILE} ..."
+cd api && ln -s ../${ENV_FILE} ./${ENV_FILE} && cd ..
+echo " done"

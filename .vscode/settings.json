@@ -1,12 +1,14 @@
 {
     "cSpell.words": [
         "autoflush",
+        "nestjs",
         "PGDATABASE",
         "PGPORT",
         "PGSERVER",
         "PGUSER",
         "sessionmaker",
         "sitewatcher",
-        "sqlalchemy"
+        "sqlalchemy",
+        "typeorm"
     ]
 }
