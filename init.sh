@@ -28,7 +28,8 @@ else
     echo "PG_DATABASE=sitewatcher" >>${ENV_FILE}
     echo "PG_PORT=5432" >>${ENV_FILE}
 
-    echo "API_PORT=80" >>${ENV_FILE}
+    echo "API_EX_PORT=3000" >>${ENV_FILE}
+    echo "API_PORT=3000" >>${ENV_FILE}
 
     echo " created."
 fi
