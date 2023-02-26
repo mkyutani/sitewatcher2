@@ -5,6 +5,7 @@ services:
     image: postgres:15-bullseye
     hostname: pg
     container_name: sw2pg
+    working_dir: /app
     user: "${UID}:${GID}"
     environment:
       - "POSTGRES_USER=${PG_USER}"
@@ -16,14 +17,14 @@ services:
     volumes:
       - ./site/pg/data:/var/lib/postgresql/data
       - ./site/pg/initdb:/docker-entrypoint-initdb.d
-      - ./site/pg/home:/home/yuta
+      - ./site/pg/home:/app
       - /etc/passwd:/etc/passwd:ro
       - /etc/group:/etc/group:ro
     networks:
       - local-network
 
-  fastapi:
-    image: tiangolo/uvicorn-gunicorn-fastapi:latest
+  nestjs:
+    build: api
     hostname: api
     container_name: sw2api
     depends_on:
@@ -33,12 +34,14 @@ services:
       - "PORT=${API_PORT}"
       - "PGUSER=${PG_USER}"
       - "PGPASSWORD=${PG_PASSWORD}"
+      - "PGSERVER=pg"
       - "PGDATABASE=${PG_DATABASE}"
       - "PGPORT=${PG_PORT}"
     ports:
-      - '${API_PORT}:${API_PORT}'
+      - '${API_EX_PORT}:${API_PORT}'
     volumes:
-      - ./api:/app
+      - ./api:/api
+      - /app/node_modules
       - ./site/logs:/logs
       - /etc/passwd:/etc/passwd:ro
       - /etc/group:/etc/group:ro
@@ -48,4 +51,4 @@ services:
 networks:
   local-network:
     driver: bridge
-    name: sitewatcher-network
+    name: sw2nw

@@ -6,6 +6,7 @@ site/
 env/
 log/
 tmp/
+work/
 .env
 *.log
 *.tmp
