@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Query, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Patch, Param, Delete, Logger } from '@nestjs/common';
 import { SitesService } from './sites.service';
 import { CreateSiteDto } from './dto/create-site.dto';
 import { UpdateSiteDto } from './dto/update-site.dto';
@@ -7,8 +7,11 @@ import { UpdateSiteDto } from './dto/update-site.dto';
 export class SitesController {
   constructor(private readonly sitesService: SitesService) {}
 
+  logger = new Logger(this.constructor.name);
+
   @Post()
   async create(@Query() createSiteDto: CreateSiteDto): Promise<any> {
+    this.logger.log('Created ' + JSON.stringify(createSiteDto));
     return this.sitesService.create(createSiteDto);
   }
 
