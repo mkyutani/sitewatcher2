@@ -3,9 +3,11 @@
 create_directory() {
     local dir=$1
     local mode=$2
+    local user=$3
+    local group=$4
     if [ ! -e "${dir}" ]; then
-        mkdir -p "${dir}"
-        chmod "${mode}" "${dir}"
+        mkdir "${dir}" -m "${mode}"
+        chown "${user}:${group}" "${dir}"
         echo -n " ${dir}/"
         CREATED=1
     fi
@@ -17,13 +19,10 @@ if [ -e ${ENV_FILE} ]; then
     echo " already exists."
 else
     touch ${ENV_FILE}
-    echo "USER=$(id -un)" >>${ENV_FILE}
-    echo "GROUP=$(id -gn)" >>${ENV_FILE}
-    echo "UID=$(id -u)" >>${ENV_FILE}
-    echo "GID=$(id -g)" >>${ENV_FILE}
     echo "LOGS=/logs" >>${ENV_FILE}
 
-    echo "PG_USER=$(id -un)" >>${ENV_FILE}
+    echo "PG_USER=postgres" >>${ENV_FILE}
+    echo "PG_GROUP=postgres" >>${ENV_FILE}
     echo "PG_PASSWORD=postgres" >>${ENV_FILE}
     echo "PG_SERVER=pg" >>${ENV_FILE}
     echo "PG_DATABASE=sitewatcher" >>${ENV_FILE}
@@ -35,18 +34,18 @@ else
     echo " created."
 fi
 
+USER=$(id -un)
+GROUP=$(id -gn)
+
 SITE_DIR=site
 echo -n "Creating site directories ..."
 CREATED=0
-create_directory "${SITE_DIR}" 775
-create_directory "${SITE_DIR}/client" 775
-create_directory "${SITE_DIR}/api" 775
-create_directory "${SITE_DIR}/data" 775
-create_directory "${SITE_DIR}/pg" 775
-create_directory "${SITE_DIR}/pg/data" 775
-create_directory "${SITE_DIR}/pg/initdb" 775
-create_directory "${SITE_DIR}/pg/home" 775
-create_directory "${SITE_DIR}/logs" 775
+create_directory "${SITE_DIR}" 775 ${USER} ${GROUP}
+create_directory "${SITE_DIR}/api" 775 node node
+create_directory "${SITE_DIR}/api/logs" 775 node node
+create_directory "${SITE_DIR}/pg" 775 postgres postgres
+create_directory "${SITE_DIR}/pg/data" 775 postgres postgres
+create_directory "${SITE_DIR}/pg/initdb" 775 postgres postgres
 if [ ${CREATED} = 1 ]; then
     echo " created."
 else
