@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
@@ -9,11 +9,11 @@ import { Site } from './entities/site.entity'
 @Injectable()
 export class SitesService {
   constructor(
-    @InjectRepository(Site) private userRepository: Repository<Site>,
+    @InjectRepository(Site) private siteRepository: Repository<Site>,
   ) {}
 
   async create({ name, url, type }: CreateSiteDto): Promise<any> {
-    await this.userRepository
+    await this.siteRepository
     .save({
       name: name,
       url: url,
@@ -26,19 +26,44 @@ export class SitesService {
     });
   }
 
-  findAll() {
-    return `This action returns all sites`;
+  async findAll() {
+    return await this.siteRepository.find().catch((e) => {
+      throw new InternalServerErrorException(
+        `[${e.message}]: Failed to get a site.`,
+      );
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} site`;
+  async findOne(id: number) {
+    return await this.siteRepository
+    .findOne({
+      where: { id: id },
+    })
+    .then((res) => {
+      if (!res) {
+        throw new NotFoundException();
+      }
+      return res;
+    })
   }
 
-  update(id: number, updateSiteDto: UpdateSiteDto) {
-    return `This action updates a #${id} site`;
+  async update(id: number, updateSiteDto: UpdateSiteDto) {
+    const site = await this.siteRepository.findOne({ where: { id: id } });
+    if (!site) {
+        throw new NotFoundException();
+    }
+
+    site.name = updateSiteDto.name;
+    site.url = updateSiteDto.url;
+    site.type = updateSiteDto.type;
+    return await this.siteRepository.save(site);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} site`;
+  async remove(id: number) {
+    const site = await this.siteRepository.findOne({ where: { id: id } });
+    if (!site) {
+        throw new NotFoundException();
+    }
+    return await this.siteRepository.delete(site);
   }
 }

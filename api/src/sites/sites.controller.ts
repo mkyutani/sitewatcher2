@@ -11,27 +11,31 @@ export class SitesController {
 
   @Post()
   async create(@Query() createSiteDto: CreateSiteDto): Promise<any> {
-    this.logger.log('Created ' + JSON.stringify(createSiteDto));
+    this.logger.log('POST ' + JSON.stringify(createSiteDto));
     return this.sitesService.create(createSiteDto);
   }
 
   @Get()
-  findAll() {
+  async findAll() {
+    this.logger.log('GET all');
     return this.sitesService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string) {
+    this.logger.log('GET ' + id);
     return this.sitesService.findOne(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSiteDto: UpdateSiteDto) {
+  async update(@Param('id') id: string, @Query() updateSiteDto: UpdateSiteDto) {
+    this.logger.log('PATCH ' + JSON.stringify(updateSiteDto));
     return this.sitesService.update(+id, updateSiteDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
+    this.logger.log('DELETE ' + id);
     return this.sitesService.remove(+id);
   }
 }
