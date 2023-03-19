@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
+import { SiteService } from './site.service';
+import { SiteController } from './site.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { SitesService } from './sites.service';
-import { SitesController } from './sites.controller';
 import { Site } from './entities/site.entity';
 
 @Module({
-  controllers: [SitesController],
-  providers: [SitesService],
+  providers: [SiteService],
+  controllers: [SiteController],
   imports: [TypeOrmModule.forFeature([Site])]
 })
-export class SitesModule {}
+export class SiteModule {}

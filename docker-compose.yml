@@ -1,4 +1,4 @@
-version: "3.1"
+version: "3.7"
 
 services:
   postgres:
@@ -15,14 +15,17 @@ services:
       - "PGPASSWORD=${PG_PASSWORD}"
       - "PGDATABASE=${PG_DATABASE}"
     volumes:
-      - ./site/pg/data:/var/lib/postgresql/data
-      - ./site/pg/initdb:/docker-entrypoint-initdb.d
-      - ./site/pg/home:/app
+      - ./volumes/pg/data:/var/lib/postgresql/data
+      - ./volumes/pg/initdb:/docker-entrypoint-initdb.d
+      - ./volumes/pg/home:/app
     networks:
       - local-network
 
   nestjs:
-    build: api
+    build:
+      context: api
+      dockerfile: "Dockerfile"
+      target: "${IMAGE_NODE_ENV}"
     hostname: api
     container_name: sw2api
     working_dir: "/app"
@@ -41,11 +44,12 @@ services:
       - "PG_SERVER=pg"
       - "PG_DATABASE=${PG_DATABASE}"
       - "PG_PORT=${PG_PORT}"
+      - "IMAGE_NODE_ENV=${IMAGE_NODE_ENV}"
     ports:
       - "${API_EX_PORT}:${API_PORT}"
     volumes:
       - /app/node_modules
-      - ./site/api/logs:/logs
+      - ./volumes/api/logs:/logs
     networks:
       - local-network
 

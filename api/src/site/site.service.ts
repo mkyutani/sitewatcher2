@@ -7,7 +7,7 @@ import { UpdateSiteDto } from './dto/update-site.dto';
 import { Site } from './entities/site.entity'
 
 @Injectable()
-export class SitesService {
+export class SiteService {
   constructor(
     @InjectRepository(Site) private siteRepository: Repository<Site>,
   ) {}
@@ -47,23 +47,23 @@ export class SitesService {
     })
   }
 
-  async update(id: number, updateSiteDto: UpdateSiteDto) {
-    const site = await this.siteRepository.findOne({ where: { id: id } });
-    if (!site) {
-        throw new NotFoundException();
+  async update(id: number, dto: UpdateSiteDto) {
+    const target = await this.siteRepository.findOne({ where: { id: id } });
+    if (!target) {
+      throw new NotFoundException('Not Found');
+    } else {
+      await this.siteRepository.update(id, dto);
+      return target;
     }
-
-    site.name = updateSiteDto.name;
-    site.url = updateSiteDto.url;
-    site.type = updateSiteDto.type;
-    return await this.siteRepository.save(site);
   }
 
   async remove(id: number) {
-    const site = await this.siteRepository.findOne({ where: { id: id } });
-    if (!site) {
-        throw new NotFoundException();
+    const target = await this.siteRepository.findOne({ where: { id: id } });
+    if (!target) {
+      throw new NotFoundException('Not Found');
+    } else {
+      await this.siteRepository.delete(id);
+      return target;
     }
-    return await this.siteRepository.delete(site);
   }
 }

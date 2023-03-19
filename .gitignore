@@ -2,7 +2,7 @@
 .json
 
 # Local files
-site/
+volumes/
 env/
 log/
 tmp/

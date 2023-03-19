@@ -31,13 +31,15 @@ else
     echo "API_EX_PORT=3000" >>${ENV_FILE}
     echo "API_PORT=3000" >>${ENV_FILE}
 
+    echo "IMAGE_NODE_ENV=production" >>${ENV_FILE}
+
     echo " created."
 fi
 
 USER=$(id -un)
 GROUP=$(id -gn)
 
-SITE_DIR=site
+SITE_DIR=volumes
 echo -n "Creating site directories ..."
 CREATED=0
 create_directory "${SITE_DIR}" 775 ${USER} ${GROUP}
