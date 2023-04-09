@@ -7,6 +7,7 @@ import { Site } from './entities/site.entity';
 @Module({
   providers: [SiteService],
   controllers: [SiteController],
-  imports: [TypeOrmModule.forFeature([Site])]
+  imports: [TypeOrmModule.forFeature([Site])],
+  exports: [TypeOrmModule]
 })
 export class SiteModule {}

@@ -25,7 +25,7 @@ services:
     build:
       context: api
       dockerfile: "Dockerfile"
-      target: "${IMAGE_NODE_ENV}"
+      target: "${NODE_MODE}"
     hostname: api
     container_name: sw2api
     working_dir: "/app"
@@ -33,7 +33,8 @@ services:
     command: >
       sh -c "
       npm run typeorm:run-migrations &&
-      node dist/src/main.js
+      npm run ${NODE_MODE};
+      tail -f /dev/null
       "
     depends_on:
       - postgres
@@ -44,7 +45,7 @@ services:
       - "PG_SERVER=pg"
       - "PG_DATABASE=${PG_DATABASE}"
       - "PG_PORT=${PG_PORT}"
-      - "IMAGE_NODE_ENV=${IMAGE_NODE_ENV}"
+      - "NODE_MODE=${NODE_MODE}"
     ports:
       - "${API_EX_PORT}:${API_PORT}"
     volumes:

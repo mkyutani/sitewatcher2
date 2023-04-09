@@ -31,7 +31,7 @@ else
     echo "API_EX_PORT=3000" >>${ENV_FILE}
     echo "API_PORT=3000" >>${ENV_FILE}
 
-    echo "IMAGE_NODE_ENV=production" >>${ENV_FILE}
+    echo "NODE_MODE=production" >>${ENV_FILE}
 
     echo " created."
 fi
