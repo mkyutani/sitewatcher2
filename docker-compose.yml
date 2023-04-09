@@ -21,21 +21,14 @@ services:
     networks:
       - local-network
 
-  nestjs:
+  deno:
     build:
       context: api
       dockerfile: "Dockerfile"
-      target: "${NODE_MODE}"
+      target: "${TARGET}"
     hostname: api
     container_name: sw2api
     working_dir: "/app"
-#    command: "tail -f /dev/null"
-    command: >
-      sh -c "
-      npm run typeorm:run-migrations &&
-      npm run ${NODE_MODE};
-      tail -f /dev/null
-      "
     depends_on:
       - postgres
     environment:
@@ -45,12 +38,12 @@ services:
       - "PG_SERVER=pg"
       - "PG_DATABASE=${PG_DATABASE}"
       - "PG_PORT=${PG_PORT}"
-      - "NODE_MODE=${NODE_MODE}"
+      - "TARGET=${TARGET}"
     ports:
       - "${API_EX_PORT}:${API_PORT}"
     volumes:
-      - /app/node_modules
-      - ./volumes/api/logs:/logs
+      - ./api:/app
+      - ./volumes/deno-dir.${TARGET}:/deno-dir
     networks:
       - local-network
 

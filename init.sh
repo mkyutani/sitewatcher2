@@ -1,5 +1,59 @@
 #!/usr/bin/env sh
 
+#
+# command line arguments
+# if no arguments, target as "production"
+#
+TARGET="production"
+if [ "$1" != "" ]; then
+    TARGET="$1"
+fi
+
+#
+# environment parameters
+#
+USER=$(id -un)
+GROUP=$(id -gn)
+
+#
+# .env
+#
+ENV_FILE=.env
+echo -n "Preparing ${ENV_FILE} ..."
+
+CREATED=1
+if [ -e ${ENV_FILE} ]; then
+    rm -f ${ENV_FILE}
+    CREATED=2
+fi
+
+touch ${ENV_FILE}
+echo "LOGS=/logs" >>${ENV_FILE}
+
+echo "PG_USER=postgres" >>${ENV_FILE}
+echo "PG_GROUP=postgres" >>${ENV_FILE}
+echo "PG_PASSWORD=postgres" >>${ENV_FILE}
+echo "PG_SERVER=pg" >>${ENV_FILE}
+echo "PG_DATABASE=sitewatcher" >>${ENV_FILE}
+echo "PG_PORT=5432" >>${ENV_FILE}
+
+echo "API_EX_PORT=8089" >>${ENV_FILE}
+echo "API_PORT=8089" >>${ENV_FILE}
+
+echo "TARGET=${TARGET}" >>${ENV_FILE}
+
+cp -f ./${ENV_FILE} api/${ENV_FILE}
+
+if [ ${CREATED} = 1 ]; then
+    echo " created."
+else
+    echo " overwritten."
+fi
+
+#
+# volume directories
+#
+
 create_directory() {
     local dir=$1
     local mode=$2
@@ -13,47 +67,16 @@ create_directory() {
     fi
 }
 
-ENV_FILE=.env
-echo -n "Preparing ${ENV_FILE} ..."
-if [ -e ${ENV_FILE} ]; then
-    echo " already exists."
-else
-    touch ${ENV_FILE}
-    echo "LOGS=/logs" >>${ENV_FILE}
-
-    echo "PG_USER=postgres" >>${ENV_FILE}
-    echo "PG_GROUP=postgres" >>${ENV_FILE}
-    echo "PG_PASSWORD=postgres" >>${ENV_FILE}
-    echo "PG_SERVER=pg" >>${ENV_FILE}
-    echo "PG_DATABASE=sitewatcher" >>${ENV_FILE}
-    echo "PG_PORT=5432" >>${ENV_FILE}
-
-    echo "API_EX_PORT=3000" >>${ENV_FILE}
-    echo "API_PORT=3000" >>${ENV_FILE}
-
-    echo "NODE_MODE=production" >>${ENV_FILE}
-
-    echo " created."
-fi
-
-USER=$(id -un)
-GROUP=$(id -gn)
-
-SITE_DIR=volumes
+VOLUMES=volumes
 echo -n "Creating site directories ..."
 CREATED=0
-create_directory "${SITE_DIR}" 775 ${USER} ${GROUP}
-create_directory "${SITE_DIR}/api" 775 node node
-create_directory "${SITE_DIR}/api/logs" 775 node node
-create_directory "${SITE_DIR}/pg" 775 postgres postgres
-create_directory "${SITE_DIR}/pg/data" 775 postgres postgres
-create_directory "${SITE_DIR}/pg/initdb" 775 postgres postgres
+create_directory "${VOLUMES}" 775 ${USER} ${GROUP}
+create_directory "${VOLUMES}/deno-dir.${TARGET}" 775 1993 1993
+create_directory "${VOLUMES}/pg" 775 999 999
+create_directory "${VOLUMES}/pg/data" 775 999 999
+create_directory "${VOLUMES}/pg/initdb" 775 999 999
 if [ ${CREATED} = 1 ]; then
     echo " created."
 else
     echo " already exist."
 fi
-
-echo -n "Creating simbolic links to ${ENV_FILE} ..."
-cd api && ln -s ../${ENV_FILE} ./${ENV_FILE} && cd ..
-echo " done"

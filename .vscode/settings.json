@@ -1,15 +1,12 @@
 {
     "cSpell.words": [
-        "autoflush",
-        "e2etest",
-        "nestjs",
         "PGDATABASE",
         "PGPORT",
         "PGSERVER",
         "PGUSER",
-        "sessionmaker",
         "sitewatcher",
-        "sqlalchemy",
-        "typeorm"
-    ]
+    ],
+    "deno.enable": true,
+    "deno.lint": true,
+    "deno.unstable": true
 }
