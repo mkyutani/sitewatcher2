@@ -1,14 +1,31 @@
-import { serve } from "./deps.ts"
+import { Application } from "./deps.ts"
 
-const port = Deno.env.get("API_PORT");
+import * as log from "https://deno.land/std@0.182.0/log/mod.ts";
+await log.setup({
+  handlers: {
+      console: new log.handlers.ConsoleHandler("DEBUG", {
+        formatter: function(r: log.LogRecord) {
+          return ["[" + r.levelName + "]", r.datetime.toISOString(), r.msg].join(" ");
+        }
+      })
+  },
+  loggers: {
+      default: {
+          level: "DEBUG",
+          handlers: ["console"],
+      }
+  }
+});
 
-const handler = (request: Request): Response => {
-  const body = `Your user-agent is:\n\n${
-    request.headers.get("user-agent") ?? "Unknown"
-  }`;
-  console.log(body);
+const app = new Application();
 
-  return new Response(body, { status: 200 });
-};
+app.use((ctx) => {
+  ctx.response.body = {
+    ip: ctx.request.ip
+  }
+  log.debug(ctx.request.ip);
+});
 
-await serve(handler, { port });
+const port = Number(Deno.env.get("API_PORT")) || 8089;
+log.info("listening on port" + port);
+await app.listen({ port: port });

@@ -1,10 +1,11 @@
 {
     "cSpell.words": [
+        "datetime",
         "PGDATABASE",
         "PGPORT",
         "PGSERVER",
         "PGUSER",
-        "sitewatcher",
+        "sitewatcher"
     ],
     "deno.enable": true,
     "deno.lint": true,
