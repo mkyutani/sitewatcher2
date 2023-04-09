@@ -1,6 +1,5 @@
-import { Application } from "./deps.ts"
+import { Application, log } from "./deps.ts"
 
-import * as log from "https://deno.land/std@0.182.0/log/mod.ts";
 await log.setup({
   handlers: {
       console: new log.handlers.ConsoleHandler("DEBUG", {
@@ -27,5 +26,5 @@ app.use((ctx) => {
 });
 
 const port = Number(Deno.env.get("API_PORT")) || 8089;
-log.info("listening on port" + port);
+log.info("listening on port " + port);
 await app.listen({ port: port });
