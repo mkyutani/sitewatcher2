@@ -1,4 +1,6 @@
-import { Application, log } from "./deps.ts"
+import { Application, log } from "./deps.ts";
+import { router } from "./router.ts";
+import "https://deno.land/std@0.182.0/dotenv/load.ts"; // auto loading .env into environment variables
 
 await log.setup({
   handlers: {
@@ -18,13 +20,18 @@ await log.setup({
 
 const app = new Application();
 
-app.use((ctx) => {
-  ctx.response.body = {
-    ip: ctx.request.ip
-  }
-  log.debug(ctx.request.ip);
+app.addEventListener("listen", ({ hostname, port, secure }) => {
+  log.info(
+    `Listening on: ${secure ? "https://" : "http://"}${hostname ?? "localhost"}:${port}`
+  );
 });
 
+app.addEventListener("error", (evt) => {
+  log.error(evt.error);
+});
+
+app.use(router.routes());
+app.use(router.allowedMethods());
+
 const port = Number(Deno.env.get("API_PORT")) || 8089;
-log.info("listening on port " + port);
 await app.listen({ port: port });

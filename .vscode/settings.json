@@ -5,6 +5,7 @@
         "PGPORT",
         "PGSERVER",
         "PGUSER",
+        "sitescontroller",
         "sitewatcher"
     ],
     "deno.enable": true,

@@ -1,3 +1,16 @@
-# /
-http://localhost:8089
+### Get all Sites
+GET http://localhost:8089/api/v1/sites
 
+### Get Site by ID
+GET http://localhost:8089/api/v1/sites/1
+
+### Create Site
+POST http://localhost:8089/api/v1/sites
+Content-Type: application/json
+
+### Update Site
+PUT http://localhost:8089/api/v1/sites/1
+Content-Type: application/json
+
+### Delete Site
+DELETE  http://localhost:8089/api/v1/sites/1
