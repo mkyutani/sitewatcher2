@@ -1,12 +1,21 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 #
 # command line arguments
 # if no arguments, target as "production"
 #
-TARGET="production"
-if [ "$1" != "" ]; then
-    TARGET="$1"
+targets=("production" "development" "createdb")
+if [ "$1" == "" ]; then
+    echo "usage: init.sh {`echo ${targets[@]}|sed 's/ /|/g'`}" >>/dev/stderr
+    exit 1
+else
+    ARG1_LOWER=`echo $1|tr A-Z a-z`
+    if printf "%s\n" "${targets[@]}" | grep -qx "$ARG1_LOWER"; then
+        TARGET="$ARG1_LOWER"
+    else
+        echo "Invalid target $1." >>/dev/stderr
+        exit 1
+    fi
 fi
 
 #

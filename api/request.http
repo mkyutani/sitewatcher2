@@ -2,15 +2,26 @@
 GET http://localhost:8089/api/v1/sites
 
 ### Get Site by ID
-GET http://localhost:8089/api/v1/sites/1
+GET http://localhost:8089/api/v1/sites/2
 
 ### Create Site
 POST http://localhost:8089/api/v1/sites
 Content-Type: application/json
 
+{
+    "name": "NEDO公募情報",
+    "source": "https://www.nedo.go.jp/search/index.php?type=koubo",
+    "type": "html"
+}
+
 ### Update Site
-PUT http://localhost:8089/api/v1/sites/1
+PUT http://localhost:8089/api/v1/sites/22
 Content-Type: application/json
 
+{
+    "name": "NEDO:公募情報",
+    "source": "https://www.nedo.go.jp/search/index.php?type=koubo",
+    "type": "html"}
+
 ### Delete Site
-DELETE  http://localhost:8089/api/v1/sites/1
+DELETE  http://localhost:8089/api/v1/sites/12

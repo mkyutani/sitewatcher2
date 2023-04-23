@@ -3,6 +3,9 @@ WORKDIR /app
 RUN chown -R deno:deno /deno-dir && chmod -R 770 /deno-dir
 RUN chown -R deno:deno /app && chmod -R 770 /app
 
+FROM base AS createdb
+# do nothing
+
 FROM base AS development
 USER deno
 COPY --chown=deno:deno . /app

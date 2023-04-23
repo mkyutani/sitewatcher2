@@ -15,9 +15,9 @@ services:
       - "PGPASSWORD=${PG_PASSWORD}"
       - "PGDATABASE=${PG_DATABASE}"
     volumes:
-      - ./volumes/pg/data:/var/lib/postgresql/data
-      - ./volumes/pg/initdb:/docker-entrypoint-initdb.d
       - ./volumes/pg/home:/app
+      - ./pg/initdb.${TARGET}:/docker-entrypoint-initdb.d
+      - ./volumes/pg/data:/var/lib/postgresql/data
     networks:
       - local-network
 
