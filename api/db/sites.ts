@@ -1,5 +1,6 @@
 import sql from "./db.ts"
 import { log } from "../deps.ts";
+import { collectHtml } from "../htmlCollector.ts";
 
 type SiteParam = {
   name: string,
@@ -14,24 +15,34 @@ async function getSite(id: string) {
     from sites
     where id = ${parseInt(id, 10)}
   `
-  return site;
+  return site[0];
 }
 
 async function getSites() {
   const sites = await sql `
     select
-      id, name, source, type
+      id, name, source, type, lastUpdated
     from sites
   `
   return sites;
+}
+
+async function getSiteLinks(id: string) {
+  const siteLinks = await sql `
+    select
+      id, site, name, longName, link, lastUpdated
+    from siteLinks
+    where site = ${parseInt(id, 10)}
+  `
+  return siteLinks;
 }
 
 async function createSite({...reqBody}: SiteParam) {
   try {
     const site = await sql `
       insert
-      into sites (name, source, type)
-      values (${reqBody.name}, ${reqBody.source}, ${reqBody.type})
+      into sites (name, source, type, lastUpdated)
+      values (${reqBody.name}, ${reqBody.source}, ${reqBody.type}, current_timestamp)
     `
     return site;
   } catch (error) {
@@ -60,10 +71,13 @@ async function updateSite(id: string, {...reqBody}: SiteParam) {
   try {
     const site = await sql `
       update sites
-      set ${sql(reqBody, "name", "source", "type")}
+      set name = ${reqBody.name},
+        source = ${reqBody.source},
+        type = ${reqBody.type},
+        lastUpdated = current_timestamp
       where id = ${parseInt(id, 10)}
     `
-    return site;
+      return site;
   } catch (error) {
     if (error instanceof sql.PostgresError) {
       log.error(`${error.name}:${error.code}:${error.detail}`);
@@ -86,6 +100,30 @@ async function updateSite(id: string, {...reqBody}: SiteParam) {
   }
 }
 
+async function updateSiteLinks(id: string) {
+  const links = await getSite(id)
+    .then((site) => {
+      const sourceType = site["type"].toLowerCase();
+      const source = site["source"]
+      if (sourceType == "html") {
+        return collectHtml(source);
+      }
+    })
+    .catch(() => {
+      const errorCode = "UNRECOGNIZED";
+      const errorMessage = "unrecognized error";
+      return {
+        "errors": [
+          {
+            "code": errorCode,
+            "message": errorMessage
+          }
+        ]
+      }
+    })
+  return links;
+}
+
 async function deleteSite(id: string) {
   const site = await sql `
     delete
@@ -95,5 +133,5 @@ async function deleteSite(id: string) {
   return site;
 }
 
-export { getSite, getSites, createSite, updateSite, deleteSite };
+export { getSite, getSites, getSiteLinks, createSite, updateSite, updateSiteLinks, deleteSite };
 export type { SiteParam };
