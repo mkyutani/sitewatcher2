@@ -1,4 +1,4 @@
-import { sitesController } from "./controllers/sitescontroller.ts";
+import { sitesController } from "./controller/sitescontroller.ts";
 import { Router } from "./deps.ts"
 
 const router = new Router();

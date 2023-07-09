@@ -2,10 +2,10 @@
 GET http://localhost:8089/api/v1/sites
 
 ### Get Site by ID
-GET http://localhost:8089/api/v1/sites/3
+GET http://localhost:8089/api/v1/sites/1
 
 ### Get Site Links by ID
-GET http://localhost:8089/api/v1/sites/22/links
+GET http://localhost:8089/api/v1/sites/1/links
 
 ### Create Site (1)
 POST http://localhost:8089/api/v1/sites
@@ -38,7 +38,7 @@ Content-Type: application/json
 }
 
 ### Update Site
-PUT http://localhost:8089/api/v1/sites/3
+PUT http://localhost:8089/api/v1/sites/1
 Content-Type: application/json
 
 {
@@ -48,7 +48,7 @@ Content-Type: application/json
 }
 
 ### Update Site Links by ID
-PUT http://localhost:8089/api/v1/sites/3/links
+PUT http://localhost:8089/api/v1/sites/1/links
 
 ### Delete Site
-DELETE  http://localhost:8089/api/v1/sites/12
+DELETE  http://localhost:8089/api/v1/sites/1

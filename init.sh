@@ -5,7 +5,7 @@
 # if no arguments, target as "production"
 #
 targets=("production" "development" "createdb")
-if [ "$1" == "" ]; then
+if [ "$1" == "" -o "$1" == "--help" ]; then
     echo "usage: init.sh {`echo ${targets[@]}|sed 's/ /|/g'`}" >>/dev/stderr
     exit 1
 else

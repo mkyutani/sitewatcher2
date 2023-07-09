@@ -6,11 +6,11 @@
   Node,
   urlJoin,
   urlParse,
-} from "./deps.ts";
+} from "../deps.ts";
 import { LinkInfo } from "./linkInfo.ts";
 
-export async function collectHtml(source: string) {
-  const linkInfos = await fetch(source)
+export async function collectHtml(source: string): Promise<LinkInfo[]> {
+  const linkInfos: LinkInfo[] = await fetch(source)
     .then((res) => {
       if (res.status >= 400) {
         throw res.status;
@@ -91,6 +91,7 @@ export async function collectHtml(source: string) {
     })
     .catch((reason) => {
       console.error(reason);
+      return [];
     });
   return linkInfos;
 }

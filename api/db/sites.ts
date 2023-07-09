@@ -1,137 +1,88 @@
 import sql from "./db.ts"
 import { log } from "../deps.ts";
-import { collectHtml } from "../htmlCollector.ts";
 
-type SiteParam = {
-  name: string,
-  source: string,
-  type: string
-};
-
-async function getSite(id: string) {
-  const site = await sql `
-    select
-      id, name, source, type
-    from sites
-    where id = ${parseInt(id, 10)}
-  `
-  return site[0];
-}
-
-async function getSites() {
-  const sites = await sql `
-    select
-      id, name, source, type, lastUpdated
-    from sites
-  `
-  return sites;
-}
-
-async function getSiteLinks(id: string) {
-  const siteLinks = await sql `
-    select
-      id, site, name, longName, link, lastUpdated
-    from siteLinks
-    where site = ${parseInt(id, 10)}
-  `
-  return siteLinks;
-}
-
-async function createSite({...reqBody}: SiteParam) {
-  try {
-    const site = await sql `
+export const siteDatabase = {
+  async get(id: number) {
+    try {
+      const site = await sql `
+        select
+          id, name, source, type
+        from sites
+        where id = ${id}
+      `
+      if (site.length > 0) {
+        return site[0];
+      }
+    } catch (error) {
+      if (error instanceof sql.PostgresError) {
+        log.error(`siteDatabase.get:${error.name}:${error.code}:${error.detail}`);
+      }
+    }
+    return null;
+  },
+  async getAll() {
+    try {
+      const sites = await sql `
+        select
+          id, name, source, type, lastUpdated
+        from sites
+      `
+      return sites;
+    } catch (error) {
+      if (error instanceof sql.PostgresError) {
+        log.error(`siteDatabase.getAll:${error.name}:${error.code}:${error.detail}`);
+      }
+    }
+  },
+  async create(name: string, source: string, type: string) {
+    try {
+      log.info(`
       insert
       into sites (name, source, type, lastUpdated)
-      values (${reqBody.name}, ${reqBody.source}, ${reqBody.type}, current_timestamp)
-    `
-    return site;
-  } catch (error) {
-    if (error instanceof sql.PostgresError) {
-      log.error(`${error.name}:${error.code}:${error.detail}`);
-      const pgErrorCode = parseInt(error.code);
-      let errorCode = "UNRECOGNIZED";
-      let errorMessage = "unrecognized error";
-      if (pgErrorCode == 23505) {
-        errorCode = "DUPLICATE"
-        errorMessage = "already exists";
-      }
-      return {
-        "errors": [
-          {
-            "code": errorCode,
-            "message": errorMessage
-          }
-        ]
+      values (${name}, ${source}, ${type}, current_timestamp)
+    `)
+      await sql `
+        insert
+        into sites (name, source, type, lastUpdated)
+        values (${name}, ${source}, ${type}, current_timestamp)
+      `
+    } catch (error) {
+      if (error instanceof sql.PostgresError) {
+        log.error(`siteDatabase.create:${error.name}:${error.code}:${error.detail}`);
       }
     }
-  }
-}
-
-async function updateSite(id: string, {...reqBody}: SiteParam) {
-  try {
-    const site = await sql `
-      update sites
-      set name = ${reqBody.name},
-        source = ${reqBody.source},
-        type = ${reqBody.type},
-        lastUpdated = current_timestamp
-      where id = ${parseInt(id, 10)}
-    `
-      return site;
-  } catch (error) {
-    if (error instanceof sql.PostgresError) {
-      log.error(`${error.name}:${error.code}:${error.detail}`);
-      const pgErrorCode = parseInt(error.code);
-      let errorCode = "UNRECOGNIZED";
-      let errorMessage = "unrecognized error";
-      if (pgErrorCode == 23505) {
-        errorCode = "DUPLICATE"
-        errorMessage = "already exists";
-      }
-      return {
-        "errors": [
-          {
-            "code": errorCode,
-            "message": errorMessage
-          }
-        ]
+    return {};
+  },
+  async update(id: number, name: string, source: string, type: string) {
+    try {
+      const site = await sql `
+        update sites
+        set name = ${name},
+          source = ${source},
+          type = ${type},
+          lastUpdated = current_timestamp
+        where id = ${id}
+      `
+        return site;
+    } catch (error) {
+      if (error instanceof sql.PostgresError) {
+        log.error(`siteDatabase.update:${error.name}:${error.code}:${error.detail}`);
       }
     }
+    return {};
+  },
+  async delete(id: number) {
+    try {
+      await sql `
+        delete
+        from sites
+        where id = ${id}
+      `
+    } catch (error) {
+      if (error instanceof sql.PostgresError) {
+        log.error(`siteDatabase.delete:${error.name}:${error.code}:${error.detail}`);
+      }
+    }
+    return {};
   }
 }
-
-async function updateSiteLinks(id: string) {
-  const links = await getSite(id)
-    .then((site) => {
-      const sourceType = site["type"].toLowerCase();
-      const source = site["source"]
-      if (sourceType == "html") {
-        return collectHtml(source);
-      }
-    })
-    .catch(() => {
-      const errorCode = "UNRECOGNIZED";
-      const errorMessage = "unrecognized error";
-      return {
-        "errors": [
-          {
-            "code": errorCode,
-            "message": errorMessage
-          }
-        ]
-      }
-    })
-  return links;
-}
-
-async function deleteSite(id: string) {
-  const site = await sql `
-    delete
-    from sites
-    where id = ${parseInt(id, 10)}
-  `
-  return site;
-}
-
-export { getSite, getSites, getSiteLinks, createSite, updateSite, updateSiteLinks, deleteSite };
-export type { SiteParam };
