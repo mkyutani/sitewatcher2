@@ -1,7 +1,7 @@
 import sql from "./db.ts"
 import { log } from "../deps.ts";
 
-export const resourceDatabase = {
+export const resourceRepository = {
   async get(site: number, uri: string) {
     try {
       const resource = await sql `
@@ -16,7 +16,7 @@ export const resourceDatabase = {
       }
     } catch (error) {
       if (error instanceof sql.PostgresError) {
-        log.error(`resourceDatabase.get:${error.name}:${error.code}:${error.detail}`);
+        log.error(`resourceRepository.get:${error.name}:${error.code}:${error.detail}`);
       }
     }
     return null;
@@ -32,7 +32,7 @@ export const resourceDatabase = {
       return resources;
     } catch (error) {
       if (error instanceof sql.PostgresError) {
-        log.error(`resourceDatabase.getAll:${error.name}:${error.code}:${error.detail}`);
+        log.error(`resourceRepository.getAll:${error.name}:${error.code}:${error.detail}`);
       }
     }
   },
@@ -54,7 +54,7 @@ export const resourceDatabase = {
       `
     } catch (error) {
       if (error instanceof sql.PostgresError) {
-        log.error(`resourceDatabase.update:${error.name}:${error.code}:${error.detail}`);
+        log.error(`resourceRepository.update:${error.name}:${error.code}:${error.detail}`);
         log.error(`
         insert
         into resources (site, uri, name, longName, lastUpdated)
@@ -82,7 +82,7 @@ export const resourceDatabase = {
       `
     } catch (error) {
       if (error instanceof sql.PostgresError) {
-        log.error(`resourceDatabase.delete:${error.name}:${error.code}:${error.detail}`);
+        log.error(`resourceRepository.delete:${error.name}:${error.code}:${error.detail}`);
       }
     }
     return {};

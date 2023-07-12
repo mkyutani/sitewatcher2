@@ -1,7 +1,7 @@
 import sql from "./db.ts"
 import { log } from "../deps.ts";
 
-export const siteDatabase = {
+export const siteRepository = {
   async get(id: number) {
     try {
       const site = await sql `
@@ -15,7 +15,7 @@ export const siteDatabase = {
       }
     } catch (error) {
       if (error instanceof sql.PostgresError) {
-        log.error(`siteDatabase.get:${error.name}:${error.code}:${error.detail}`);
+        log.error(`siteRepository.get:${error.name}:${error.code}:${error.detail}`);
       }
     }
     return null;
@@ -30,7 +30,7 @@ export const siteDatabase = {
       return sites;
     } catch (error) {
       if (error instanceof sql.PostgresError) {
-        log.error(`siteDatabase.getAll:${error.name}:${error.code}:${error.detail}`);
+        log.error(`siteRepository.getAll:${error.name}:${error.code}:${error.detail}`);
       }
     }
   },
@@ -48,7 +48,7 @@ export const siteDatabase = {
       `
     } catch (error) {
       if (error instanceof sql.PostgresError) {
-        log.error(`siteDatabase.create:${error.name}:${error.code}:${error.detail}`);
+        log.error(`siteRepository.create:${error.name}:${error.code}:${error.detail}`);
       }
     }
     return {};
@@ -66,7 +66,7 @@ export const siteDatabase = {
         return site;
     } catch (error) {
       if (error instanceof sql.PostgresError) {
-        log.error(`siteDatabase.update:${error.name}:${error.code}:${error.detail}`);
+        log.error(`siteRepository.update:${error.name}:${error.code}:${error.detail}`);
       }
     }
     return {};
@@ -80,7 +80,7 @@ export const siteDatabase = {
       `
     } catch (error) {
       if (error instanceof sql.PostgresError) {
-        log.error(`siteDatabase.delete:${error.name}:${error.code}:${error.detail}`);
+        log.error(`siteRepository.delete:${error.name}:${error.code}:${error.detail}`);
       }
     }
     return {};
