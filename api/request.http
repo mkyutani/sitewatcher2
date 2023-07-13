@@ -42,9 +42,17 @@ PUT http://localhost:8089/api/v1/sites/1
 Content-Type: application/json
 
 {
-    "name": "NEDO:公募情報④",
+    "name": "NEDO:公募情報⑤",
     "source": "https://www.nedo.go.jp/search/index.php?type=koubo",
     "type": "html"
+}
+
+### Update Site (partial data)
+PUT http://localhost:8089/api/v1/sites/1
+Content-Type: application/json
+
+{
+    "name": "NEDO:公募情報④NEW"
 }
 
 ### Update Site Links by ID

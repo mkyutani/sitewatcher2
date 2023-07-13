@@ -14,9 +14,8 @@ export const siteRepository = {
         return site[0];
       }
     } catch (error) {
-      if (error instanceof sql.PostgresError) {
-        log.error(`siteRepository.get:${error.name}:${error.code}:${error.detail}`);
-      }
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      log.error(`siteRepository.get:${description}`);
     }
     return null;
   },
@@ -29,45 +28,52 @@ export const siteRepository = {
       `
       return sites;
     } catch (error) {
-      if (error instanceof sql.PostgresError) {
-        log.error(`siteRepository.getAll:${error.name}:${error.code}:${error.detail}`);
-      }
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      log.error(`siteRepository.getAll:${description}`);
     }
   },
   async create(name: string, source: string, type: string) {
     try {
-      log.info(`
-      insert
-      into sites (name, source, type, lastUpdated)
-      values (${name}, ${source}, ${type}, current_timestamp)
-    `)
       await sql `
         insert
         into sites (name, source, type, lastUpdated)
         values (${name}, ${source}, ${type}, current_timestamp)
       `
     } catch (error) {
-      if (error instanceof sql.PostgresError) {
-        log.error(`siteRepository.create:${error.name}:${error.code}:${error.detail}`);
-      }
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      log.error(`siteRepository.create:${description}`);
     }
     return {};
   },
   async update(id: number, name: string, source: string, type: string) {
     try {
-      const site = await sql `
-        update sites
-        set name = ${name},
-          source = ${source},
-          type = ${type},
-          lastUpdated = current_timestamp
-        where id = ${id}
-      `
-        return site;
-    } catch (error) {
-      if (error instanceof sql.PostgresError) {
-        log.error(`siteRepository.update:${error.name}:${error.code}:${error.detail}`);
+      if (name) {
+        await sql `
+          update sites
+          set name = ${name},
+            lastUpdated = current_timestamp
+          where id = ${id}
+        `
       }
+      if (source) {
+        await sql `
+          update sites
+          set source = ${source},
+            lastUpdated = current_timestamp
+          where id = ${id}
+        `
+      }
+      if (type) {
+        await sql `
+          update sites
+          set type = ${type},
+            lastUpdated = current_timestamp
+          where id = ${id}
+        `
+      }
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      log.error(`siteRepository.update:${description}`);
     }
     return {};
   },
@@ -79,9 +85,8 @@ export const siteRepository = {
         where id = ${id}
       `
     } catch (error) {
-      if (error instanceof sql.PostgresError) {
-        log.error(`siteRepository.delete:${error.name}:${error.code}:${error.detail}`);
-      }
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      log.error(`siteRepository.delete:${description}`);
     }
     return {};
   }

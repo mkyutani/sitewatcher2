@@ -15,9 +15,8 @@ export const resourceRepository = {
         return resource[0];
       }
     } catch (error) {
-      if (error instanceof sql.PostgresError) {
-        log.error(`resourceRepository.get:${error.name}:${error.code}:${error.detail}`);
-      }
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      log.error(`resourceRepository.get:${description}`);
     }
     return null;
   },
@@ -31,9 +30,8 @@ export const resourceRepository = {
       `
       return resources;
     } catch (error) {
-      if (error instanceof sql.PostgresError) {
-        log.error(`resourceRepository.getAll:${error.name}:${error.code}:${error.detail}`);
-      }
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      log.error(`resourceRepository.getAll:${description}`);
     }
   },
   async create(site: number, uri: string, name: string, longName: string) {
@@ -54,7 +52,7 @@ export const resourceRepository = {
       `
     } catch (error) {
       if (error instanceof sql.PostgresError) {
-        log.error(`resourceRepository.update:${error.name}:${error.code}:${error.detail}`);
+        log.error(`resourceRepository.create:PG${error.code}:${error.message}`);
         log.error(`
         insert
         into resources (site, uri, name, longName, lastUpdated)
@@ -81,9 +79,8 @@ export const resourceRepository = {
           and uri = ${uri}
       `
     } catch (error) {
-      if (error instanceof sql.PostgresError) {
-        log.error(`resourceRepository.delete:${error.name}:${error.code}:${error.detail}`);
-      }
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      log.error(`resourceRepository.delete:${description}`);
     }
     return {};
   }
