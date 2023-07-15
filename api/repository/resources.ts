@@ -6,7 +6,7 @@ export const resourceRepository = {
     try {
       const resource = await sql `
         select
-          site, uri, name, longName
+          site, uri, name, longName, enabled, lastUpdated
         from resources
         where site = ${site}
           and uri = ${uri}
@@ -24,7 +24,7 @@ export const resourceRepository = {
     try {
       const resources = await sql `
       select
-        site, uri, name, longName
+        site, uri, name, longName, enabled, lastUpdated
       from resources
       where site = ${site}
       `
@@ -34,15 +34,15 @@ export const resourceRepository = {
       log.error(`resourceRepository.getAll:${description}`);
     }
   },
-  async create(site: number, uri: string, name: string, longName: string) {
-    return await this.update(site, uri, name, longName);
+  async create(site: number, uri: string, name: string, longName: string, enabled: boolean) {
+    return await this.update(site, uri, name, longName, enabled);
   },
-  async update(site: number, uri: string, name: string, longName: string) {
+  async update(site: number, uri: string, name: string, longName: string, enabled: boolean) {
     try {
       await sql `
         insert
-        into resources (site, uri, name, longName, lastUpdated)
-        values (${site}, ${uri}, ${name}, ${longName}, current_timestamp)
+        into resources (site, uri, name, longName, enabled, lastUpdated)
+        values (${site}, ${uri}, ${name}, ${longName}, ${enabled}, current_timestamp)
         on conflict (site, uri)
         do
           update

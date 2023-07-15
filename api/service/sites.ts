@@ -5,13 +5,15 @@ import { collectHtml } from "./htmlCollector.ts";
 export type createParam = {
   name: string,
   source: string,
-  type: string
+  type: string,
+  enabled: boolean
 };
 
 export type updateParam = {
   name: string,
   source: string,
-  type: string
+  type: string,
+  enabled: boolean
 };
 
 export const siteService = {
@@ -25,10 +27,10 @@ export const siteService = {
     return await resourceRepository.getAll(parseInt(id, 10));
   },
   async create({...reqBody}: createParam) {
-    return await siteRepository.create(reqBody.name, reqBody.source, reqBody.type);
+    return await siteRepository.create(reqBody.name, reqBody.source, reqBody.type, reqBody.enabled);
   },
   async update(id: string, {...reqBody}: updateParam) {
-    return await siteRepository.update(parseInt(id, 10), reqBody.name, reqBody.source, reqBody.type);
+    return await siteRepository.update(parseInt(id, 10), reqBody.name, reqBody.source, reqBody.type, reqBody.enabled);
   },
   async updateLinks(id: string) {
     const id_number = parseInt(id, 10);
@@ -46,7 +48,7 @@ export const siteService = {
       .then((linkInfos) => {
         if (linkInfos.length > 0)
         for (const linkInfo of linkInfos) {
-          resourceRepository.update(id_number, linkInfo.link, linkInfo.name, linkInfo.longName);
+          resourceRepository.update(id_number, linkInfo.link, linkInfo.name, linkInfo.longName, true);
         }
         return {};
       })

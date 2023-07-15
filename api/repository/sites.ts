@@ -6,7 +6,7 @@ export const siteRepository = {
     try {
       const site = await sql `
         select
-          id, name, source, type
+          id, name, source, type, enabled, lastUpdated
         from sites
         where id = ${id}
       `
@@ -23,7 +23,7 @@ export const siteRepository = {
     try {
       const sites = await sql `
         select
-          id, name, source, type, lastUpdated
+          id, name, source, type, enabled, lastUpdated
         from sites
       `
       return sites;
@@ -32,12 +32,12 @@ export const siteRepository = {
       log.error(`siteRepository.getAll:${description}`);
     }
   },
-  async create(name: string, source: string, type: string) {
+  async create(name: string, source: string, type: string, enabled: boolean) {
     try {
       await sql `
         insert
-        into sites (name, source, type, lastUpdated)
-        values (${name}, ${source}, ${type}, current_timestamp)
+        into sites (name, source, type, enabled, lastUpdated)
+        values (${name}, ${source}, ${type}, ${enabled}, current_timestamp)
       `
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
@@ -45,9 +45,9 @@ export const siteRepository = {
     }
     return {};
   },
-  async update(id: number, name: string, source: string, type: string) {
+  async update(id: number, name: string, source: string, type: string, enabled: boolean) {
     try {
-      if (name) {
+      if (name !== void 0) {
         await sql `
           update sites
           set name = ${name},
@@ -55,7 +55,7 @@ export const siteRepository = {
           where id = ${id}
         `
       }
-      if (source) {
+      if (source !== void 0) {
         await sql `
           update sites
           set source = ${source},
@@ -63,10 +63,18 @@ export const siteRepository = {
           where id = ${id}
         `
       }
-      if (type) {
+      if (type !== void 0) {
         await sql `
           update sites
           set type = ${type},
+            lastUpdated = current_timestamp
+          where id = ${id}
+        `
+      }
+      if (enabled != null) {
+        await sql `
+          update sites
+          set enabled = ${enabled},
             lastUpdated = current_timestamp
           where id = ${id}
         `

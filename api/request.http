@@ -5,7 +5,7 @@ GET http://localhost:8089/api/v1/sites
 GET http://localhost:8089/api/v1/sites/1
 
 ### Get Site Links by ID
-GET http://localhost:8089/api/v1/sites/1/links
+GET http://localhost:8089/api/v1/sites/4/links
 
 ### Create Site (1)
 POST http://localhost:8089/api/v1/sites
@@ -14,7 +14,8 @@ Content-Type: application/json
 {
     "name": "NEDO公募情報①",
     "source": "https://www.nedo.go.jp/search/index.php?type=koubo",
-    "type": "html"
+    "type": "html",
+    "enabled": true
 }
 
 ### Create Site (2)
@@ -24,7 +25,8 @@ Content-Type: application/json
 {
     "name": "NEDO公募情報②",
     "source": "https://www.nedo.go.jp/search/index.php?type=koubo",
-    "type": "html"
+    "type": "html",
+    "enabled": true
 }
 
 ### Create Site (3)
@@ -34,7 +36,8 @@ Content-Type: application/json
 {
     "name": "NEDO公募情報③",
     "source": "https://www.nedo.go.jp/search/index.php?type=koubo",
-    "type": "html"
+    "type": "html",
+    "enabled": true
 }
 
 ### Update Site
@@ -44,7 +47,8 @@ Content-Type: application/json
 {
     "name": "NEDO:公募情報⑤",
     "source": "https://www.nedo.go.jp/search/index.php?type=koubo",
-    "type": "html"
+    "type": "html",
+    "enabled": true
 }
 
 ### Update Site (partial data)
@@ -55,8 +59,16 @@ Content-Type: application/json
     "name": "NEDO:公募情報④NEW"
 }
 
+### Update Site (disabled)
+PUT http://localhost:8089/api/v1/sites/1
+Content-Type: application/json
+
+{
+    "enabled": false
+}
+
 ### Update Site Links by ID
-PUT http://localhost:8089/api/v1/sites/1/links
+PUT http://localhost:8089/api/v1/sites/4/links
 
 ### Delete Site
 DELETE  http://localhost:8089/api/v1/sites/1

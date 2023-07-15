@@ -4,6 +4,7 @@ create table sites (
   name varchar(256) not null,
   source varchar(4096) not null,
   type varchar(32) not null,
+  enabled boolean not null,
   lastUpdated timestamp not null,
   primary key(id),
   unique(name)
@@ -15,6 +16,7 @@ create table resources (
   uri varchar(4096) not null,
   name varchar(256) not null,
   longName varchar(4096) not null,
+  enabled boolean not null,
   lastUpdated timestamp not null,
   primary key(site, uri)
 );
