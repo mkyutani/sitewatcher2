@@ -50,4 +50,8 @@ export const sitesController = {
     const { id } = helpers.getQuery(ctx, { mergeParams: true });
     ctx.response.body = await siteService.delete(id);
   },
+  async deleteResources(ctx:RouterContext<string>) {
+    const { id } = helpers.getQuery(ctx, { mergeParams: true });
+    ctx.response.body = await siteService.deleteResources(id);
+  },
 }

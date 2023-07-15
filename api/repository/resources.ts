@@ -6,7 +6,7 @@ export const resourceRepository = {
     try {
       const resource = await sql `
         select
-          site, uri, name, longName, enabled, lastUpdated
+          site, uri, name, longName, hash, status, mark, enabled, lastUpdated
         from resources
         where site = ${site}
           and uri = ${uri}
@@ -24,7 +24,7 @@ export const resourceRepository = {
     try {
       const resources = await sql `
       select
-        site, uri, name, longName, enabled, lastUpdated
+        site, uri, name, longName, hash, status, mark, enabled, lastUpdated
       from resources
       where site = ${site}
       `
@@ -37,36 +37,58 @@ export const resourceRepository = {
   async create(site: number, uri: string, name: string, longName: string, enabled: boolean) {
     return await this.update(site, uri, name, longName, enabled);
   },
-  async update(site: number, uri: string, name: string, longName: string, enabled: boolean) {
+  async markAllAsRemoving(site: number) {
     try {
       await sql `
+        update resources
+        set mark = 'NOTFOUND',
+          lastUpdated = current_timestamp
+        where site = ${site}
+      `
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      log.error(`resourceRepository.markAllAsRemoving:${description}`);
+    }
+    return {};
+  },
+  async completeMarkedAsRemoving(site: number) {
+    try {
+      await sql `
+        update resources
+        set status = 'REMOVED',
+          mark = '',
+          lastUpdated = current_timestamp
+        where site = ${site}
+          and mark = 'NOTFOUND'
+      `
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      log.error(`resourceRepository.completeMarkedAsRemoving:${description}`);
+    }
+    return {};
+  },
+  async update(site: number, uri: string, name: string, longName: string, enabled: boolean) {
+    try {
+      const resource = await sql `
         insert
-        into resources (site, uri, name, longName, enabled, lastUpdated)
-        values (${site}, ${uri}, ${name}, ${longName}, ${enabled}, current_timestamp)
+        into resources (site, uri, name, longName, hash, status, mark, enabled, lastUpdated)
+        values (${site}, ${uri}, ${name}, ${longName}, '', 'NEW', 'FOUND', ${enabled}, current_timestamp)
         on conflict (site, uri)
         do
           update
-          set name = ${name},
-            longName = ${longName},
+          set status = 'UPDATED',
+            mark = 'FOUND',
             lastUpdated = current_timestamp
+          where resources.site = ${site}
+            and resources.uri = ${uri}
+            and resources.mark = 'NOTFOUND'
+        returning *
       `
+      log.info(resource);
+      return resource;
     } catch (error) {
-      if (error instanceof sql.PostgresError) {
-        log.error(`resourceRepository.create:PG${error.code}:${error.message}`);
-        log.error(`
-        insert
-        into resources (site, uri, name, longName, lastUpdated)
-        values (${site}, ${uri}, ${name}, ${longName}, current_timestamp)
-        on conflict (site, uri)
-        do
-          update sites
-            set name = ${name},
-              longName = ${longName},
-              lastUpdated = current_timestamp
-            where site = ${site}
-              and uri = ${uri}
-      `)
-      }
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      log.error(`resourceRepository.update:${description}`);
     }
     return {};
   },
@@ -77,6 +99,19 @@ export const resourceRepository = {
         from resources
         where site = ${site}
           and uri = ${uri}
+      `
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      log.error(`resourceRepository.delete:${description}`);
+    }
+    return {};
+  },
+  async deleteAll(site: number) {
+    try {
+      await sql `
+        delete
+        from resources
+        where site = ${site}
       `
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 

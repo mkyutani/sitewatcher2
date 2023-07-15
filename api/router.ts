@@ -10,5 +10,6 @@ router.post('/api/v1/sites', sitesController.create);
 router.put('/api/v1/sites/:id', sitesController.update);
 router.put('/api/v1/sites/:id/resources', sitesController.updateResources);
 router.delete('/api/v1/sites/:id', sitesController.delete);
+router.delete('/api/v1/sites/:id/resources', sitesController.deleteResources);
 
 export { router }

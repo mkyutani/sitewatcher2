@@ -34,7 +34,8 @@ export const siteService = {
   },
   async updateResources(id: string) {
     const id_number = parseInt(id, 10);
-    return await siteRepository.get(id_number)
+    resourceRepository.markAllAsRemoving(id_number);
+    const linkInfos = await siteRepository.get(id_number)
       .then((site) => {
         if (site) {
           const sourceType = site["type"].toLowerCase();
@@ -44,16 +45,17 @@ export const siteService = {
           }
         }
         return [];
-      })
-      .then((linkInfos) => {
-        if (linkInfos.length > 0)
-        for (const linkInfo of linkInfos) {
-          resourceRepository.update(id_number, linkInfo.link, linkInfo.name, linkInfo.longName, true);
-        }
-        return {};
-      })
+      });
+    for (const linkInfo of linkInfos) {
+      resourceRepository.update(id_number, linkInfo.link, linkInfo.name, linkInfo.longName, true);
+    }
+    resourceRepository.completeMarkedAsRemoving(id_number);
+    return {};
   },
   async delete(id: string) {
     return await siteRepository.delete(parseInt(id, 10));
+  },
+  async deleteResources(id: string) {
+    return await resourceRepository.deleteAll(parseInt(id, 10));
   }
 }
