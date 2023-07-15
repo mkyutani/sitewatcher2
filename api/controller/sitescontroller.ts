@@ -12,9 +12,9 @@ export const sitesController = {
       ctx.response.status = 404;
     }
   },
-  async getLinks(ctx:RouterContext<string>) {
+  async getResources(ctx:RouterContext<string>) {
     const { id } = helpers.getQuery(ctx, { mergeParams: true });
-    ctx.response.body = await siteService.getLinks(id);
+    ctx.response.body = await siteService.getResources(id);
   },
   async create(ctx:RouterContext<string>) {
     if(!ctx.request.hasBody) {
@@ -42,9 +42,9 @@ export const sitesController = {
       ctx.response.status = 400;
     }
   },
-  async updateLinks(ctx:RouterContext<string>) {
+  async updateResources(ctx:RouterContext<string>) {
     const { id } = helpers.getQuery(ctx, { mergeParams: true });
-    ctx.response.body = await siteService.updateLinks(id);
+    ctx.response.body = await siteService.updateResources(id);
   },
   async delete(ctx:RouterContext<string>) {
     const { id } = helpers.getQuery(ctx, { mergeParams: true });

@@ -23,7 +23,7 @@ export const siteService = {
   async getAll() {
     return await siteRepository.getAll();
   },
-  async getLinks(id: string) {
+  async getResources(id: string) {
     return await resourceRepository.getAll(parseInt(id, 10));
   },
   async create({...reqBody}: createParam) {
@@ -32,7 +32,7 @@ export const siteService = {
   async update(id: string, {...reqBody}: updateParam) {
     return await siteRepository.update(parseInt(id, 10), reqBody.name, reqBody.source, reqBody.type, reqBody.enabled);
   },
-  async updateLinks(id: string) {
+  async updateResources(id: string) {
     const id_number = parseInt(id, 10);
     return await siteRepository.get(id_number)
       .then((site) => {

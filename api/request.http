@@ -4,8 +4,8 @@ GET http://localhost:8089/api/v1/sites
 ### Get Site by ID
 GET http://localhost:8089/api/v1/sites/1
 
-### Get Site Links by ID
-GET http://localhost:8089/api/v1/sites/4/links
+### Get Site Resources by ID
+GET http://localhost:8089/api/v1/sites/4/resources
 
 ### Create Site (1)
 POST http://localhost:8089/api/v1/sites
@@ -67,8 +67,8 @@ Content-Type: application/json
     "enabled": false
 }
 
-### Update Site Links by ID
-PUT http://localhost:8089/api/v1/sites/4/links
+### Update Site Resources by ID
+PUT http://localhost:8089/api/v1/sites/4/resources
 
 ### Delete Site
 DELETE  http://localhost:8089/api/v1/sites/1
