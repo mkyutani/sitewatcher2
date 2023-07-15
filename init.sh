@@ -4,9 +4,9 @@
 # command line arguments
 # if no arguments, target as "production"
 #
-targets=("production" "development" "createdb")
+targets=("production" "development" "createdb" "clean")
 if [ "$1" == "" -o "$1" == "--help" ]; then
-    echo "usage: init.sh {`echo ${targets[@]}|sed 's/ /|/g'`}" >>/dev/stderr
+    echo "usage: init.sh [--help] {`echo ${targets[@]}|sed 's/ /|/g'`}" >>/dev/stderr
     exit 1
 else
     ARG1_LOWER=`echo $1|tr A-Z a-z`
@@ -19,15 +19,32 @@ else
 fi
 
 #
-# environment parameters
+# environment variables
 #
 USER=$(id -un)
 GROUP=$(id -gn)
+ENV_FILE=.env
+VOLUMES=volumes
+
+#
+# clean
+#
+
+if [ "$TARGET" == "clean" ]; then
+    if [ -e ${ENV_FILE} ]; then
+        rm -f ${ENV_FILE}
+        echo ${ENV_FILE} removed.
+    fi
+    if [ -e ${VOLUMES} ]; then
+        rm -fr ${VOLUMES}
+        echo ${VOLUMES} removed.
+    fi
+    exit 1
+fi
 
 #
 # .env
 #
-ENV_FILE=.env
 echo -n "Preparing ${ENV_FILE} ..."
 
 CREATED=1
@@ -76,7 +93,6 @@ create_directory() {
     fi
 }
 
-VOLUMES=volumes
 echo -n "Creating site directories ..."
 CREATED=0
 create_directory "${VOLUMES}" 775 ${USER} ${GROUP}
