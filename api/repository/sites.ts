@@ -10,14 +10,15 @@ export const siteRepository = {
         from sites
         where id = ${id}
       `
-      if (site.length > 0) {
-        return site[0];
+      if (site.length == 0) {
+        return {};
       }
+      return site[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`siteRepository.get:${description}`);
+      log.error(`Failed to get site ${id}: ${description}`);
+      return null;
     }
-    return null;
   },
   async getAll() {
     try {
@@ -29,28 +30,37 @@ export const siteRepository = {
       return sites;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`siteRepository.getAll:${description}`);
+      log.error(`Failed to get all sites: ${description}`);
+      return null;
     }
   },
   async create(name: string, source: string, type: string, enabled: boolean) {
     try {
-      const site = await sql `
+      const resources = await sql `
         insert
         into sites (name, source, type, enabled, lastUpdated)
         values (${name}, ${source}, ${type}, ${enabled}, current_timestamp)
+        returning id
       `
-      log.info(site);
-      return site;
+      return resources[0];
     } catch (error) {
-      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`siteRepository.create:${description}`);
+      if (error instanceof sql.PostgresError) {
+        log.error(`Failed to create site ${source}: PG${error.code}:${error.message}`);
+        if (parseInt(error.code, 10) == 23505) {
+          return "Duplicated";
+        } else {
+          return null;
+        }
+      } else {
+        log.error(`Failed to create site ${source}: ${error.name}:${error.message}`)
+        return null;
+      }
     }
-    return {};
   },
   async update(id: number, name: string, source: string, type: string, enabled: boolean) {
     try {
       if (name !== void 0) {
-        await sql `
+        sql `
           update sites
           set name = ${name},
             lastUpdated = current_timestamp
@@ -81,14 +91,21 @@ export const siteRepository = {
           where id = ${id}
         `
       }
-      const site = siteRepository.get(id);
-      log.info(site);
-      return site;
+      const site = await sql `
+        select
+          id, name, source, type, enabled, lastUpdated
+        from sites
+        where id = ${id}
+      `
+      if (site.length == 0) {
+        return {};
+      }
+      return site[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`siteRepository.update:${description}`);
+      log.error(`Failed to update site ${id}: ${description}`);
+      return null;
     }
-    return {};
   },
   async delete(id: number) {
     try {
@@ -97,10 +114,11 @@ export const siteRepository = {
         from sites
         where id = ${id}
       `
+      return {};
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`siteRepository.delete:${description}`);
+      log.error(`Failed to delete site ${id}: ${description}`);
+      return null;
     }
-    return {};
   }
 }

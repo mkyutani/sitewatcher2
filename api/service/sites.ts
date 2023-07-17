@@ -1,3 +1,4 @@
+import { log } from "../deps.ts";
 import { resourceRepository } from "../repository/resources.ts";
 import { siteRepository } from "../repository/sites.ts";
 import { collectHtml } from "./htmlCollector.ts";
@@ -18,44 +19,87 @@ export type updateParam = {
 
 export const siteService = {
   async get(id: string) {
-    return await siteRepository.get(parseInt(id, 10));
+    const result = await siteRepository.get(parseInt(id, 10));
+    if (!result) {
+      return 500;
+    } else if (Object.keys(result).length == 0) {
+      return 404;
+    }
+    return result;
   },
   async getAll() {
-    return await siteRepository.getAll();
+    const result = await siteRepository.getAll();
+    if (!result) {
+      return 500;
+    }
+    return result;
   },
   async getResources(id: string) {
-    return await resourceRepository.getAll(parseInt(id, 10));
+    const result = await resourceRepository.getAll(parseInt(id, 10));
+    if (!result) {
+      return 500;
+    }
+    return result;
   },
   async create({...reqBody}: createParam) {
-    return await siteRepository.create(reqBody.name, reqBody.source, reqBody.type, reqBody.enabled);
+    const result = await siteRepository.create(reqBody.name, reqBody.source, reqBody.type, reqBody.enabled);
+    if (!result) {
+      return 500;
+    }
+    return result;
   },
   async update(id: string, {...reqBody}: updateParam) {
-    return await siteRepository.update(parseInt(id, 10), reqBody.name, reqBody.source, reqBody.type, reqBody.enabled);
+    const result = await siteRepository.update(parseInt(id, 10), reqBody.name, reqBody.source, reqBody.type, reqBody.enabled);
+    if (!result) {
+      return 500;
+    } else if (Object.keys(result).length == 0) {
+      return 404;
+    }
+    return result;
   },
   async updateResources(id: string) {
-    const id_number = parseInt(id, 10);
-    resourceRepository.markAllAsRemoving(id_number);
-    const linkInfos = await siteRepository.get(id_number)
-      .then((site) => {
-        if (site) {
-          const sourceType = site["type"].toLowerCase();
-          const source = site["source"]
-          if (sourceType == "html") {
-            return collectHtml(source);
-          }
-        }
-        return [];
-      });
-    for (const linkInfo of linkInfos) {
-      resourceRepository.update(id_number, linkInfo.link, linkInfo.name, linkInfo.longName, true);
+    const site = await siteService.get(id);
+    if (typeof site === "number") {
+      return site;
     }
-    resourceRepository.completeMarkedAsRemoving(id_number);
+    const sourceType = site["type"].toLowerCase();
+    const source = site["source"];
+    if (sourceType.indexOf("html") == -1) {
+      return 403;
+    }
+
+    const linkInfos =  await collectHtml(source);
+    const id_number = parseInt(id, 10);
+    const failures = [];
+    if (!resourceRepository.markAll(id_number, '')) {
+      failures.push("marking");
+    }
+    for (const linkInfo of linkInfos) {
+      if (!resourceRepository.update(id_number, linkInfo.link, linkInfo.name, linkInfo.longName, true, 'm')) {
+        failures.push(linkInfo.link);
+      }
+    }
+    if (!resourceRepository.removeAll(id_number, '')) {
+      failures.push("removing");
+    }
+    if (failures.length > 0) {
+      log.error(`Error occurred during update resources: ${failures}`);
+      return 500;
+    }
     return {};
   },
   async delete(id: string) {
-    return await siteRepository.delete(parseInt(id, 10));
+    const result = await siteRepository.delete(parseInt(id, 10));
+    if (!result) {
+      return 500;
+    }
+    return result;
   },
   async deleteResources(id: string) {
-    return await resourceRepository.deleteAll(parseInt(id, 10));
+    const result = await resourceRepository.deleteAll(parseInt(id, 10));
+    if (!result) {
+      return 500;
+    }
+    return result;
   }
 }

@@ -9,9 +9,9 @@ POST http://localhost:8089/api/v1/sites
 Content-Type: application/json
 
 {
-    "name": "NEDO公募情報①",
-    "source": "https://www.nedo.go.jp/search/index.php?type=koubo",
-    "type": "html",
+    "name": "厚生労働省：審議会・研究会等",
+    "source": "https://www.mhlw.go.jp/stf/shingi/indexshingi.html",
+    "type": "html:list",
     "enabled": true
 }
 
@@ -65,13 +65,13 @@ Content-Type: application/json
 }
 
 ### Delete Site
-DELETE  http://localhost:8089/api/v1/sites/1
+DELETE  http://localhost:8089/api/v1/sites/10
 
 ### Get Site Resources by ID
-GET http://localhost:8089/api/v1/sites/1/resources
+GET http://localhost:8089/api/v1/sites/11/resources
 
 ### Update Site Resources by ID
-PUT http://localhost:8089/api/v1/sites/1/resources
+PUT http://localhost:8089/api/v1/sites/11/resources
 
 ### Delete Site Resources by ID
-DELETE http://localhost:8089/api/v1/sites/1/resources
+DELETE http://localhost:8089/api/v1/sites/11/resources
