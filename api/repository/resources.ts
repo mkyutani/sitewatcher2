@@ -67,7 +67,6 @@ export const resourceRepository = {
       await sql `
         update resources
         set status = 'REMOVED',
-          mark = '',
           lastUpdated = current_timestamp
         where site = ${site}
           and mark = ${mark}

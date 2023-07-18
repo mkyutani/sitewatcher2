@@ -54,7 +54,7 @@ Content-Type: application/json
 }
 
 ### Delete Site
-DELETE  http://localhost:8089/api/v1/sites/2
+DELETE  http://localhost:8089/api/v1/sites/7
 
 ### Get Site Resources by ID
 GET http://localhost:8089/api/v1/sites/11/resources

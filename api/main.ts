@@ -18,7 +18,7 @@ await log.setup({
   }
 });
 
-const app = new Application();
+const app = new Application({ logErrors: false });
 
 app.addEventListener("listen", ({ hostname, port, secure }) => {
   log.info(
@@ -27,7 +27,7 @@ app.addEventListener("listen", ({ hostname, port, secure }) => {
 });
 
 app.addEventListener("error", (evt) => {
-  log.error(evt.error);
+  log.error(`${evt.error.name}: ${evt.error.message}`);
 });
 
 app.use(router.routes());

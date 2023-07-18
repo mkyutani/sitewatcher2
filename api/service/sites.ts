@@ -3,14 +3,14 @@ import { resourceRepository } from "../repository/resources.ts";
 import { siteRepository } from "../repository/sites.ts";
 import { collectHtml } from "./htmlCollector.ts";
 
-export type createParam = {
+export type siteCreateParam = {
   uri: string,
   name: string,
   type: string,
   enabled: boolean
 };
 
-export type updateParam = {
+export type siteUpdateParam = {
   uri: string,
   name: string,
   type: string,
@@ -19,88 +19,55 @@ export type updateParam = {
 
 export const siteService = {
   async get(id: string) {
-    const result = await siteRepository.get(parseInt(id, 10));
-    if (!result) {
-      return 500;
-    } else if (Object.keys(result).length == 0) {
-      return 404;
-    }
-    return result;
+    return await siteRepository.get(parseInt(id, 10));
   },
   async getAll() {
-    const result = await siteRepository.getAll();
-    if (!result) {
-      return 500;
-    }
-    return result;
+    return await siteRepository.getAll();
   },
   async getResources(id: string) {
-    const result = await resourceRepository.getAll(parseInt(id, 10));
-    if (!result) {
-      return 500;
-    }
-    return result;
+    return await resourceRepository.getAll(parseInt(id, 10));
   },
-  async create({...reqBody}: createParam) {
-    const result = await siteRepository.create(reqBody.uri, reqBody.name, reqBody.type, reqBody.enabled);
-    if (!result) {
-      return 500;
-    }
-    return result;
+  async create({...reqBody}: siteCreateParam) {
+    return await siteRepository.create(reqBody.uri, reqBody.name, reqBody.type, reqBody.enabled);
   },
-  async update(id: string, {...reqBody}: updateParam) {
-    log.debug(reqBody);
-    const result = await siteRepository.update(parseInt(id, 10), reqBody.uri, reqBody.name, reqBody.type, reqBody.enabled);
-    if (!result) {
-      return 500;
-    } else if (Object.keys(result).length == 0) {
-      return 404;
-    }
-    return result;
+  async update(id: string, {...reqBody}: siteUpdateParam) {
+    return await siteRepository.update(parseInt(id, 10), reqBody?.uri, reqBody?.name, reqBody?.type, reqBody?.enabled);
   },
   async updateResources(id: string) {
-    const site = await siteService.get(id);
-    if (typeof site === "number") {
-      return site;
-    }
-    const uriType = site["type"].toLowerCase();
-    const uri = site["uri"];
+    const result = await siteService.get(id);
+    if (!result) return null;
+    else if (Object.keys(result).length == 0) return -1;
+
+    const uriType = result.type.toLowerCase();
+    const uri = result.uri;
     if (uriType.indexOf("html") == -1) {
-      return 403;
+      return 0;
     }
 
     const linkInfos =  await collectHtml(uri);
     const id_number = parseInt(id, 10);
     const failures = [];
-    if (!resourceRepository.markAll(id_number, '')) {
+    if (!await resourceRepository.markAll(id_number, '-')) {
       failures.push("marking");
     }
     for (const linkInfo of linkInfos) {
-      if (!resourceRepository.update(id_number, linkInfo.link, linkInfo.name, linkInfo.longName, true, 'm')) {
+      if (!await resourceRepository.update(id_number, linkInfo.link, linkInfo.name, linkInfo.longName, true, 'm')) {
         failures.push(linkInfo.link);
       }
     }
-    if (!resourceRepository.removeAll(id_number, '')) {
+    if (!await resourceRepository.removeAll(id_number, '-')) {
       failures.push("removing");
     }
     if (failures.length > 0) {
       log.error(`Error occurred during update resources: ${failures}`);
-      return 500;
+      return null;
     }
-    return {};
+    return linkInfos.length;
   },
   async delete(id: string) {
-    const result = await siteRepository.delete(parseInt(id, 10));
-    if (!result) {
-      return 500;
-    }
-    return result;
+    return await siteRepository.delete(parseInt(id, 10));
   },
   async deleteResources(id: string) {
-    const result = await resourceRepository.deleteAll(parseInt(id, 10));
-    if (!result) {
-      return 500;
-    }
-    return result;
+    return await resourceRepository.deleteAll(parseInt(id, 10));
   }
 }
