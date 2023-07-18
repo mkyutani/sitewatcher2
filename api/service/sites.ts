@@ -4,15 +4,15 @@ import { siteRepository } from "../repository/sites.ts";
 import { collectHtml } from "./htmlCollector.ts";
 
 export type createParam = {
+  uri: string,
   name: string,
-  source: string,
   type: string,
   enabled: boolean
 };
 
 export type updateParam = {
+  uri: string,
   name: string,
-  source: string,
   type: string,
   enabled: boolean
 };
@@ -42,14 +42,15 @@ export const siteService = {
     return result;
   },
   async create({...reqBody}: createParam) {
-    const result = await siteRepository.create(reqBody.name, reqBody.source, reqBody.type, reqBody.enabled);
+    const result = await siteRepository.create(reqBody.uri, reqBody.name, reqBody.type, reqBody.enabled);
     if (!result) {
       return 500;
     }
     return result;
   },
   async update(id: string, {...reqBody}: updateParam) {
-    const result = await siteRepository.update(parseInt(id, 10), reqBody.name, reqBody.source, reqBody.type, reqBody.enabled);
+    log.debug(reqBody);
+    const result = await siteRepository.update(parseInt(id, 10), reqBody.uri, reqBody.name, reqBody.type, reqBody.enabled);
     if (!result) {
       return 500;
     } else if (Object.keys(result).length == 0) {
@@ -62,13 +63,13 @@ export const siteService = {
     if (typeof site === "number") {
       return site;
     }
-    const sourceType = site["type"].toLowerCase();
-    const source = site["source"];
-    if (sourceType.indexOf("html") == -1) {
+    const uriType = site["type"].toLowerCase();
+    const uri = site["uri"];
+    if (uriType.indexOf("html") == -1) {
       return 403;
     }
 
-    const linkInfos =  await collectHtml(source);
+    const linkInfos =  await collectHtml(uri);
     const id_number = parseInt(id, 10);
     const failures = [];
     if (!resourceRepository.markAll(id_number, '')) {

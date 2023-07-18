@@ -6,7 +6,7 @@ export const siteRepository = {
     try {
       const site = await sql `
         select
-          id, name, source, type, enabled, lastUpdated
+          id, uri, name, type, enabled, lastUpdated
         from sites
         where id = ${id}
       `
@@ -24,7 +24,7 @@ export const siteRepository = {
     try {
       const sites = await sql `
         select
-          id, name, source, type, enabled, lastUpdated
+          id, uri, name, type, enabled, lastUpdated
         from sites
       `
       return sites;
@@ -34,43 +34,43 @@ export const siteRepository = {
       return null;
     }
   },
-  async create(name: string, source: string, type: string, enabled: boolean) {
+  async create(uri: string, name: string, type: string, enabled: boolean) {
     try {
       const resources = await sql `
         insert
-        into sites (name, source, type, enabled, lastUpdated)
-        values (${name}, ${source}, ${type}, ${enabled}, current_timestamp)
+        into sites (uri, name, type, enabled, lastUpdated)
+        values (${uri}, ${name}, ${type}, ${enabled}, current_timestamp)
         returning id
       `
       return resources[0];
     } catch (error) {
       if (error instanceof sql.PostgresError) {
-        log.error(`Failed to create site ${source}: PG${error.code}:${error.message}`);
+        log.error(`Failed to create site ${uri}: PG${error.code}:${error.message}`);
         if (parseInt(error.code, 10) == 23505) {
           return "Duplicated";
         } else {
           return null;
         }
       } else {
-        log.error(`Failed to create site ${source}: ${error.name}:${error.message}`)
+        log.error(`Failed to create site ${uri}: ${error.name}:${error.message}`)
         return null;
       }
     }
   },
-  async update(id: number, name: string, source: string, type: string, enabled: boolean) {
+  async update(id: number, uri: string, name: string, type: string, enabled: boolean) {
     try {
-      if (name !== void 0) {
-        sql `
+      if (uri !== void 0) {
+        await sql `
           update sites
-          set name = ${name},
+          set uri = ${uri},
             lastUpdated = current_timestamp
           where id = ${id}
         `
       }
-      if (source !== void 0) {
+      if (name !== void 0) {
         await sql `
           update sites
-          set source = ${source},
+          set name = ${name},
             lastUpdated = current_timestamp
           where id = ${id}
         `
@@ -93,7 +93,7 @@ export const siteRepository = {
       }
       const site = await sql `
         select
-          id, name, source, type, enabled, lastUpdated
+          id, uri, name, type, enabled, lastUpdated
         from sites
         where id = ${id}
       `

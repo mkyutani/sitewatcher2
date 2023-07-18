@@ -38,8 +38,8 @@ export const sitesController = {
     const reqBodyRaw = await ctx.request.body({ type: 'json' });
     const reqBody = await reqBodyRaw.value;
     ctx.assert(reqBody, 400,  "No data");
+    ctx.assert(reqBody.uri, 400, "uri is missing");
     ctx.assert(reqBody.name, 400, "Name is missing");
-    ctx.assert(reqBody.source, 400, "Source is missing");
     ctx.assert(reqBody.type, 400, "Type is missing");
     ctx.assert(reqBody.enabled, 400, "Enabled is missing");
     const result = await siteService.create(reqBody as createParam);
