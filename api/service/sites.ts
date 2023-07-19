@@ -8,8 +8,8 @@ export const siteService = {
   async get(id: string) {
     return await siteRepository.get(parseInt(id, 10));
   },
-  async getAll() {
-    return await siteRepository.getAll();
+  async getAll(sort: string | null) {
+    return await siteRepository.getAll(sort);
   },
   async getResources(id: string) {
     return await resourceRepository.getAll(parseInt(id, 10));

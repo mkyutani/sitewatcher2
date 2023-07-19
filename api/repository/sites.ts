@@ -21,12 +21,20 @@ export const siteRepository = {
       return null;
     }
   },
-  async getAll() {
+  async getAll(sort: string | null) {
     try {
+      if (sort && ["id", "uri", "name"].indexOf(sort) == -1) {
+        return "Invalid sort key";
+      }
       const sites = await sql `
         select
           id, uri, name, type, enabled, lastUpdated
         from sites
+        ${sort === "uri" ?
+          sql`order by uri` :
+          sort === "name" ?
+            sql`order by name` :
+            sql`order by id`}
       `
       return sites;
     } catch (error) {

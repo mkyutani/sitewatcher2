@@ -1,12 +1,14 @@
-import { RouterContext, helpers, log } from "../deps.ts";
+import { RouterContext, helpers } from "../deps.ts";
 import { SiteParam } from "../model/sites.ts";
 import { siteService } from "../service/sites.ts";
 
 export const sitesController = {
   async getAll(ctx: RouterContext<string>) {
-    const sites = await siteService.getAll();
-    if (!sites) ctx.response.status = 500;
-    else ctx.response.body = sites;
+    const { sort } = helpers.getQuery(ctx, { mergeParams: true });
+    const result = await siteService.getAll(sort);
+    if (!result) ctx.response.status = 500;
+    else if (typeof result == "string") ctx.response.status = 400;
+    ctx.response.body = result;
   },
   async get(ctx:RouterContext<string>) {
     const { id } = helpers.getQuery(ctx, { mergeParams: true });
