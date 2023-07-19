@@ -59,47 +59,16 @@ export const siteRepository = {
   },
   async update(id: number, uri: string, name: string, type: string, enabled: boolean) {
     try {
-      if (uri !== void 0) {
-        await sql `
-          update sites
-          set uri = ${uri},
-            lastUpdated = current_timestamp
-          where id = ${id}
-        `
-      }
-      if (name !== void 0) {
-        await sql `
-          update sites
-          set name = ${name},
-            lastUpdated = current_timestamp
-          where id = ${id}
-        `
-      }
-      if (type !== void 0) {
-        await sql `
-          update sites
-          set type = ${type},
-            lastUpdated = current_timestamp
-          where id = ${id}
-        `
-      }
-      if (enabled != null) {
-        await sql `
-          update sites
-          set enabled = ${enabled},
-            lastUpdated = current_timestamp
-          where id = ${id}
-        `
-      }
       const site = await sql `
-        select
-          id, uri, name, type, enabled, lastUpdated
-        from sites
-        where id = ${id}
-      `
-      if (site.length == 0) {
-        return {};
-      }
+      update sites
+      set uri = ${uri ? uri : sql`uri`},
+        name = ${name ? name : sql`name`},
+        type = ${type ? type : sql`type`},
+        enabled = ${enabled ? enabled : sql`enabled`},
+        lastUpdated = current_timestamp
+      where id = ${id}
+      returning *
+    `
       return site[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
