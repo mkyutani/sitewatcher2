@@ -69,15 +69,18 @@ export const siteRepository = {
     const enabled = siteParam?.enabled;
     try {
       const site = await sql `
-      update sites
-      set uri = ${uri ? uri : sql`uri`},
-        name = ${name ? name : sql`name`},
-        type = ${type ? type : sql`type`},
-        enabled = ${enabled ? enabled : sql`enabled`},
-        lastUpdated = current_timestamp
-      where id = ${id}
-      returning *
-    `
+        update sites
+        set uri = ${uri ? uri : sql`uri`},
+          name = ${name ? name : sql`name`},
+          type = ${type ? type : sql`type`},
+          enabled = ${(enabled !== void 0) ? enabled : sql`enabled`},
+          lastUpdated = current_timestamp
+        where id = ${id}
+        returning *
+      `
+      if (site.length == 0) {
+        return {};
+      }
       return site[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 

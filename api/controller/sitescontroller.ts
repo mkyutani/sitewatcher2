@@ -1,4 +1,4 @@
-import { RouterContext, helpers } from "../deps.ts";
+import { RouterContext, helpers, log } from "../deps.ts";
 import { SiteParam } from "../model/sites.ts";
 import { siteService } from "../service/sites.ts";
 
@@ -22,7 +22,8 @@ export const sitesController = {
     else ctx.response.body = resources;
   },
   async create(ctx:RouterContext<string>) {
-    const reqBodyRaw = await ctx.request.body({ type: 'json' });
+    const reqBodyRaw = await ctx.request.body();
+    ctx.assert(reqBodyRaw.type === "json", 415, "Media mismatch");
     const reqBody = await reqBodyRaw.value;
     ctx.assert(reqBody, 400, "No data");
     ctx.assert(reqBody.uri, 400, "Uri is missing");
@@ -38,7 +39,8 @@ export const sitesController = {
   },
   async update(ctx:RouterContext<string>) {
     const { id } = helpers.getQuery(ctx, { mergeParams: true });
-    const reqBodyRaw = await ctx.request.body({ type: 'json' });
+    const reqBodyRaw = await ctx.request.body();
+    ctx.assert(reqBodyRaw.type === "json", 415, "Media mismatch");
     const reqBody = await reqBodyRaw.value;
     ctx.assert(reqBody, 400, "No data");
     const site = await siteService.update(id, reqBody as SiteParam);

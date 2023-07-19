@@ -26,6 +26,12 @@ Content-Type: application/json
     "enabled": true
 }
 
+### Create Site (0)
+POST http://localhost:8089/api/v1/sites
+Content-Type: text/plain
+
+plain text
+
 ### Update Site
 PUT http://localhost:8089/api/v1/sites/5
 Content-Type: application/json
@@ -38,7 +44,7 @@ Content-Type: application/json
 }
 
 ### Update Site (partial data)
-PUT http://localhost:8089/api/v1/sites/5
+PUT http://localhost:8089/api/v1/sites/1
 Content-Type: application/json
 
 {
@@ -52,6 +58,18 @@ Content-Type: application/json
 {
     "enabled": false
 }
+
+### Update Site (no content)
+PUT http://localhost:8089/api/v1/sites/1
+Content-Type: application/json
+
+{}
+
+### Update Site (plain text)
+PUT http://localhost:8089/api/v1/sites/1
+Content-Type: text/plain
+
+plain text
 
 ### Delete Site
 DELETE  http://localhost:8089/api/v1/sites/7
