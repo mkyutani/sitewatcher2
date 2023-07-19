@@ -1,5 +1,6 @@
 import sql from "./db.ts"
 import { log } from "../deps.ts";
+import { SiteParam } from "../model/sites.ts";
 
 export const siteRepository = {
   async get(id: number) {
@@ -34,7 +35,11 @@ export const siteRepository = {
       return null;
     }
   },
-  async create(uri: string, name: string, type: string, enabled: boolean) {
+  async create(siteParam: SiteParam) {
+    const uri = siteParam?.uri;
+    const name = siteParam?.name;
+    const type = siteParam?.type;
+    const enabled = siteParam?.enabled;
     try {
       const resources = await sql `
         insert
@@ -57,7 +62,11 @@ export const siteRepository = {
       }
     }
   },
-  async update(id: number, uri: string, name: string, type: string, enabled: boolean) {
+  async update(id: number, siteParam: SiteParam) {
+    const uri = siteParam?.uri;
+    const name = siteParam?.name;
+    const type = siteParam?.type;
+    const enabled = siteParam?.enabled;
     try {
       const site = await sql `
       update sites

@@ -1,21 +1,8 @@
 import { log } from "../deps.ts";
+import { SiteParam } from "../model/sites.ts";
 import { resourceRepository } from "../repository/resources.ts";
 import { siteRepository } from "../repository/sites.ts";
 import { collectHtml } from "./htmlCollector.ts";
-
-export type siteCreateParam = {
-  uri: string,
-  name: string,
-  type: string,
-  enabled: boolean
-};
-
-export type siteUpdateParam = {
-  uri: string,
-  name: string,
-  type: string,
-  enabled: boolean
-};
 
 export const siteService = {
   async get(id: string) {
@@ -27,11 +14,11 @@ export const siteService = {
   async getResources(id: string) {
     return await resourceRepository.getAll(parseInt(id, 10));
   },
-  async create({...reqBody}: siteCreateParam) {
-    return await siteRepository.create(reqBody.uri, reqBody.name, reqBody.type, reqBody.enabled);
+  async create({...reqBody}: SiteParam) {
+    return await siteRepository.create(reqBody as SiteParam);
   },
-  async update(id: string, {...reqBody}: siteUpdateParam) {
-    return await siteRepository.update(parseInt(id, 10), reqBody?.uri, reqBody?.name, reqBody?.type, reqBody?.enabled);
+  async update(id: string, {...reqBody}: SiteParam) {
+    return await siteRepository.update(parseInt(id, 10), reqBody as SiteParam);
   },
   async updateResources(id: string) {
     const result = await siteService.get(id);

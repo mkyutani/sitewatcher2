@@ -1,5 +1,6 @@
 import { RouterContext, helpers } from "../deps.ts";
-import { siteService, siteCreateParam, siteUpdateParam } from "../service/sites.ts";
+import { SiteParam } from "../model/sites.ts";
+import { siteService } from "../service/sites.ts";
 
 export const sitesController = {
   async getAll(ctx: RouterContext<string>) {
@@ -28,7 +29,7 @@ export const sitesController = {
     ctx.assert(reqBody.name, 400, "Name is missing");
     ctx.assert(reqBody.type, 400, "Type is missing");
     ctx.assert(reqBody.enabled, 400, "Enabled is missing");
-    const result = await siteService.create(reqBody as siteCreateParam);
+    const result = await siteService.create(reqBody as SiteParam);
     if (!result) ctx.response.status = 500;
     else {
       if (typeof result == "string") ctx.response.status = 400;
@@ -40,7 +41,7 @@ export const sitesController = {
     const reqBodyRaw = await ctx.request.body({ type: 'json' });
     const reqBody = await reqBodyRaw.value;
     ctx.assert(reqBody, 400, "No data");
-    const site = await siteService.update(id, reqBody as siteUpdateParam);
+    const site = await siteService.update(id, reqBody as SiteParam);
     if (!site) ctx.response.status = 500;
     else if (Object.keys(site).length == 0) ctx.response.status = 404;
     else ctx.response.body = site;
