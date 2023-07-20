@@ -21,7 +21,7 @@ export const siteRepository = {
       return null;
     }
   },
-  async getAll(name: string | null, sort: string | null) {
+  async getAll(name: string | null, strict_flag: boolean | null, sort: string | null) {
     try {
       if (sort && ["id", "uri", "name"].indexOf(sort) == -1) {
         return "Invalid sort key";
@@ -30,8 +30,8 @@ export const siteRepository = {
         select
           id, uri, name, type, enabled, lastUpdated
         from sites
-        ${(name && name.length > 0)?
-          sql`where name ilike ${`%${name}%`}` :
+        ${(name && name.length > 0) ?
+          (strict_flag ? sql`where name = ${name}` : sql`where name ilike ${`%${name}%`}`) :
           sql``}
         ${sort === "uri" ?
           sql`order by uri` :

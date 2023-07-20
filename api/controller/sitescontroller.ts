@@ -4,8 +4,11 @@ import { siteService } from "../service/sites.ts";
 
 export const sitesController = {
   async getAll(ctx: RouterContext<string>) {
-    const { name, sort } = helpers.getQuery(ctx, { mergeParams: true });
-    const result = await siteService.getAll(name, sort);
+    const { name, strict, sort } = helpers.getQuery(ctx, { mergeParams: true });
+    const strict_lower = (strict !== void 0) ? strict.toLowerCase() : "false";
+    const strict_flag = (strict_lower === "true") ? true : ((strict_lower === "false") ? false : null);
+    ctx.assert(strict_flag != null, 400, "Invalid strict value"); 
+    const result = await siteService.getAll(name, strict_flag, sort);
     if (!result) ctx.response.status = 500;
     else if (typeof result == "string") ctx.response.status = 400;
     ctx.response.body = result;
