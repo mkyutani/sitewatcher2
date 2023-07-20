@@ -31,7 +31,7 @@ export const siteRepository = {
           id, uri, name, type, enabled, lastUpdated
         from sites
         ${(name && name.length > 0)?
-          sql`where name like ${`%${name}%`}` :
+          sql`where name ilike ${`%${name}%`}` :
           sql``}
         ${sort === "uri" ?
           sql`order by uri` :
