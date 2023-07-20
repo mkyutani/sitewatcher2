@@ -4,8 +4,8 @@ import { siteService } from "../service/sites.ts";
 
 export const sitesController = {
   async getAll(ctx: RouterContext<string>) {
-    const { sort } = helpers.getQuery(ctx, { mergeParams: true });
-    const result = await siteService.getAll(sort);
+    const { name, sort } = helpers.getQuery(ctx, { mergeParams: true });
+    const result = await siteService.getAll(name, sort);
     if (!result) ctx.response.status = 500;
     else if (typeof result == "string") ctx.response.status = 400;
     ctx.response.body = result;
