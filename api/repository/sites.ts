@@ -7,7 +7,7 @@ export const siteRepository = {
     try {
       const site = await sql `
         select
-          id, uri, name, type, enabled, lastUpdated
+          id, uri, name, type, enabled, created, updated
         from sites
         where id = ${id}
       `
@@ -28,7 +28,7 @@ export const siteRepository = {
       }
       const sites = await sql `
         select
-          id, uri, name, type, enabled, lastUpdated
+          id, uri, name, type, enabled, created, updated
         from sites
         ${(name && name.length > 0) ?
           (strict_flag ? sql`where name = ${name}` : sql`where name ilike ${`%${name}%`}`) :
@@ -54,8 +54,8 @@ export const siteRepository = {
     try {
       const resources = await sql `
         insert
-        into sites (uri, name, type, enabled, lastUpdated)
-        values (${uri}, ${name}, ${type}, ${enabled}, current_timestamp)
+        into sites (uri, name, type, enabled, created, updated)
+        values (${uri}, ${name}, ${type}, ${enabled}, current_timestamp, current_timestamp)
         returning id
       `
       return resources[0];
@@ -85,7 +85,7 @@ export const siteRepository = {
           name = ${name ? name : sql`name`},
           type = ${type ? type : sql`type`},
           enabled = ${(enabled !== void 0) ? enabled : sql`enabled`},
-          lastUpdated = current_timestamp
+          updated = current_timestamp
         where id = ${id}
         returning *
       `

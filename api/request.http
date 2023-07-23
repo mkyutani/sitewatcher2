@@ -20,8 +20,8 @@ POST http://localhost:8089/api/v1/sites
 Content-Type: application/json
 
 {
-    "uri": "https://www.nedo.go.jp/search/index.php?type=koubo",
-    "name": "NEDO公募情報②",
+    "uri": "https://www.meti.go.jp/shingikai/index_report.html",
+    "name": "経済産業省：報告書",
     "type": "html",
     "enabled": true
 }
@@ -33,22 +33,11 @@ Content-Type: text/plain
 plain text
 
 ### Update Site
-PUT http://localhost:8089/api/v1/sites/5
+PUT http://localhost:8089/api/v1/sites/2
 Content-Type: application/json
 
 {
-    "uri": "https://www.nedo.go.jp/search/index.php?type=koubo",
-    "name": "NEDO:公募情報②Rev1",
-    "type": "html",
-    "enabled": true
-}
-
-### Update Site (partial data)
-PUT http://localhost:8089/api/v1/sites/1
-Content-Type: application/json
-
-{
-    "name": "NEDO:公募情報②Rev2"
+    "name": "経済産業省：報告書Rev2"
 }
 
 ### Update Site (disabled)
@@ -72,13 +61,13 @@ Content-Type: text/plain
 plain text
 
 ### Delete Site
-DELETE  http://localhost:8089/api/v1/sites/7
+DELETE  http://localhost:8089/api/v1/sites/2
 
 ### Get Site Resources by ID
-GET http://localhost:8089/api/v1/sites/11/resources
+GET http://localhost:8089/api/v1/sites/2/resources
 
 ### Update Site Resources by ID
-PUT http://localhost:8089/api/v1/sites/11/resources
+PUT http://localhost:8089/api/v1/sites/2/resources
 
 ### Delete Site Resources by ID
-DELETE http://localhost:8089/api/v1/sites/11/resources
+DELETE http://localhost:8089/api/v1/sites/2/resources

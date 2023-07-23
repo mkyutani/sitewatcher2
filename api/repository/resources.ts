@@ -6,7 +6,7 @@ export const resourceRepository = {
     try {
       const resources = await sql `
         select
-          site, uri, name, longName, hash, status, mark, enabled, lastUpdated
+          site, uri, name, longName, hash, status, mark, enabled, created, updated
         from resources
         where site = ${site}
       `
@@ -21,14 +21,14 @@ export const resourceRepository = {
     try {
       const resources = await sql `
         insert
-        into resources (site, uri, name, longName, hash, status, mark, enabled, lastUpdated)
-        values (${site}, ${uri}, ${name}, ${longName}, '', 'NEW', ${mark}, ${enabled}, current_timestamp)
+        into resources (site, uri, name, longName, hash, status, mark, enabled, created, updated)
+        values (${site}, ${uri}, ${name}, ${longName}, '', 'NEW', ${mark}, ${enabled}, current_timestamp, current_timestamp)
         on conflict (site, uri)
         do
           update
           set status = 'UPDATED',
             mark = ${mark},
-            lastUpdated = current_timestamp
+            updated = current_timestamp
           where resources.site = ${site}
             and resources.uri = ${uri}
             and resources.mark <> ${mark}
@@ -52,7 +52,7 @@ export const resourceRepository = {
       await sql `
         update resources
         set mark = ${mark},
-          lastUpdated = current_timestamp
+          updated = current_timestamp
         where site = ${site}
       `
       return {};
@@ -67,7 +67,7 @@ export const resourceRepository = {
       await sql `
         update resources
         set status = 'REMOVED',
-          lastUpdated = current_timestamp
+          updated = current_timestamp
         where site = ${site}
           and mark = ${mark}
       `
