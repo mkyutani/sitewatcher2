@@ -17,11 +17,6 @@ create table resources (
   uri varchar(4096) not null,
   name varchar(256) not null,
   longName varchar(4096) not null,
-  hash varchar(64) not null,
-  status varchar(8) not null,
-  mark varchar(8) not null,
-  enabled boolean not null,
   created timestamp not null,
-  updated timestamp not null,
   primary key(site, uri)
 );

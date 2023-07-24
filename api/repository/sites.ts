@@ -5,16 +5,16 @@ import { SiteParam } from "../model/sites.ts";
 export const siteRepository = {
   async get(id: number) {
     try {
-      const site = await sql `
+      const sites = await sql `
         select
           id, uri, name, type, enabled, created, updated
         from sites
         where id = ${id}
       `
-      if (site.length == 0) {
+      if (sites.length == 0) {
         return {};
       }
-      return site[0];
+      return sites[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       log.error(`Failed to get site ${id}: ${description}`);
@@ -79,7 +79,7 @@ export const siteRepository = {
     const type = siteParam?.type;
     const enabled = siteParam?.enabled;
     try {
-      const site = await sql `
+      const sites = await sql `
         update sites
         set uri = ${uri ? uri : sql`uri`},
           name = ${name ? name : sql`name`},
@@ -89,10 +89,10 @@ export const siteRepository = {
         where id = ${id}
         returning *
       `
-      if (site.length == 0) {
+      if (sites.length == 0) {
         return {};
       }
-      return site[0];
+      return sites[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       log.error(`Failed to update site ${id}: ${description}`);

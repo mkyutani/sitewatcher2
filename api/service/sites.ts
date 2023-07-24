@@ -23,33 +23,23 @@ export const siteService = {
   async updateResources(id: string) {
     const result = await siteService.get(id);
     if (!result) return null;
-    else if (Object.keys(result).length == 0) return -1;
+    else if (Object.keys(result).length == 0) return 404;
 
     const uriType = result.type.toLowerCase();
     const uri = result.uri;
     if (uriType.indexOf("html") == -1) {
-      return 0;
+      return 415;
     }
 
-    const linkInfos =  await collectHtml(uri);
+    const resources =  await collectHtml(uri);
     const id_number = parseInt(id, 10);
-    const failures = [];
-    if (!await resourceRepository.markAll(id_number, '-')) {
-      failures.push("marking");
-    }
-    for (const linkInfo of linkInfos) {
-      if (!await resourceRepository.update(id_number, linkInfo.link, linkInfo.name, linkInfo.longName, true, 'm')) {
-        failures.push(linkInfo.link);
-      }
-    }
-    if (!await resourceRepository.removeAll(id_number, '-')) {
-      failures.push("removing");
-    }
-    if (failures.length > 0) {
-      log.error(`Error occurred during update resources: ${failures}`);
+    const transaction = await resourceRepository.createAll(id_number, resources);
+    if (!transaction) {
+      log.error(`Error occurred during update resources`);
       return null;
     }
-    return linkInfos.length;
+    log.info(transaction);
+    return transaction;
   },
   async delete(id: string) {
     return await siteRepository.delete(parseInt(id, 10));

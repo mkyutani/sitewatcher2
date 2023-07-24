@@ -57,7 +57,7 @@ export const sitesController = {
     const { id } = helpers.getQuery(ctx, { mergeParams: true });
     const result = await siteService.updateResources(id);
     if (!result) ctx.response.status = 500;
-    else if (result == -1) ctx.response.status = 404;
+    else if (typeof result === "number") ctx.response.status = result;
     else ctx.response.body = result;
   },
   async delete(ctx:RouterContext<string>) {

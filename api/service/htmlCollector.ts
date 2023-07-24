@@ -8,9 +8,9 @@
   urlJoin,
   urlParse,
 } from "../deps.ts";
-import { LinkInfo } from "./linkInfo.ts";
+import { ResourceParam } from "../model/resources.ts";
 
-export async function collectHtml(source: string): Promise<LinkInfo[]> {
+export async function collectHtml(source: string): Promise<ResourceParam[]> {
   const sourceUrlBase = urlParse(source);
   const sourceUrlDir = source.endsWith("/")
     ? sourceUrlBase.pathname
@@ -52,7 +52,7 @@ export async function collectHtml(source: string): Promise<LinkInfo[]> {
       throw new Error("Failed to parse document");
     }
 
-    const linkInfos: LinkInfo[] = [];
+    const resources: ResourceParam[] = [];
 
     Array.from(document.querySelectorAll("body a"))
       .filter((n: Node): n is Element => n instanceof Element)
@@ -65,29 +65,29 @@ export async function collectHtml(source: string): Promise<LinkInfo[]> {
           ) {
             const name = e.textContent.trim();
             const href = a.value.trim().replace(/[\n\r]/g, "");
-            let link: string;
+            let uri: string;
             if (href.match(/^[^:]*:/)) {
-              link = href;
+              uri = href;
             } else if (href.match(/^\/\//)) {
-              link = sourceUrlBase.protocol + href;
+              uri = sourceUrlBase.protocol + href;
             } else if (href.match(/^\//)) {
-              link = urlJoin(sourceUrlBase.origin, href);
+              uri = urlJoin(sourceUrlBase.origin, href);
             } else {
-              link = urlJoin(sourceUrlBase.origin, sourceUrlDir, href);
+              uri = urlJoin(sourceUrlBase.origin, sourceUrlDir, href);
             }
-            if (link.startsWith(sourceUrlBase.origin)) {
-              linkInfos.push({
+            if (uri.startsWith(sourceUrlBase.origin)) {
+              resources.push({
                 name: name,
                 longName: name,
-                link: link
+                uri: uri
               })
             }
           }
         }
       });
 
-    log.info(`collectHtml:${linkInfos.length} links found in ${source}`);
-    return linkInfos;
+    log.info(`collectHtml:${resources.length} links found in ${source}`);
+    return resources;
   } catch (reason) {
     log.error(`collectHtml:${reason.message}`);
     return reason;
