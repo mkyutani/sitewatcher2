@@ -1,4 +1,3 @@
-import { log } from "../deps.ts";
 import { SiteParam } from "../model/sites.ts";
 import { resourceRepository } from "../repository/resources.ts";
 import { siteRepository } from "../repository/sites.ts";
@@ -23,23 +22,24 @@ export const siteService = {
   async updateResources(id: string) {
     const result = await siteService.get(id);
     if (!result) return null;
-    else if (Object.keys(result).length == 0) return 404;
+    else if (Object.keys(result).length == 0) return { "count": 0 };
 
     const uriType = result.type.toLowerCase();
     const uri = result.uri;
     if (uriType.indexOf("html") == -1) {
-      return 415;
+      return { "count": 0 };
     }
 
     const resources =  await collectHtml(uri);
-    const id_number = parseInt(id, 10);
-    const transaction = await resourceRepository.createAll(id_number, resources);
-    if (!transaction) {
-      log.error(`Error occurred during update resources`);
-      return null;
+    if (!resources) {
+      return { "count": 0 };
     }
-    log.info(transaction);
-    return transaction;
+
+    const count = await resourceRepository.createAll(parseInt(id, 10), resources);
+    if (!count) return null;
+    else {
+      return { "count": parseInt(count.count, 10) };
+    }
   },
   async delete(id: string) {
     return await siteRepository.delete(parseInt(id, 10));

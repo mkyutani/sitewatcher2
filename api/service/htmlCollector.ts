@@ -10,7 +10,7 @@
 } from "../deps.ts";
 import { ResourceParam } from "../model/resources.ts";
 
-export async function collectHtml(source: string): Promise<ResourceParam[]> {
+export async function collectHtml(source: string): Promise<ResourceParam[] | null> {
   const sourceUrlBase = urlParse(source);
   const sourceUrlDir = source.endsWith("/")
     ? sourceUrlBase.pathname
@@ -19,7 +19,7 @@ export async function collectHtml(source: string): Promise<ResourceParam[]> {
   try {
     const res = await fetch(source);
     if (res.status >= 400) {
-      throw new Error(`Failed to fetch: ${res.status}`);
+      throw new Error(`Response ${res.status}`);
     }
 
     const content_type = res.headers.get("Content-type");
@@ -49,7 +49,7 @@ export async function collectHtml(source: string): Promise<ResourceParam[]> {
       "text/html",
     );
     if (!document) {
-      throw new Error("Failed to parse document");
+      throw new Error("Unknown parse error");
     }
 
     const resources: ResourceParam[] = [];
@@ -89,7 +89,7 @@ export async function collectHtml(source: string): Promise<ResourceParam[]> {
     log.info(`collectHtml:${resources.length} links found in ${source}`);
     return resources;
   } catch (reason) {
-    log.error(`collectHtml:${reason.message}`);
-    return reason;
+    log.error(`Collect HTML: ${reason.message}`);
+    return null;
   }
 }

@@ -64,10 +64,10 @@ plain text
 DELETE  http://localhost:8089/api/v1/sites/2
 
 ### Get Site Resources by ID
-GET http://localhost:8089/api/v1/sites/2/resources
+GET http://localhost:8089/api/v1/sites/15/resources
 
 ### Update Site Resources by ID
-PUT http://localhost:8089/api/v1/sites/2/resources
+PUT http://localhost:8089/api/v1/sites/15/resources
 
 ### Delete Site Resources by ID
-DELETE http://localhost:8089/api/v1/sites/2/resources
+DELETE http://localhost:8089/api/v1/sites/15/resources
