@@ -17,7 +17,7 @@ export const siteRepository = {
       return sites[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`Failed to get site ${id}: ${description}`);
+      log.error(`Site${id}:${description}`);
       return null;
     }
   },
@@ -42,7 +42,7 @@ export const siteRepository = {
       return sites;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`Failed to get all sites: ${description}`);
+      log.error(`Site:${description}`);
       return null;
     }
   },
@@ -60,15 +60,10 @@ export const siteRepository = {
       `
       return resources[0];
     } catch (error) {
-      if (error instanceof sql.PostgresError) {
-        log.error(`Failed to create site ${uri}: PG${error.code}:${error.message}`);
-        if (parseInt(error.code, 10) == 23505) {
+      if (error instanceof sql.PostgresError && parseInt(error.code, 10) == 23505) {
           return "Duplicated";
-        } else {
-          return null;
-        }
       } else {
-        log.error(`Failed to create site ${uri}: ${error.name}:${error.message}`)
+        log.error(`Site:PG${error.code}:${error.message}:${uri}`);
         return null;
       }
     }
@@ -95,21 +90,25 @@ export const siteRepository = {
       return sites[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`Failed to update site ${id}: ${description}`);
+      log.error(`Site${id}:${description}`);
       return null;
     }
   },
   async delete(id: number) {
     try {
-      await sql `
+      const sites = await sql `
         delete
         from sites
         where id = ${id}
+        returning id
       `
-      return {};
+      if (sites.length == 0) {
+        return {};
+      }
+      return sites[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`Failed to delete site ${id}: ${description}`);
+      log.error(`Site${id}:${description}`);
       return null;
     }
   }
