@@ -1,3 +1,7 @@
+################
+# Sites
+################
+
 ### Get all Sites
 GET http://localhost:8089/api/v1/sites
 
@@ -63,6 +67,10 @@ plain text
 ### Delete Site
 DELETE  http://localhost:8089/api/v1/sites/de876013-33df-47bb-ae2c-154faaf63d80
 
+################
+# Resources
+################
+
 ### Get Site Resources by ID
 GET http://localhost:8089/api/v1/sites/de876013-33df-47bb-ae2c-154faaf63d80/resources
 
@@ -71,3 +79,60 @@ PUT http://localhost:8089/api/v1/sites/de876013-33df-47bb-ae2c-154faaf63d80/reso
 
 ### Delete Site Resources by ID
 DELETE http://localhost:8089/api/v1/sites/de876013-33df-47bb-ae2c-154faaf63d80/resources
+
+################
+# Channels
+################
+
+### Get all Channels
+GET http://localhost:8089/api/v1/channels
+
+### Get Channel by ID
+GET http://localhost:8089/api/v1/channels/b3282836-d52c-452e-837f-cb842d09f5a3
+
+### Create Channel (1)
+POST http://localhost:8089/api/v1/channels
+Content-Type: application/json
+
+{
+    "name": "厚生労働省チャネル",
+    "enabled": true
+}
+
+### Create Channel (0)
+POST http://localhost:8089/api/v1/channels
+Content-Type: text/plain
+
+plain text
+
+### Update Channel
+PUT http://localhost:8089/api/v1/channels/b3282836-d52c-452e-837f-cb842d09f5a3
+Content-Type: application/json
+
+{
+    "name": "厚生労働省チャネルRev2"
+}
+
+### Update Channel (disabled)
+PUT http://localhost:8089/api/v1/channels/b3282836-d52c-452e-837f-cb842d09f5a3
+Content-Type: application/json
+
+{
+    "enabled": true
+}
+
+### Update Channel (no content)
+PUT http://localhost:8089/api/v1/channels/b3282836-d52c-452e-837f-cb842d09f5a3
+Content-Type: application/json
+
+{}
+
+### Update Channel (plain text)
+PUT http://localhost:8089/api/v1/channels/b3282836-d52c-452e-837f-cb842d09f5a3
+Content-Type: text/plain
+
+plain text
+
+### Delete Channel
+DELETE  http://localhost:8089/api/v1/channels/b3282836-d52c-452e-837f-cb842d09f5a3
+

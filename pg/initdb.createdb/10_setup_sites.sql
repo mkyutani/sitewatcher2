@@ -25,6 +25,7 @@ drop table if exists channels;
 create table channels (
   id uuid default gen_random_uuid() not null,
   name varchar(256) not null,
+  enabled boolean not null,
   created timestamp not null,
   updated timestamp not null,
   referred timestamp not null,
