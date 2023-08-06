@@ -5,19 +5,19 @@ import { collectHtml } from "./htmlCollector.ts";
 
 export const siteService = {
   async get(id: string) {
-    return await siteRepository.get(parseInt(id, 10));
+    return await siteRepository.get(id);
   },
   async getAll(name: string | null, strict_flag: boolean | null, sort: string | null) {
     return await siteRepository.getAll(name, strict_flag, sort);
   },
   async getResources(id: string) {
-    return await resourceRepository.getAll(parseInt(id, 10));
+    return await resourceRepository.getAll(id);
   },
   async create({...reqBody}: SiteParam) {
     return await siteRepository.create(reqBody as SiteParam);
   },
   async update(id: string, {...reqBody}: SiteParam) {
-    return await siteRepository.update(parseInt(id, 10), reqBody as SiteParam);
+    return await siteRepository.update(id, reqBody as SiteParam);
   },
   async updateResources(id: string) {
     const result = await siteService.get(id);
@@ -35,16 +35,16 @@ export const siteService = {
       return { "count": 0 };
     }
 
-    const count = await resourceRepository.createAll(parseInt(id, 10), resources);
+    const count = await resourceRepository.createAll(id, resources);
     if (!count) return null;
     else {
       return { "count": parseInt(count.count, 10) };
     }
   },
   async delete(id: string) {
-    return await siteRepository.delete(parseInt(id, 10));
+    return await siteRepository.delete(id);
   },
   async deleteResources(id: string) {
-    return await resourceRepository.deleteAll(parseInt(id, 10));
+    return await resourceRepository.deleteAll(id);
   }
 }

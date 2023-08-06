@@ -3,7 +3,7 @@ import { log } from "../deps.ts";
 import { ResourceParam } from "../model/resources.ts";
 
 export const resourceRepository = {
-  async getAll(site: number) {
+  async getAll(site: string) {
     try {
       const resources = await sql `
         select
@@ -18,7 +18,7 @@ export const resourceRepository = {
       return null;
     }
   },
-  async createAll(site: number, resourceParams : ResourceParam[]) {
+  async createAll(site: string, resourceParams : ResourceParam[]) {
     try {
       const options = "transaction isolation level serializable"
       const result = await sql.begin(options, async sql => {
@@ -51,7 +51,7 @@ export const resourceRepository = {
       return null;
     }
   },
-  async deleteAll(site: number) {
+  async deleteAll(site: string) {
     try {
       await sql `
         delete

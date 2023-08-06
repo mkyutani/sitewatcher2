@@ -2,16 +2,16 @@
 GET http://localhost:8089/api/v1/sites
 
 ### Get Site by ID
-GET http://localhost:8089/api/v1/sites/1
+GET http://localhost:8089/api/v1/sites/de876013-33df-47bb-ae2c-154faaf63d80
 
 ### Create Site (1)
 POST http://localhost:8089/api/v1/sites
 Content-Type: application/json
 
 {
-    "uri": "https://www.mhlw.go.jp/stf/shingi/indexshingi.html",
-    "name": "厚生労働省：審議会・研究会等",
-    "type": "html:list",
+    "uri": "https://www.mhlw.go.jp/stf/new-info/",
+    "name": "厚生労働省",
+    "type": "html",
     "enabled": true
 }
 
@@ -33,41 +33,41 @@ Content-Type: text/plain
 plain text
 
 ### Update Site
-PUT http://localhost:8089/api/v1/sites/2
+PUT http://localhost:8089/api/v1/sites/de876013-33df-47bb-ae2c-154faaf63d80
 Content-Type: application/json
 
 {
-    "name": "経済産業省：報告書Rev2"
+    "name": "厚生労働省Rev2"
 }
 
 ### Update Site (disabled)
-PUT http://localhost:8089/api/v1/sites/1
+PUT http://localhost:8089/api/v1/sites/de876013-33df-47bb-ae2c-154faaf63d80
 Content-Type: application/json
 
 {
-    "enabled": false
+    "enabled": true
 }
 
 ### Update Site (no content)
-PUT http://localhost:8089/api/v1/sites/1
+PUT http://localhost:8089/api/v1/sites/de876013-33df-47bb-ae2c-154faaf63d80
 Content-Type: application/json
 
 {}
 
 ### Update Site (plain text)
-PUT http://localhost:8089/api/v1/sites/1
+PUT http://localhost:8089/api/v1/sites/de876013-33df-47bb-ae2c-154faaf63d80
 Content-Type: text/plain
 
 plain text
 
 ### Delete Site
-DELETE  http://localhost:8089/api/v1/sites/2
+DELETE  http://localhost:8089/api/v1/sites/de876013-33df-47bb-ae2c-154faaf63d80
 
 ### Get Site Resources by ID
-GET http://localhost:8089/api/v1/sites/15/resources
+GET http://localhost:8089/api/v1/sites/de876013-33df-47bb-ae2c-154faaf63d80/resources
 
 ### Update Site Resources by ID
-PUT http://localhost:8089/api/v1/sites/15/resources
+PUT http://localhost:8089/api/v1/sites/de876013-33df-47bb-ae2c-154faaf63d80/resources
 
 ### Delete Site Resources by ID
-DELETE http://localhost:8089/api/v1/sites/15/resources
+DELETE http://localhost:8089/api/v1/sites/de876013-33df-47bb-ae2c-154faaf63d80/resources

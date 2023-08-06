@@ -3,7 +3,7 @@ import { log } from "../deps.ts";
 import { SiteParam } from "../model/sites.ts";
 
 export const siteRepository = {
-  async get(id: number) {
+  async get(id: string) {
     try {
       const sites = await sql `
         select
@@ -17,8 +17,14 @@ export const siteRepository = {
       return sites[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`Site${id}:${description}`);
-      return null;
+      if (error instanceof sql.PostgresError && error.code === "22P02") {
+        // Ignore invalid uuid
+        log.warning(`Site:${id}:${description}`);
+        return {};
+      } else {
+        log.error(`Site:${id}:${description}`);
+        return null;
+      }
     }
   },
   async getAll(name: string | null, strict_flag: boolean | null, sort: string | null) {
@@ -68,7 +74,7 @@ export const siteRepository = {
       }
     }
   },
-  async update(id: number, siteParam: SiteParam) {
+  async update(id: string, siteParam: SiteParam) {
     const uri = siteParam?.uri;
     const name = siteParam?.name;
     const type = siteParam?.type;
@@ -90,11 +96,11 @@ export const siteRepository = {
       return sites[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`Site${id}:${description}`);
+      log.error(`Site:${id}:${description}`);
       return null;
     }
   },
-  async delete(id: number) {
+  async delete(id: string) {
     try {
       const sites = await sql `
         delete
@@ -108,7 +114,7 @@ export const siteRepository = {
       return sites[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`Site${id}:${description}`);
+      log.error(`Site:${id}:${description}`);
       return null;
     }
   }
