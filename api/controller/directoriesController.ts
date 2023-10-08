@@ -51,5 +51,29 @@ export const directoriesController = {
     ctx.assert(result, 500, "Unknown");
     ctx.assert(Object.keys(result).length > 0, 404, id);
     ctx.response.body = null;
+  },
+  async getCollector(ctx:RouterContext<string>) {
+    const { id } = helpers.getQuery(ctx, { mergeParams: true });
+    const result = await directoryService.getCollector(id);
+    ctx.assert(result, 500, "Unknown");
+    ctx.assert(Object.keys(result).length > 0, 404, "");
+    ctx.response.body = result;
+  },
+  async createCollector(ctx:RouterContext<string>) {
+    const reqBodyRaw = await ctx.request.body();
+    ctx.assert(reqBodyRaw.type === "json", 415, reqBodyRaw.type);
+    const reqBody = await reqBodyRaw.value;
+    ctx.assert(reqBody, 400, "No data");
+    ctx.assert(reqBody.target, 400, "Target is missing");
+    const result = await directoryService.createCollector(reqBody.target as string);
+    ctx.assert(result, 500, "Unknown");
+    ctx.response.body = result;
+  },
+  async deleteCollector(ctx:RouterContext<string>) {
+    const { id } = helpers.getQuery(ctx, { mergeParams: true });
+    const result = await directoryService.deleteCollector(id);
+    ctx.assert(result, 500, "Unknown");
+    ctx.assert(Object.keys(result).length > 0, 404, "");
+    ctx.response.body = null;
   }
 }

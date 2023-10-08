@@ -6,7 +6,7 @@
 GET http://localhost:8089/api/v1/directories
 
 ### Get directory by ID
-GET http://localhost:8089/api/v1/directories/55f78542-a596-4dcf-89bf-0d932e591bac
+GET http://localhost:8089/api/v1/directories/5b603bfd-9e04-419a-baf1-89bafd64601e
 
 ### Create directory (1)
 POST http://localhost:8089/api/v1/directories
@@ -63,3 +63,17 @@ plain text
 
 ### Delete directory
 DELETE  http://localhost:8089/api/v1/directories/55f78542-a596-4dcf-89bf-0d932e591bac
+
+### Get task
+GET http://localhost:8089/api/v1/directoryCollectors/c10d6460-cb5b-45eb-92b6-3ef129b66b81
+
+### Create task
+POST http://localhost:8089/api/v1/directoryCollectors
+Content-Type: application/json
+
+{
+    "target": "5b603bfd-9e04-419a-baf1-89bafd64601e"
+}
+
+### Delete task
+DELETE http://localhost:8089/api/v1/directoryCollectors/c10d6460-cb5b-45eb-92b6-3ef129b66b81

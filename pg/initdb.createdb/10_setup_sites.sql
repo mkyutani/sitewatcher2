@@ -16,7 +16,7 @@ create table directory_sites (
   id uuid default gen_random_uuid() not null,
   uri varchar(4096) not null,
   name varchar(256) not null,
-  type varchar(32) not null,
+  longName varchar(4096) not null,
   enabled boolean not null,
   created timestamp not null,
   updated timestamp not null,
@@ -76,4 +76,17 @@ create table channel_resources (
   name varchar(256) not null,
   longName varchar(4096) not null,
   primary key(id)
+);
+
+drop table if exists tasks;
+create table tasks (
+  id uuid default gen_random_uuid() not null,
+  target uuid not null,
+  type varchar(32) not null,
+  method varchar(32) not null,
+  status varchar(32) not null,
+  created timestamp not null,
+  updated timestamp not null,
+  primary key(id),
+  unique(target)
 );
