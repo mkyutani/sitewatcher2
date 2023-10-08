@@ -1,7 +1,7 @@
 import { RouterContext, helpers } from "../deps.ts";
 import { taskService } from "../service/tasks.ts";
 
-export const tasksController = {
+export const taskController = {
   async getAll(ctx: RouterContext<string>) {
     const result = await taskService.getAll();
     ctx.assert(result, 500, "Unknown");

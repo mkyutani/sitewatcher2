@@ -2,7 +2,7 @@ import { RouterContext, helpers } from "../deps.ts";
 import { DirectoryParam } from "../model/directories.ts";
 import { directoryService } from "../service/directories.ts";
 
-export const directoriesController = {
+export const directoryController = {
   async getAll(ctx: RouterContext<string>) {
     const { name, strict, sort } = helpers.getQuery(ctx, { mergeParams: true });
     const strict_lower = (strict !== void 0) ? strict.toLowerCase() : "false";

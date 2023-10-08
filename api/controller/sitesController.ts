@@ -2,7 +2,7 @@ import { RouterContext, helpers } from "../deps.ts";
 import { SiteParam } from "../model/sites.ts";
 import { siteService } from "../service/sites.ts";
 
-export const sitesController = {
+export const siteController = {
   async getAll(ctx: RouterContext<string>) {
     const { name, strict, sort } = helpers.getQuery(ctx, { mergeParams: true });
     const strict_lower = (strict !== void 0) ? strict.toLowerCase() : "false";
