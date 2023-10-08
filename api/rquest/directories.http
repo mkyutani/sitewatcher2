@@ -1,0 +1,65 @@
+################
+# Directories
+################
+
+### Get all directories
+GET http://localhost:8089/api/v1/directories
+
+### Get directory by ID
+GET http://localhost:8089/api/v1/directories/55f78542-a596-4dcf-89bf-0d932e591bac
+
+### Create directory (1)
+POST http://localhost:8089/api/v1/directories
+Content-Type: application/json
+
+{
+    "uri": "https://www.cas.go.jp/jp/seisakukaigi/index.html",
+    "name": "内閣官房",
+    "type": "html",
+    "enabled": true
+}
+
+### Create directory (failure)
+POST http://localhost:8089/api/v1/directories
+Content-Type: application/json
+
+{
+    "name": "内閣官房"
+}
+
+### Create directory (0)
+POST http://localhost:8089/api/v1/directories
+Content-Type: text/plain
+
+plain text
+
+### Update directory
+PUT http://localhost:8089/api/v1/directories/55f78542-a596-4dcf-89bf-0d932e591bac
+Content-Type: application/json
+
+{
+    "name": "内閣官房本部・会議"
+}
+
+### Update directory (disabled)
+PUT http://localhost:8089/api/v1/directories/55f78542-a596-4dcf-89bf-0d932e591bac
+Content-Type: application/json
+
+{
+    "enabled": false
+}
+
+### Update directory (no content)
+PUT http://localhost:8089/api/v1/directories/55f78542-a596-4dcf-89bf-0d932e591bac
+Content-Type: application/json
+
+{}
+
+### Update directory (plain text)
+PUT http://localhost:8089/api/v1/directories/55f78542-a596-4dcf-89bf-0d932e591bac
+Content-Type: text/plain
+
+plain text
+
+### Delete directory
+DELETE  http://localhost:8089/api/v1/directories/55f78542-a596-4dcf-89bf-0d932e591bac

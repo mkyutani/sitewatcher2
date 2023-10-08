@@ -1,3 +1,29 @@
+drop table if exists directories;
+create table directories (
+  id uuid default gen_random_uuid() not null,
+  uri varchar(4096) not null,
+  name varchar(256) not null,
+  type varchar(32) not null,
+  enabled boolean not null,
+  created timestamp not null,
+  updated timestamp not null,
+  primary key(id),
+  unique(uri)
+);
+
+drop table if exists directory_sites;
+create table directory_sites (
+  id uuid default gen_random_uuid() not null,
+  uri varchar(4096) not null,
+  name varchar(256) not null,
+  type varchar(32) not null,
+  enabled boolean not null,
+  created timestamp not null,
+  updated timestamp not null,
+  primary key(id),
+  unique(uri)
+);
+
 drop table if exists sites;
 create table sites (
   id uuid default gen_random_uuid() not null,

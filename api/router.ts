@@ -1,8 +1,15 @@
 import { channelController } from "./controller/channelController.ts";
 import { sitesController } from "./controller/sitescontroller.ts";
+import { directoriesController } from "./controller/directoriesController.ts";
 import { Router } from "./deps.ts"
 
 const router = new Router();
+
+router.get('/api/v1/directories', directoriesController.getAll);
+router.get('/api/v1/directories/:id', directoriesController.get);
+router.post('/api/v1/directories', directoriesController.create);
+router.put('/api/v1/directories/:id', directoriesController.update);
+router.delete('/api/v1/directories/:id', directoriesController.delete);
 
 router.get('/api/v1/sites', sitesController.getAll);
 router.get('/api/v1/sites/:id', sitesController.get);
