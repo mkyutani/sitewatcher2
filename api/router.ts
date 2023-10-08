@@ -1,5 +1,5 @@
 import { channelController } from "./controller/channelController.ts";
-import { sitesController } from "./controller/sitescontroller.ts";
+import { sitesController } from "./controller/sitesController.ts";
 import { directoriesController } from "./controller/directoriesController.ts";
 import { Router } from "./deps.ts"
 
