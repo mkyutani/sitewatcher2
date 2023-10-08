@@ -22,10 +22,16 @@ export const directoryService = {
   async getCollector(id: string) {
     return await taskRepository.get(id);
   },
+  async getCollectorByTarget(target: string) {
+    return await taskRepository.getByTarget(target);
+  },
   async createCollector(target: string) {
     return await taskRepository.create({ target: target, type: "directory", method: "collect" } as TaskParam);
   },
   async deleteCollector(id: string) {
     return await taskRepository.delete(id);
+  },
+  async deleteCollectorByTarget(target: string) {
+    return await taskRepository.deleteByTarget(target);
   }
 }

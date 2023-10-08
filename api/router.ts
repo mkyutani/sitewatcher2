@@ -11,8 +11,11 @@ router.get('/api/v1/directories/:id', directoryController.get);
 router.post('/api/v1/directories', directoryController.create);
 router.put('/api/v1/directories/:id', directoryController.update);
 router.delete('/api/v1/directories/:id', directoryController.delete);
+
+router.get('/api/v1/directoryCollectors', directoryController.getCollectorByTarget);
 router.get('/api/v1/directoryCollectors/:id', directoryController.getCollector);
 router.post('/api/v1/directoryCollectors', directoryController.createCollector);
+router.delete('/api/v1/directoryCollectors', directoryController.deleteCollectorByTarget);
 router.delete('/api/v1/directoryCollectors/:id', directoryController.deleteCollector);
 
 router.get('/api/v1/sites', siteController.getAll);

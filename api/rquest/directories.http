@@ -65,7 +65,10 @@ plain text
 DELETE  http://localhost:8089/api/v1/directories/55f78542-a596-4dcf-89bf-0d932e591bac
 
 ### Get task
-GET http://localhost:8089/api/v1/directoryCollectors/c10d6460-cb5b-45eb-92b6-3ef129b66b81
+GET http://localhost:8089/api/v1/directoryCollectors/b61e55df-2f91-41b8-b1a0-5f2cff0ccc0a
+
+### Get task by target
+GET http://localhost:8089/api/v1/directoryCollectors?target=5b603bfd-9e04-419a-baf1-89bafd64601e
 
 ### Create task
 POST http://localhost:8089/api/v1/directoryCollectors
@@ -77,3 +80,6 @@ Content-Type: application/json
 
 ### Delete task
 DELETE http://localhost:8089/api/v1/directoryCollectors/c10d6460-cb5b-45eb-92b6-3ef129b66b81
+
+### Delete task by target
+DELETE http://localhost:8089/api/v1/directoryCollectors?target=5b603bfd-9e04-419a-baf1-89bafd64601e
