@@ -1,5 +1,4 @@
-drop table if exists directories;
-create table directories (
+create table if not exists directories (
   id uuid default gen_random_uuid() not null,
   uri varchar(4096) not null,
   name varchar(256) not null,
@@ -11,8 +10,7 @@ create table directories (
   unique(uri)
 );
 
-drop table if exists directory_sites;
-create table directory_sites (
+create table if not exists directory_sites (
   id uuid default gen_random_uuid() not null,
   uri varchar(4096) not null,
   name varchar(256) not null,
@@ -24,8 +22,7 @@ create table directory_sites (
   unique(uri)
 );
 
-drop table if exists sites;
-create table sites (
+create table if not exists sites (
   id uuid default gen_random_uuid() not null,
   uri varchar(4096) not null,
   name varchar(256) not null,
@@ -37,8 +34,7 @@ create table sites (
   unique(uri)
 );
 
-drop table if exists resources;
-create table resources (
+create table if not exists resources (
   site uuid references sites on delete cascade,
   uri varchar(4096) not null,
   name varchar(256) not null,
@@ -47,8 +43,7 @@ create table resources (
   primary key(site, uri)
 );
 
-drop table if exists channels;
-create table channels (
+create table if not exists channels (
   id uuid default gen_random_uuid() not null,
   name varchar(256) not null,
   enabled boolean not null,
@@ -59,15 +54,13 @@ create table channels (
   unique(name)
 );
 
-drop table if exists channel_sites;
-create table channel_sites (
+create table if not exists channel_sites (
   channel uuid not null,
   site uuid not null,
   primary key(channel, site)
 );
 
-drop table if exists channel_resources;
-create table channel_resources (
+create table if not exists channel_resources (
   id uuid default gen_random_uuid() not null,
   channel uuid not null,
   site_uri varchar(4096) not null,
@@ -78,8 +71,7 @@ create table channel_resources (
   primary key(id)
 );
 
-drop table if exists tasks;
-create table tasks (
+create table if not exists tasks (
   id uuid default gen_random_uuid() not null,
   target uuid not null,
   type varchar(32) not null,
