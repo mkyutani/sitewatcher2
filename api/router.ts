@@ -12,20 +12,14 @@ router.post('/api/v1/directories', directoryController.create);
 router.put('/api/v1/directories/:id', directoryController.update);
 router.delete('/api/v1/directories/:id', directoryController.delete);
 
-router.get('/api/v1/directoryCollectors', directoryController.getCollectorByTarget);
-router.get('/api/v1/directoryCollectors/:id', directoryController.getCollector);
-router.post('/api/v1/directoryCollectors', directoryController.createCollector);
-router.delete('/api/v1/directoryCollectors', directoryController.deleteCollectorByTarget);
-router.delete('/api/v1/directoryCollectors/:id', directoryController.deleteCollector);
-
 router.get('/api/v1/sites', siteController.getAll);
 router.get('/api/v1/sites/:id', siteController.get);
-router.get('/api/v1/sites/:id/resources', siteController.getResources);
+//router.get('/api/v1/sites/:id/resources', siteController.getResources);
 router.post('/api/v1/sites', siteController.create);
 router.put('/api/v1/sites/:id', siteController.update);
-router.put('/api/v1/sites/:id/resources', siteController.updateResources);
+//router.put('/api/v1/sites/:id/resources', siteController.updateResources);
 router.delete('/api/v1/sites/:id', siteController.delete);
-router.delete('/api/v1/sites/:id/resources', siteController.deleteResources);
+//router.delete('/api/v1/sites/:id/resources', siteController.deleteResources);
 
 router.get('/api/v1/channels', channelController.getAll);
 router.get('/api/v1/channels/:id', channelController.get);

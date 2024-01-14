@@ -7,14 +7,18 @@ export const directoryRepository = {
     try {
       const directories = await sql `
         select
-          id, uri, name, type, enabled, created, updated
-        from directories
-        where id = ${id}
+          id, name, metadata, enabled, created, updated
+        from directory
+        where id like ${id}
       `
       if (directories.length == 0) {
         return {};
       }
-      return directories[0];
+      const directory = directories[0];
+      if (directory.metadata) {
+        directory.metadata = JSON.parse(directory.metadata);
+      }
+      return directory;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       if (error instanceof sql.PostgresError && error.code === "22P02") {
@@ -29,22 +33,25 @@ export const directoryRepository = {
   },
   async getAll(name: string | null, strict_flag: boolean | null, sort: string | null) {
     try {
-      if (sort && ["id", "uri", "name"].indexOf(sort) == -1) {
+      if (sort && ["id", "name"].indexOf(sort) == -1) {
         return "Invalid sort key";
       }
       const directories = await sql `
         select
-          id, uri, name, type, enabled, created, updated
-        from directories
+          id, name, metadata, enabled, created, updated
+        from directory
         ${(name && name.length > 0) ?
           (strict_flag ? sql`where name = ${name}` : sql`where name ilike ${`%${name}%`}`) :
           sql``}
-        ${sort === "uri" ?
-          sql`order by uri` :
-          sort === "name" ?
-            sql`order by name` :
-            sql`order by id`}
+        ${sort === "name" ?
+          sql`order by name` :
+          sql`order by id`}
       `
+      for (const directory of directories) {
+        if (directory.metadata) {
+          directory.metadata = JSON.parse(directory.metadata);
+        }
+      }
       return directories;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
@@ -53,38 +60,38 @@ export const directoryRepository = {
     }
   },
   async create(DirectoryParam: DirectoryParam) {
-    const uri = DirectoryParam?.uri;
     const name = DirectoryParam?.name;
-    const type = DirectoryParam?.type;
+    const metadata = DirectoryParam?.metadata;
     const enabled = DirectoryParam?.enabled;
     try {
-      const resources = await sql `
+      const directories = await sql `
         insert
-        into directories (uri, name, type, enabled, created, updated)
-        values (${uri}, ${name}, ${type}, ${enabled}, current_timestamp, current_timestamp)
+        into directory (name, metadata, enabled, created, updated)
+        values (${name}, ${JSON.stringify(metadata)}, ${enabled}, current_timestamp, current_timestamp)
         returning id
       `
-      return resources[0];
+      if (directories[0].metadata) {
+        directories[0].metadata = JSON.parse(directories[0].metadata);
+      }
+      return directories[0];
     } catch (error) {
       if (error instanceof sql.PostgresError && parseInt(error.code, 10) == 23505) {
           return "Duplicated";
       } else {
-        log.error(`Site:PG${error.code}:${error.message}:${uri}`);
+        log.error(`Site:PG${error.code}:${error.message}:${name}`);
         return null;
       }
     }
   },
   async update(id: string, param: DirectoryParam) {
-    const uri = param?.uri;
     const name = param?.name;
-    const type = param?.type;
+    const metadata = param?.metadata;
     const enabled = param?.enabled;
     try {
       const directories = await sql `
-        update directories
-        set uri = ${uri ? uri : sql`uri`},
-          name = ${name ? name : sql`name`},
-          type = ${type ? type : sql`type`},
+        update directory
+        set name = ${name ? name : sql`name`},
+          metadata = ${metadata ? JSON.stringify(metadata) : sql`metadata`},
           enabled = ${(enabled !== void 0) ? enabled : sql`enabled`},
           updated = current_timestamp
         where id = ${id}
@@ -92,6 +99,9 @@ export const directoryRepository = {
       `
       if (directories.length == 0) {
         return {};
+      }
+      if (directories[0].metadata) {
+        directories[0].metadata = JSON.parse(directories[0].metadata);
       }
       return directories[0];
     } catch (error) {
@@ -104,7 +114,7 @@ export const directoryRepository = {
     try {
       const directories = await sql `
         delete
-        from directories
+        from directory
         where id = ${id}
         returning id
       `

@@ -6,43 +6,85 @@
 GET http://localhost:8089/api/v1/directories
 
 ### Get directory by ID
-GET http://localhost:8089/api/v1/directories/5b603bfd-9e04-419a-baf1-89bafd64601e
+GET http://localhost:8089/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
+
+### Get directory by ID (not found)
+GET http://localhost:8089/api/v1/directories/not-found
 
 ### Create directory (1)
 POST http://localhost:8089/api/v1/directories
 Content-Type: application/json
 
 {
-    "uri": "https://www.cas.go.jp/jp/seisakukaigi/index.html",
     "name": "内閣官房",
-    "type": "html",
-    "enabled": true
+    "metadata": {
+        "type": "list"
+    },
+    "enabled": "true"
 }
 
-### Create directory (failure)
+### Create directory (metadata, stringified json)
 POST http://localhost:8089/api/v1/directories
 Content-Type: application/json
 
 {
-    "name": "内閣官房"
+    "name": "内閣官房",
+    "metadata": "{ \"type\": \"list\" }",
+    "enabled": true
 }
 
-### Create directory (0)
+### Create directory (metadata, not json)
+POST http://localhost:8089/api/v1/directories
+Content-Type: application/json
+
+{
+    "name": "内閣官房",
+    "metadata": "type: list",
+    "enabled": true
+}
+
+### Create directory (not json)
 POST http://localhost:8089/api/v1/directories
 Content-Type: text/plain
 
 plain text
 
 ### Update directory
-PUT http://localhost:8089/api/v1/directories/55f78542-a596-4dcf-89bf-0d932e591bac
+PUT http://localhost:8089/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
 Content-Type: application/json
 
 {
-    "name": "内閣官房本部・会議"
+    "name": "内閣官房：会議"
+}
+
+### Update directory (metadata)
+PUT http://localhost:8089/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
+Content-Type: application/json
+
+{
+    "metadata": {
+        "type": "list"
+    }
+}
+
+### Update directory (metadata, stringified json)
+PUT http://localhost:8089/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
+Content-Type: application/json
+
+{
+    "metadata": "{ \"type\": \"list\" }"
+}
+
+### Update directory (metadata, not json)
+PUT http://localhost:8089/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
+Content-Type: application/json
+
+{
+    "metadata": "type: list"
 }
 
 ### Update directory (disabled)
-PUT http://localhost:8089/api/v1/directories/55f78542-a596-4dcf-89bf-0d932e591bac
+PUT http://localhost:8089/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
 Content-Type: application/json
 
 {
@@ -50,36 +92,22 @@ Content-Type: application/json
 }
 
 ### Update directory (no content)
-PUT http://localhost:8089/api/v1/directories/55f78542-a596-4dcf-89bf-0d932e591bac
+PUT http://localhost:8089/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
 Content-Type: application/json
 
 {}
 
 ### Update directory (plain text)
-PUT http://localhost:8089/api/v1/directories/55f78542-a596-4dcf-89bf-0d932e591bac
+PUT http://localhost:8089/api/v1/directories/dfe4965a-9d2c-4cd5-8a0a-3541eeb4b54b
 Content-Type: text/plain
 
 plain text
 
+### Update directory (not found)
+PUT  http://localhost:8089/api/v1/directories/not-found
+
 ### Delete directory
-DELETE  http://localhost:8089/api/v1/directories/55f78542-a596-4dcf-89bf-0d932e591bac
+DELETE  http://localhost:8089/api/v1/directories/a87ac4e7-f896-472e-9c04-86bba02abcaf
 
-### Get task
-GET http://localhost:8089/api/v1/directoryCollectors/b61e55df-2f91-41b8-b1a0-5f2cff0ccc0a
-
-### Get task by target
-GET http://localhost:8089/api/v1/directoryCollectors?target=5b603bfd-9e04-419a-baf1-89bafd64601e
-
-### Create task
-POST http://localhost:8089/api/v1/directoryCollectors
-Content-Type: application/json
-
-{
-    "target": "5b603bfd-9e04-419a-baf1-89bafd64601e"
-}
-
-### Delete task
-DELETE http://localhost:8089/api/v1/directoryCollectors/c10d6460-cb5b-45eb-92b6-3ef129b66b81
-
-### Delete task by target
-DELETE http://localhost:8089/api/v1/directoryCollectors?target=5b603bfd-9e04-419a-baf1-89bafd64601e
+### Delete directory (not found)
+DELETE  http://localhost:8089/api/v1/directories/not-found

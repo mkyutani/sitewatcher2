@@ -1,6 +1,5 @@
 export type DirectoryParam = {
-  uri: string,
-  name: string,
-  type: string,
-  enabled: boolean
+  name: string | null,
+  metadata: JSON | null,
+  enabled: boolean | null
 };

@@ -1,7 +1,7 @@
 import { SiteParam } from "../model/sites.ts";
-import { resourceRepository } from "../repository/resources.ts";
+//import { resourceRepository } from "../repository/resources.ts";
 import { siteRepository } from "../repository/sites.ts";
-import { collectHtml } from "./htmlCollector.ts";
+//import { collectHtml } from "./htmlCollector.ts";
 
 export const siteService = {
   async get(id: string) {
@@ -10,15 +10,18 @@ export const siteService = {
   async getAll(name: string | null, strict_flag: boolean | null, sort: string | null) {
     return await siteRepository.getAll(name, strict_flag, sort);
   },
+  /*
   async getResources(id: string) {
     return await resourceRepository.getAll(id);
   },
+  */
   async create({...reqBody}: SiteParam) {
     return await siteRepository.create(reqBody as SiteParam);
   },
   async update(id: string, {...reqBody}: SiteParam) {
     return await siteRepository.update(id, reqBody as SiteParam);
   },
+  /*
   async updateResources(id: string) {
     const result = await siteService.get(id);
     if (!result) return null;
@@ -41,10 +44,13 @@ export const siteService = {
       return { "count": parseInt(count.count, 10) };
     }
   },
+  */
   async delete(id: string) {
     return await siteRepository.delete(id);
   },
+  /*
   async deleteResources(id: string) {
     return await resourceRepository.deleteAll(id);
   }
+  */
 }

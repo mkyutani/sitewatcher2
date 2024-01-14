@@ -1,3 +1,5 @@
 # sitewatcher2
 
-web site watcher version 2
+## Architecture and design
+
+* [Design](design.md)

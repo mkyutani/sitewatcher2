@@ -1,7 +1,5 @@
 import { DirectoryParam } from "../model/directories.ts";
 import { directoryRepository } from "../repository/directories.ts";
-import { TaskParam } from "../model/tasks.ts";
-import { taskRepository } from "../repository/tasks.ts";
 
 export const directoryService = {
   async get(id: string) {
@@ -18,20 +16,5 @@ export const directoryService = {
   },
   async delete(id: string) {
     return await directoryRepository.delete(id);
-  },
-  async getCollector(id: string) {
-    return await taskRepository.get(id);
-  },
-  async getCollectorByTarget(target: string) {
-    return await taskRepository.getByTarget(target);
-  },
-  async createCollector(target: string) {
-    return await taskRepository.create({ target: target, type: "directory", method: "collect" } as TaskParam);
-  },
-  async deleteCollector(id: string) {
-    return await taskRepository.delete(id);
-  },
-  async deleteCollectorByTarget(target: string) {
-    return await taskRepository.deleteByTarget(target);
   }
 }

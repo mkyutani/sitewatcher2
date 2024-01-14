@@ -6,7 +6,7 @@
 GET http://localhost:8089/api/v1/sites
 
 ### Get Site by ID
-GET http://localhost:8089/api/v1/sites/de876013-33df-47bb-ae2c-154faaf63d80
+GET http://localhost:8089/api/v1/sites/2ecb3609-fadb-4320-8764-b10e8ae9f912
 
 ### Create Site (1)
 POST http://localhost:8089/api/v1/sites
@@ -14,8 +14,11 @@ Content-Type: application/json
 
 {
     "uri": "https://www.mhlw.go.jp/stf/new-info/",
-    "name": "厚生労働省",
-    "type": "html",
+    "name": "厚生労働省新着情報",
+    "directory": "769c2f96-4b28-4d05-97db-9c47f460eb6f",
+    "metadata": {
+        "description": "厚生労働省の新着情報"
+    },
     "enabled": true
 }
 
@@ -25,8 +28,9 @@ Content-Type: application/json
 
 {
     "uri": "https://www.meti.go.jp/shingikai/index_report.html",
-    "name": "経済産業省：報告書",
-    "type": "html",
+    "name": "経済産業省報告",
+    "directory": "e88d7483-f988-46ac-873f-0e4b71c6c979",
+    "metadata": "{\"description\": \"経済産業省の報告\"}",
     "enabled": true
 }
 
@@ -37,15 +41,19 @@ Content-Type: text/plain
 plain text
 
 ### Update Site
-PUT http://localhost:8089/api/v1/sites/de876013-33df-47bb-ae2c-154faaf63d80
+PUT http://localhost:8089/api/v1/sites/3364fa54-5d12-4c5f-b428-bc8e8eebaab0
 Content-Type: application/json
 
 {
-    "name": "厚生労働省Rev2"
+    "name": "厚生労働省Rev2",
+    "directory": "769c2f96-4b28-4d05-97db-9c47f460eb6f",
+    "metadata": {
+        "description": "厚生労働省の新着情報"
+    }
 }
 
 ### Update Site (disabled)
-PUT http://localhost:8089/api/v1/sites/de876013-33df-47bb-ae2c-154faaf63d80
+PUT http://localhost:8089/api/v1/sites/3364fa54-5d12-4c5f-b428-bc8e8eebaab0
 Content-Type: application/json
 
 {
@@ -65,7 +73,7 @@ Content-Type: text/plain
 plain text
 
 ### Delete Site
-DELETE  http://localhost:8089/api/v1/sites/de876013-33df-47bb-ae2c-154faaf63d80
+DELETE  http://localhost:8089/api/v1/sites/63821c73-8edf-41f8-b63d-299912060d6c
 
 ################
 # Resources
