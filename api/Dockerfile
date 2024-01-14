@@ -3,10 +3,7 @@ WORKDIR /app
 RUN chown -R deno:deno /deno-dir && chmod -R 770 /deno-dir
 RUN chown -R deno:deno /app && chmod -R 770 /app
 
-FROM base AS createdb
-# do nothing
-
-FROM base AS development
+FROM base AS dev
 USER deno
 COPY --chown=deno:deno . /app
 RUN deno cache main.ts
