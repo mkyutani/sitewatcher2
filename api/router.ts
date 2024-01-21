@@ -3,6 +3,7 @@ import { siteController } from "./controller/sitesController.ts";
 import { directoryController } from "./controller/directoriesController.ts";
 import { Router } from "./deps.ts"
 import { taskController } from "./controller/tasksController.ts";
+import { directoryMetadataController } from "./controller/directoryMetadataController.ts";
 
 const router = new Router();
 
@@ -11,6 +12,11 @@ router.get('/api/v1/directories/:id', directoryController.get);
 router.post('/api/v1/directories', directoryController.create);
 router.put('/api/v1/directories/:id', directoryController.update);
 router.delete('/api/v1/directories/:id', directoryController.delete);
+router.get('/api/v1/directories/:id/metadata', directoryMetadataController.getAll);
+router.get('/api/v1/directories/:id/metadata/:key', directoryMetadataController.get);
+router.post('/api/v1/directories/:id/metadata', directoryMetadataController.create);
+router.put('/api/v1/directories/:id/metadata', directoryMetadataController.update);
+router.delete('/api/v1/directories/:id/metadata/:key', directoryMetadataController.delete);
 
 router.get('/api/v1/sites', siteController.getAll);
 router.get('/api/v1/sites/:id', siteController.get);

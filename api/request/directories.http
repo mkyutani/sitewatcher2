@@ -3,16 +3,16 @@
 ################
 
 ### Get all directories
-GET http://localhost:8089/api/v1/directories
+GET http://localhost:18085/api/v1/directories
 
 ### Get directory by ID
-GET http://localhost:8089/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
+GET http://localhost:18085/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
 
 ### Get directory by ID (not found)
-GET http://localhost:8089/api/v1/directories/not-found
+GET http://localhost:18085/api/v1/directories/not-found
 
 ### Create directory (1)
-POST http://localhost:8089/api/v1/directories
+POST http://localhost:18085/api/v1/directories
 Content-Type: application/json
 
 {
@@ -24,7 +24,7 @@ Content-Type: application/json
 }
 
 ### Create directory (metadata, stringified json)
-POST http://localhost:8089/api/v1/directories
+POST http://localhost:18085/api/v1/directories
 Content-Type: application/json
 
 {
@@ -34,7 +34,7 @@ Content-Type: application/json
 }
 
 ### Create directory (metadata, not json)
-POST http://localhost:8089/api/v1/directories
+POST http://localhost:18085/api/v1/directories
 Content-Type: application/json
 
 {
@@ -44,13 +44,13 @@ Content-Type: application/json
 }
 
 ### Create directory (not json)
-POST http://localhost:8089/api/v1/directories
+POST http://localhost:18085/api/v1/directories
 Content-Type: text/plain
 
 plain text
 
 ### Update directory
-PUT http://localhost:8089/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
+PUT http://localhost:18085/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
 Content-Type: application/json
 
 {
@@ -58,7 +58,7 @@ Content-Type: application/json
 }
 
 ### Update directory (metadata)
-PUT http://localhost:8089/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
+PUT http://localhost:18085/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
 Content-Type: application/json
 
 {
@@ -68,7 +68,7 @@ Content-Type: application/json
 }
 
 ### Update directory (metadata, stringified json)
-PUT http://localhost:8089/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
+PUT http://localhost:18085/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
 Content-Type: application/json
 
 {
@@ -76,7 +76,7 @@ Content-Type: application/json
 }
 
 ### Update directory (metadata, not json)
-PUT http://localhost:8089/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
+PUT http://localhost:18085/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
 Content-Type: application/json
 
 {
@@ -84,7 +84,7 @@ Content-Type: application/json
 }
 
 ### Update directory (disabled)
-PUT http://localhost:8089/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
+PUT http://localhost:18085/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
 Content-Type: application/json
 
 {
@@ -92,22 +92,51 @@ Content-Type: application/json
 }
 
 ### Update directory (no content)
-PUT http://localhost:8089/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
+PUT http://localhost:18085/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
 Content-Type: application/json
 
 {}
 
 ### Update directory (plain text)
-PUT http://localhost:8089/api/v1/directories/dfe4965a-9d2c-4cd5-8a0a-3541eeb4b54b
+PUT http://localhost:18085/api/v1/directories/dfe4965a-9d2c-4cd5-8a0a-3541eeb4b54b
 Content-Type: text/plain
 
 plain text
 
 ### Update directory (not found)
-PUT  http://localhost:8089/api/v1/directories/not-found
+PUT  http://localhost:18085/api/v1/directories/not-found
 
 ### Delete directory
-DELETE  http://localhost:8089/api/v1/directories/a87ac4e7-f896-472e-9c04-86bba02abcaf
+DELETE  http://localhost:18085/api/v1/directories/a87ac4e7-f896-472e-9c04-86bba02abcaf
 
 ### Delete directory (not found)
-DELETE  http://localhost:8089/api/v1/directories/not-found
+DELETE  http://localhost:18085/api/v1/directories/not-found
+
+################
+# Metadata
+################
+
+### Get all metadata by directory ID
+GET http://localhost:18085/api/v1/directories/d43e6d85-e0e8-4b01-ad9e-2926db994c5e/metadata
+
+### Get metadata by directory ID and key
+GET http://localhost:18085/api/v1/directories/d43e6d85-e0e8-4b01-ad9e-2926db994c5e/metadata/type
+
+### Create metadata
+POST http://localhost:18085/api/v1/directories/d43e6d85-e0e8-4b01-ad9e-2926db994c5e/metadata
+Content-Type: application/json
+
+{
+    "type": "list"
+}
+
+### Update metadata
+PUT http://localhost:18085/api/v1/directories/d43e6d85-e0e8-4b01-ad9e-2926db994c5e/metadata
+Content-Type: application/json
+
+{
+    "type": "List"
+}
+
+### Delete directory
+DELETE  http://localhost:18085/api/v1/directories/d43e6d85-e0e8-4b01-ad9e-2926db994c5e/metadata/type
