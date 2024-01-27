@@ -29,6 +29,7 @@ services:
     hostname: api
     container_name: sw2api
     working_dir: "/app"
+    user: "deno:deno"
     depends_on:
       - postgres
     environment:
@@ -42,7 +43,6 @@ services:
     ports:
       - "${API_EX_PORT}:${API_PORT}"
     volumes:
-      - ./api:/app
       - ./volumes/deno-dir.${TARGET}:/deno-dir
     networks:
       - local-network

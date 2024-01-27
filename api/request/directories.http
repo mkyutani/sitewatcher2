@@ -17,30 +17,7 @@ Content-Type: application/json
 
 {
     "name": "内閣官房",
-    "metadata": {
-        "type": "list"
-    },
     "enabled": "true"
-}
-
-### Create directory (metadata, stringified json)
-POST http://localhost:18085/api/v1/directories
-Content-Type: application/json
-
-{
-    "name": "内閣官房",
-    "metadata": "{ \"type\": \"list\" }",
-    "enabled": true
-}
-
-### Create directory (metadata, not json)
-POST http://localhost:18085/api/v1/directories
-Content-Type: application/json
-
-{
-    "name": "内閣官房",
-    "metadata": "type: list",
-    "enabled": true
 }
 
 ### Create directory (not json)
@@ -55,32 +32,6 @@ Content-Type: application/json
 
 {
     "name": "内閣官房：会議"
-}
-
-### Update directory (metadata)
-PUT http://localhost:18085/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
-Content-Type: application/json
-
-{
-    "metadata": {
-        "type": "list"
-    }
-}
-
-### Update directory (metadata, stringified json)
-PUT http://localhost:18085/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
-Content-Type: application/json
-
-{
-    "metadata": "{ \"type\": \"list\" }"
-}
-
-### Update directory (metadata, not json)
-PUT http://localhost:18085/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
-Content-Type: application/json
-
-{
-    "metadata": "type: list"
 }
 
 ### Update directory (disabled)
@@ -107,7 +58,7 @@ plain text
 PUT  http://localhost:18085/api/v1/directories/not-found
 
 ### Delete directory
-DELETE  http://localhost:18085/api/v1/directories/a87ac4e7-f896-472e-9c04-86bba02abcaf
+DELETE  http://localhost:18085/api/v1/directories/ba1bcd9c-e41a-4794-a8ec-f1de6170b6d9
 
 ### Delete directory (not found)
 DELETE  http://localhost:18085/api/v1/directories/not-found

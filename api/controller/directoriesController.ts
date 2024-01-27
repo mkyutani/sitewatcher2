@@ -1,7 +1,7 @@
-import { RouterContext, helpers } from "../deps.ts";
+import { RouterContext, helpers, log } from "../deps.ts";
 import { DirectoryParam } from "../model/directories.ts";
 import { directoryService } from "../service/directories.ts";
-import { convertToBoolean, convertToJson, isUuid } from "../util.ts";
+import { convertToBoolean, isUuid } from "../util.ts";
 
 export const directoryController = {
   async getAll(ctx: RouterContext<string>) {
@@ -27,9 +27,6 @@ export const directoryController = {
     const reqBody = await reqBodyRaw.value;
     ctx.assert(reqBody, 400, "No data");
     ctx.assert(reqBody.name, 400, "Name is missing");
-    ctx.assert(reqBody.metadata, 400, "Metadata is missing");
-    reqBody.metadata = convertToJson(reqBody.metadata)
-    ctx.assert(reqBody.metadata, 415, "Metadata is not valid JSON");
     ctx.assert(reqBody.enabled, 400, "Enabled is missing");
     reqBody.enabled = convertToBoolean(reqBody.enabled);
     ctx.assert(reqBody.enabled != null, 400, "Invalid enabled flag");
@@ -45,10 +42,6 @@ export const directoryController = {
     ctx.assert(reqBodyRaw.type === "json", 415, "Invalid content");
     const reqBody = await reqBodyRaw.value;
     ctx.assert(reqBody, 400, "No data");
-    if (reqBody.metadata) {
-      reqBody.metadata = convertToJson(reqBody.metadata)
-      ctx.assert(reqBody.metadata, 415, "Metadata is not valid JSON");
-    }
     const result = await directoryService.update(id, reqBody as DirectoryParam);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(Object.keys(result).length > 0, 404, "");

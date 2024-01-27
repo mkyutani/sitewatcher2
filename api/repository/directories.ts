@@ -7,26 +7,23 @@ export const directoryRepository = {
     try {
       const directories = await sql `
         select
-          id, name, metadata, enabled, created, updated
+          id, name, enabled, created, updated
         from directory
-        where id like ${id}
+        where id = ${id}
       `
       if (directories.length == 0) {
         return {};
       }
       const directory = directories[0];
-      if (directory.metadata) {
-        directory.metadata = JSON.parse(directory.metadata);
-      }
       return directory;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       if (error instanceof sql.PostgresError && error.code === "22P02") {
         // Ignore invalid uuid
-        log.warning(`Site:${id}:${description}`);
+        log.warning(`directoryRepository.get:${id}:${description}`);
         return {};
       } else {
-        log.error(`Site:${id}:${description}`);
+        log.error(`directoryRepository.get:${id}:${description}`);
         return null;
       }
     }
@@ -38,7 +35,7 @@ export const directoryRepository = {
       }
       const directories = await sql `
         select
-          id, name, metadata, enabled, created, updated
+          id, name, enabled, created, updated
         from directory
         ${(name && name.length > 0) ?
           (strict_flag ? sql`where name = ${name}` : sql`where name ilike ${`%${name}%`}`) :
@@ -47,51 +44,40 @@ export const directoryRepository = {
           sql`order by name` :
           sql`order by id`}
       `
-      for (const directory of directories) {
-        if (directory.metadata) {
-          directory.metadata = JSON.parse(directory.metadata);
-        }
-      }
       return directories;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`Site:${description}`);
+      log.error(`directoryRepository.getAll:${description}`);
       return null;
     }
   },
   async create(DirectoryParam: DirectoryParam) {
     const name = DirectoryParam?.name;
-    const metadata = DirectoryParam?.metadata;
     const enabled = DirectoryParam?.enabled;
     try {
       const directories = await sql `
         insert
-        into directory (name, metadata, enabled, created, updated)
-        values (${name}, ${JSON.stringify(metadata)}, ${enabled}, current_timestamp, current_timestamp)
+        into directory (name, enabled, created, updated)
+        values (${name}, ${enabled}, current_timestamp, current_timestamp)
         returning id
       `
-      if (directories[0].metadata) {
-        directories[0].metadata = JSON.parse(directories[0].metadata);
-      }
       return directories[0];
     } catch (error) {
       if (error instanceof sql.PostgresError && parseInt(error.code, 10) == 23505) {
           return "Duplicated";
       } else {
-        log.error(`Site:PG${error.code}:${error.message}:${name}`);
+        log.error(`directoryRepository.create:PG${error.code}:${error.message}:${name}`);
         return null;
       }
     }
   },
   async update(id: string, param: DirectoryParam) {
     const name = param?.name;
-    const metadata = param?.metadata;
     const enabled = param?.enabled;
     try {
       const directories = await sql `
         update directory
         set name = ${name ? name : sql`name`},
-          metadata = ${metadata ? JSON.stringify(metadata) : sql`metadata`},
           enabled = ${(enabled !== void 0) ? enabled : sql`enabled`},
           updated = current_timestamp
         where id = ${id}
@@ -100,13 +86,10 @@ export const directoryRepository = {
       if (directories.length == 0) {
         return {};
       }
-      if (directories[0].metadata) {
-        directories[0].metadata = JSON.parse(directories[0].metadata);
-      }
       return directories[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`Site:${id}:${description}`);
+      log.error(`directoryRepository.update:${id}:${description}`);
       return null;
     }
   },
@@ -124,7 +107,7 @@ export const directoryRepository = {
       return directories[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`Site:${id}:${description}`);
+      log.error(`directoryRepository.delete:${id}:${description}`);
       return null;
     }
   }
