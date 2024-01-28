@@ -66,7 +66,8 @@ export const directoryRepository = {
       if (error instanceof sql.PostgresError && parseInt(error.code, 10) == 23505) {
           return "Duplicated";
       } else {
-        log.error(`directoryRepository.create:PG${error.code}:${error.message}:${name}`);
+        const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}`;
+        log.error(`directoryRepository.create:${description}`);
         return null;
       }
     }
@@ -88,9 +89,13 @@ export const directoryRepository = {
       }
       return directories[0];
     } catch (error) {
-      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`directoryRepository.update:${id}:${description}`);
-      return null;
+      if (error instanceof sql.PostgresError && parseInt(error.code, 10) == 23505) {
+          return "Duplicated";
+      } else {
+        const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}`;
+        log.error(`directoryRepository.update:${id}:${description}`);
+        return null;
+      }
     }
   },
   async delete(id: string) {
