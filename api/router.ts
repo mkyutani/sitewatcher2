@@ -16,6 +16,7 @@ router.get('/api/v1/directories/:id/metadata', directoryMetadataController.getAl
 router.get('/api/v1/directories/:id/metadata/:key', directoryMetadataController.get);
 router.post('/api/v1/directories/:id/metadata', directoryMetadataController.create);
 router.put('/api/v1/directories/:id/metadata', directoryMetadataController.update);
+router.delete('/api/v1/directories/:id/metadata', directoryMetadataController.deleteAll);
 router.delete('/api/v1/directories/:id/metadata/:key', directoryMetadataController.delete);
 
 router.get('/api/v1/sites', siteController.getAll);

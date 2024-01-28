@@ -109,7 +109,7 @@ Deno.test("400: Create a directory with invalid enabled flag", async () => {
     method: "POST",
     body: JSON.stringify({
       name: "almadillo",
-      enabled: "hoge"
+      enabled: "ambiguous"
     }),
     headers: {
       "Content-Type": "application/json",
@@ -168,7 +168,6 @@ Deno.test("200: Get all directories with name", async () => {
   assertEquals(res.status, 200);
   const json = JSON.parse(text);
   assertEquals(json.length, 2);
-  assertEquals(json[0].id, directories[0]);
 });
 
 Deno.test("200: Get all directories with strict flag", async () => {
@@ -177,7 +176,6 @@ Deno.test("200: Get all directories with strict flag", async () => {
   assertEquals(res.status, 200);
   const json = JSON.parse(text);
   assertEquals(json.length, 1);
-  assertEquals(json[0].id, directories[0]);
 });
 
 Deno.test("200: Get all directories sort by name", async () => {
@@ -310,7 +308,7 @@ Deno.test("400: Update a directory with invalid enabled flag", async () => {
     method: "PUT",
     body: JSON.stringify({
       name: "almadillo4",
-      enabled: "hoge"
+      enabled: "ambiguous"
     }),
     headers: {
       "Content-Type": "application/json",

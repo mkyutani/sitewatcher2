@@ -2,84 +2,50 @@
 # Directories
 ################
 
-### Get all directories
-GET http://localhost:18085/api/v1/directories
-
-### Get directory by ID
-GET http://localhost:18085/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
-
-### Get directory by ID (not found)
-GET http://localhost:18085/api/v1/directories/not-found
-
-### Create directory (1)
+### Create directory
 POST http://localhost:18085/api/v1/directories
 Content-Type: application/json
 
 {
-    "name": "内閣官房",
-    "enabled": "true"
+    "name": "armadillo",
+    "enabled": true
 }
 
-### Create directory (not json)
-POST http://localhost:18085/api/v1/directories
-Content-Type: text/plain
+### Get directory by ID
+GET http://localhost:18085/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
 
-plain text
+### Get all directories
+GET http://localhost:18085/api/v1/directories
 
 ### Update directory
 PUT http://localhost:18085/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
 Content-Type: application/json
 
 {
-    "name": "内閣官房：会議"
+    "name": "armadillo2",
 }
-
-### Update directory (disabled)
-PUT http://localhost:18085/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
-Content-Type: application/json
-
-{
-    "enabled": false
-}
-
-### Update directory (no content)
-PUT http://localhost:18085/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
-Content-Type: application/json
-
-{}
-
-### Update directory (plain text)
-PUT http://localhost:18085/api/v1/directories/dfe4965a-9d2c-4cd5-8a0a-3541eeb4b54b
-Content-Type: text/plain
-
-plain text
-
-### Update directory (not found)
-PUT  http://localhost:18085/api/v1/directories/not-found
 
 ### Delete directory
-DELETE  http://localhost:18085/api/v1/directories/ba1bcd9c-e41a-4794-a8ec-f1de6170b6d9
-
-### Delete directory (not found)
-DELETE  http://localhost:18085/api/v1/directories/not-found
+DELETE  http://localhost:18085/api/v1/directories/189024c3-4eba-45b8-9a2d-80c04d1dd61e
 
 ################
 # Metadata
 ################
 
-### Get all metadata by directory ID
-GET http://localhost:18085/api/v1/directories/d43e6d85-e0e8-4b01-ad9e-2926db994c5e/metadata
-
-### Get metadata by directory ID and key
-GET http://localhost:18085/api/v1/directories/d43e6d85-e0e8-4b01-ad9e-2926db994c5e/metadata/type
-
 ### Create metadata
-POST http://localhost:18085/api/v1/directories/d43e6d85-e0e8-4b01-ad9e-2926db994c5e/metadata
+POST http://localhost:18085/api/v1/directories/189024c3-4eba-45b8-9a2d-80c04d1dd61e/metadata
 Content-Type: application/json
 
 {
-    "type": "list"
+    "type": "list",
+    "state": "active"
 }
+
+### Get metadata
+GET http://localhost:18085/api/v1/directories/189024c3-4eba-45b8-9a2d-80c04d1dd61e/metadata/type
+
+### Get all metadata
+GET http://localhost:18085/api/v1/directories/189024c3-4eba-45b8-9a2d-80c04d1dd61e/metadata
 
 ### Update metadata
 PUT http://localhost:18085/api/v1/directories/d43e6d85-e0e8-4b01-ad9e-2926db994c5e/metadata
@@ -89,5 +55,8 @@ Content-Type: application/json
     "type": "List"
 }
 
-### Delete directory
+### Delete metadata
 DELETE  http://localhost:18085/api/v1/directories/d43e6d85-e0e8-4b01-ad9e-2926db994c5e/metadata/type
+
+### Delete all metadata
+DELETE  http://localhost:18085/api/v1/directories/d43e6d85-e0e8-4b01-ad9e-2926db994c5e/metadata

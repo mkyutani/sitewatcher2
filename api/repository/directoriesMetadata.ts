@@ -2,6 +2,36 @@ import sql from "./db.ts"
 import { log } from "../deps.ts";
 
 export const directoryMetadataRepository = {
+  async create(id: string, kvs: any) {
+    const results: any[] = [];
+    for (const key of Object.keys(kvs)) {
+      if (typeof kvs[key] !== "string") {
+        return "Invalid value type";
+      }
+      const value = kvs[key]
+      try {
+        const metadata = await sql `
+          insert
+          into directory_metadata (directory, key, value, created, updated)
+          values (${id}, ${key}, ${value}, current_timestamp, current_timestamp)
+          returning key
+        `
+        if (metadata.length > 0) {
+          results.push(metadata[0]);
+        }
+      } catch (error) {
+        if (error instanceof sql.PostgresError && parseInt(error.code, 10) == 23505) {
+            return "Duplicated";
+        } else {
+          console.log(error);
+          const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+          log.error(`directoryMetadataRepository.create:${id}:${description}`);
+          return null;
+        }
+      }
+    }
+    return results;
+  },
   async get(id: string, key: string) {
     try {
       const metadata = await sql `
@@ -42,58 +72,32 @@ export const directoryMetadataRepository = {
       return null;
     }
   },
-  async create(id: string, param: any) {
-    if (param.length == 0) {
-      return "No key-value pairs"
-    } else if (param.length > 1) {
-      return "Too many key-value pairs"
-    }
-    const key = Object.keys(param)[0]
-    const value = Object.values(param)[0]
-    try {
-      const metadata = await sql `
-        insert
-        into directory_metadata (directory, key, value, created, updated)
-        values (${id}, ${key}, ${value}, current_timestamp, current_timestamp)
-        returning key
-      `
-      return metadata[0];
-    } catch (error) {
-      if (error instanceof sql.PostgresError && parseInt(error.code, 10) == 23505) {
-          return "Duplicated";
-      } else {
+  async update(id: string, kvs: any) {
+    const results: any[] = [];
+    for (const key of Object.keys(kvs)) {
+      if (typeof kvs[key] !== "string") {
+        return "Invalid value type";
+      }
+      const value = kvs[key]
+      try {
+        const metadata = await sql `
+          update directory_metadata
+          set value = ${value},
+            updated = current_timestamp
+          where directory = ${id}
+          and key = ${key}
+          returning *
+        `
+        if (metadata.length > 0) {
+          results.push(metadata[0]);
+        }
+      } catch (error) {
         const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
         log.error(`directoryMetadataRepository.create:${id}:${description}`);
         return null;
       }
     }
-  },
-  async update(id: string, param: any) {
-    if (param.length == 0) {
-      return "No key-value pairs"
-    } else if (param.length > 1) {
-      return "Too many key-value pairs"
-    }
-    const key = Object.keys(param)[0]
-    const value = Object.values(param)[0]
-    try {
-      const metadata = await sql `
-        update directory_metadata
-        set value = ${value},
-          updated = current_timestamp
-        where directory = ${id}
-        and key = ${key}
-        returning *
-      `
-      if (metadata.length == 0) {
-        return {};
-      }
-      return metadata[0];
-    } catch (error) {
-      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`directoryMetadataRepository.create:${id}:${description}`);
-      return null;
-    }
+    return results;
   },
   async delete(id: string, key: string) {
     try {
@@ -108,6 +112,21 @@ export const directoryMetadataRepository = {
         return {};
       }
       return metadata[0];
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}`
+      log.error(`directoryMetadataRepository.delete:${id}:${description}`);
+      return null;
+    }
+  },
+  async deleteAll(id: string) {
+    try {
+      const metadata = await sql `
+        delete
+        from directory_metadata
+        where directory = ${id}
+        returning directory
+      `
+      return metadata;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}`
       log.error(`directoryMetadataRepository.delete:${id}:${description}`);
