@@ -2,7 +2,7 @@ import sql from "./db.ts"
 import { log } from "../deps.ts";
 
 export const directoryMetadataRepository = {
-  async create(id: string, kvs: any) {
+  async createOrUpdate(id: string, kvs: any) {
     const results: any[] = [];
     for (const key of Object.keys(kvs)) {
       if (typeof kvs[key] !== "string") {
@@ -14,20 +14,19 @@ export const directoryMetadataRepository = {
           insert
           into directory_metadata (directory, key, value, created, updated)
           values (${id}, ${key}, ${value}, current_timestamp, current_timestamp)
-          returning key
+          on conflict (directory, key)
+          do update
+            set value = ${value},
+            updated = current_timestamp
+          returning directory, key, value, created, updated
         `
         if (metadata.length > 0) {
           results.push(metadata[0]);
         }
       } catch (error) {
-        if (error instanceof sql.PostgresError && parseInt(error.code, 10) == 23505) {
-            return "Duplicated";
-        } else {
-          console.log(error);
-          const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-          log.error(`directoryMetadataRepository.create:${id}:${description}`);
-          return null;
-        }
+        const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+        log.error(`directoryMetadataRepository.create:${id}:${description}`);
+        return null;
       }
     }
     return results;
@@ -71,33 +70,6 @@ export const directoryMetadataRepository = {
       log.error(`directoryMetadataRepository.getAll:${id}:${description}`);
       return null;
     }
-  },
-  async update(id: string, kvs: any) {
-    const results: any[] = [];
-    for (const key of Object.keys(kvs)) {
-      if (typeof kvs[key] !== "string") {
-        return "Invalid value type";
-      }
-      const value = kvs[key]
-      try {
-        const metadata = await sql `
-          update directory_metadata
-          set value = ${value},
-            updated = current_timestamp
-          where directory = ${id}
-          and key = ${key}
-          returning *
-        `
-        if (metadata.length > 0) {
-          results.push(metadata[0]);
-        }
-      } catch (error) {
-        const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-        log.error(`directoryMetadataRepository.create:${id}:${description}`);
-        return null;
-      }
-    }
-    return results;
   },
   async delete(id: string, key: string) {
     try {

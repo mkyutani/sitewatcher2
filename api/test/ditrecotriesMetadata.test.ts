@@ -37,7 +37,7 @@ Deno.test("Directory metadata", async (t) => {
 
   const directory = await createDirectory();
 
-  await t.step("200: Create a directory metadata", async () => {
+  await t.step("200: Create directory metadata", async () => {
     const res = await fetch(`${urlBase}/directories/${directory}/metadata`, {
       method: "POST",
       body: JSON.stringify({
@@ -72,12 +72,13 @@ Deno.test("Directory metadata", async (t) => {
     console.log(json);
   });
 
-  await t.step("200: Update a directory metadata", async () => {
+  await t.step("200: Update directory metadata", async () => {
     const res = await fetch(`${urlBase}/directories/${directory}/metadata`, {
       method: "PUT",
       body: JSON.stringify({
         type: "new",
-        state: "inactive"
+        state: "inactive",
+        expired: "true"
       }),
       headers: {
         "Content-Type": "application/json",

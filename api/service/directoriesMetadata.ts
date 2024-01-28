@@ -2,7 +2,7 @@ import { directoryMetadataRepository } from "../repository/directoriesMetadata.t
 
 export const directoryMetadataService = {
   async create(id: string, {...reqBody}: any) {
-    return await directoryMetadataRepository.create(id, reqBody as any);
+    return await directoryMetadataRepository.createOrUpdate(id, reqBody as any);
   },
   async get(id: string, key: string) {
     return await directoryMetadataRepository.get(id, key);
@@ -11,7 +11,7 @@ export const directoryMetadataService = {
     return await directoryMetadataRepository.getAll(id);
   },
   async update(id: string, {...reqBody}: any) {
-    return await directoryMetadataRepository.update(id, reqBody as any);
+    return await directoryMetadataRepository.createOrUpdate(id, reqBody as any);
   },
   async delete(id: string, key: string) {
     return await directoryMetadataRepository.delete(id, key);
