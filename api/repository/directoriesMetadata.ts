@@ -13,7 +13,7 @@ export const directoryMetadataRepository = {
         const metadata = await sql `
           insert
           into directory_metadata (directory, key, value, created, updated)
-          ${id !== null ? sql`values (${id}, ${key}, ${value}, current_timestamp, current_timestamp)` : sql`select id, ${key}, ${value}, current_timestamp, current_timestamp from directory`}
+          ${id ? sql`values (${id}, ${key}, ${value}, current_timestamp, current_timestamp)` : sql`select id, ${key}, ${value}, current_timestamp, current_timestamp from directory`}
           on conflict (directory, key)
           do update
             set value = ${value},
@@ -39,9 +39,9 @@ export const directoryMetadataRepository = {
         select
           directory, key, value, created, updated
         from directory_metadata
-        where ${id !== null ? sql`directory = ${id} and key = ${key}` : sql`key = ${key}`}
+        where ${id ? sql`directory = ${id} and key = ${key}` : sql`key = ${key}`}
       `
-      if (id !== null) {
+      if (id) {
         if (metadata.length == 0) {
           return {};
         }
@@ -84,10 +84,10 @@ export const directoryMetadataRepository = {
       const metadata = await sql `
         delete
         from directory_metadata
-        where ${id !== null ? sql`directory = ${id} and key = ${key}` : sql`key = ${key}`}
+        where ${id ? sql`directory = ${id} and key = ${key}` : sql`key = ${key}`}
         returning directory, key
       `
-      if (id !== null) {
+      if (id) {
         if (metadata.length == 0) {
           return {};
         }
