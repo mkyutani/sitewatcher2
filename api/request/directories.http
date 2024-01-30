@@ -45,7 +45,7 @@ Content-Type: application/json
 GET http://localhost:18085/api/v1/directories/375395e0-dc12-49c4-9b52-eaee3cc3af44/metadata/type
 
 ### Get all metadata
-GET http://localhost:18085/api/v1/directories/375395e0-dc12-49c4-9b52-eaee3cc3af44/metadata
+GET http://localhost:18085/api/v1/directories/e463d1cf-feb6-45d4-a19d-7389ca34a14d/metadata
 
 ### Update metadata
 PUT http://localhost:18085/api/v1/directories/375395e0-dc12-49c4-9b52-eaee3cc3af44/metadata
@@ -73,12 +73,12 @@ Content-Type: application/json
 GET http://localhost:18085/api/v1/directories/metadata/state
 
 ### Update metadata for all
-PUT http://localhost:18085/api/v1/directories/metadata
+PUT http://localhost:18085/api/v1/directories/metadata?name=chicken2&strict=true
 Content-Type: application/json
 
 {
     "lock": "unlocked",
-    "state": "active"
+    "state": "superactive"
 }
 
 ### Delete metadata for all
