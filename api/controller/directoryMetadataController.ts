@@ -9,14 +9,14 @@ export const directoryMetadataController = {
     const reqBody = await reqBodyRaw.value;
     ctx.assert(reqBody, 400, "No data");
     ctx.assert(Object.keys(reqBody).length > 0, 400, "No key-value pairs");
-    const result = await directoryMetadataService.create(id, reqBody as any);
+    const result = await directoryMetadataService.create(id !== undefined ? id : null, reqBody as any);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result);
     ctx.response.body = result;
   },
   async get(ctx:RouterContext<string>) {
     const { id, key } = helpers.getQuery(ctx, { mergeParams: true });
-    const result = await directoryMetadataService.get(id, key);
+    const result = await directoryMetadataService.get(id !== undefined ? id : null, key);
     ctx.assert(result, 500, "Unknown");
     ctx.response.body = result;
   },
@@ -33,14 +33,14 @@ export const directoryMetadataController = {
     const reqBody = await reqBodyRaw.value;
     ctx.assert(reqBody, 400, "No data");
     ctx.assert(Object.keys(reqBody).length > 0, 400, "No key-value pairs");
-    const result = await directoryMetadataService.update(id, reqBody as any);
+    const result = await directoryMetadataService.update(id !== undefined ? id : null, reqBody as any);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result);
     ctx.response.body = result;
   },
   async delete(ctx:RouterContext<string>) {
     const { id, key } = helpers.getQuery(ctx, { mergeParams: true });
-    const result = await directoryMetadataService.delete(id, key);
+    const result = await directoryMetadataService.delete(id !== undefined ? id : null, key);
     ctx.assert(result, 500, "Unknown");
     ctx.response.body = null;
   },

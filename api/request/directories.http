@@ -42,13 +42,13 @@ Content-Type: application/json
 }
 
 ### Get metadata
-GET http://localhost:18085/api/v1/directories/189024c3-4eba-45b8-9a2d-80c04d1dd61e/metadata/type
+GET http://localhost:18085/api/v1/directories/375395e0-dc12-49c4-9b52-eaee3cc3af44/metadata/type
 
 ### Get all metadata
-GET http://localhost:18085/api/v1/directories/189024c3-4eba-45b8-9a2d-80c04d1dd61e/metadata
+GET http://localhost:18085/api/v1/directories/375395e0-dc12-49c4-9b52-eaee3cc3af44/metadata
 
 ### Update metadata
-PUT http://localhost:18085/api/v1/directories/d43e6d85-e0e8-4b01-ad9e-2926db994c5e/metadata
+PUT http://localhost:18085/api/v1/directories/375395e0-dc12-49c4-9b52-eaee3cc3af44/metadata
 Content-Type: application/json
 
 {
@@ -56,7 +56,30 @@ Content-Type: application/json
 }
 
 ### Delete metadata
-DELETE  http://localhost:18085/api/v1/directories/d43e6d85-e0e8-4b01-ad9e-2926db994c5e/metadata/type
+DELETE  http://localhost:18085/api/v1/directories/375395e0-dc12-49c4-9b52-eaee3cc3af44/metadata/type
 
 ### Delete all metadata
-DELETE  http://localhost:18085/api/v1/directories/d43e6d85-e0e8-4b01-ad9e-2926db994c5e/metadata
+DELETE  http://localhost:18085/api/v1/directories/375395e0-dc12-49c4-9b52-eaee3cc3af44/metadata
+
+### Create metadata for all
+POST http://localhost:18085/api/v1/directories/metadata
+Content-Type: application/json
+
+{
+    "lock": "locked"
+}
+
+### Get metadata for all
+GET http://localhost:18085/api/v1/directories/metadata/state
+
+### Update metadata for all
+PUT http://localhost:18085/api/v1/directories/metadata
+Content-Type: application/json
+
+{
+    "lock": "unlocked",
+    "state": "active"
+}
+
+### Delete metadata for all
+DELETE  http://localhost:18085/api/v1/directories/metadata/state
