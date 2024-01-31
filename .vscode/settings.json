@@ -11,5 +11,8 @@
     ],
     "deno.enable": true,
     "deno.lint": true,
-    "deno.unstable": true
+    "deno.unstable": true,
+    "deno.enablePaths": [
+        "/home/yuta/.deno/bin"
+    ]
 }

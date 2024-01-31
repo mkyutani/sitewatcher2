@@ -61,7 +61,7 @@ DELETE  http://localhost:18085/api/v1/directories/375395e0-dc12-49c4-9b52-eaee3c
 ### Delete all metadata
 DELETE  http://localhost:18085/api/v1/directories/375395e0-dc12-49c4-9b52-eaee3cc3af44/metadata
 
-### Create metadata for all
+### Create metadata for all directories
 POST http://localhost:18085/api/v1/directories/metadata
 Content-Type: application/json
 
@@ -69,10 +69,10 @@ Content-Type: application/json
     "lock": "locked"
 }
 
-### Get metadata for all
+### Get metadata for all directories
 GET http://localhost:18085/api/v1/directories/metadata/state
 
-### Update metadata for all
+### Update metadata for all directories
 PUT http://localhost:18085/api/v1/directories/metadata?name=chicken2&strict=true
 Content-Type: application/json
 
@@ -81,5 +81,5 @@ Content-Type: application/json
     "state": "superactive"
 }
 
-### Delete metadata for all
+### Delete metadata for all directories
 DELETE  http://localhost:18085/api/v1/directories/metadata/state

@@ -46,11 +46,21 @@ export const directoryMetadataRepository = {
           directory, key, value, m.created, m.updated
         from directory_metadata as m
         ${id ?
-          sql`and m.directory = ${id}` :
-          sql`${(name && name.length > 0) ?
-            sql`join directory as d on ${strict_flag ? sql`name = ${name}` : sql`name ilike ${`%${name}%`}`} where m.key = ${`${key}`} and m.directory = d.id` :
+          sql`where m.directory = ${id}
+            ${key ?
+              sql`and m.key = ${key}` :
+              sql``
+            }
+          ` :
+          (name && name.length > 0) ?
+            sql`join directory as d on 
+              ${strict_flag ?
+                sql`name = ${name}` :
+                sql`name ilike ${`%${name}%`}`
+              }
+              where m.key = ${`${key}`} and m.directory = d.id
+            ` :
             sql`where m.key = ${`${key}`}`
-          }`
         }
       `
       if (id) {
@@ -100,7 +110,13 @@ export const directoryMetadataRepository = {
         ${id ?
           sql`and directory = ${id}` :
           (name && name.length > 0) ?
-            sql`and directory in (select id from directory where ${strict_flag ? sql`name = ${name}` : sql`name ilike ${`%${name}%`}`})` :
+            sql`and directory in (select id from directory where
+              ${strict_flag ?
+                sql`name = ${name}` :
+                sql`name ilike ${`%${name}%`}`
+              }
+              )
+            ` :
             sql``
         }
         returning directory, key
