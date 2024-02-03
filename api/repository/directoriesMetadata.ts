@@ -33,8 +33,13 @@ export const directoryMetadataRepository = {
         }
       } catch (error) {
         const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-        log.error(`directoryMetadataRepository.create:${id}:${description}`);
-        return null;
+        if (error instanceof sql.PostgresError && error.code === "23503") {
+          log.warning(`directoryMetadataRepository.get:${id}:${description}`);
+          return "No such a directory"
+        } else {
+          log.error(`directoryMetadataRepository.create:${id}:${description}`);
+          return null;
+        }
       }
     }
     return results;
@@ -76,10 +81,9 @@ export const directoryMetadataRepository = {
       }
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      if (error instanceof sql.PostgresError && error.code === "22P02") {
-        // Ignore invalid uuid
+      if (error instanceof sql.PostgresError && error.code === "23503") {
         log.warning(`directoryMetadataRepository.get:${id}:${description}`);
-        return {};
+        return "No such a directory"
       } else {
         log.error(`directoryMetadataRepository.get:${id}:${description}`);
         return null;
@@ -97,8 +101,13 @@ export const directoryMetadataRepository = {
       return metadata;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`directoryMetadataRepository.getAll:${id}:${description}`);
-      return null;
+      if (error instanceof sql.PostgresError && error.code === "23503") {
+        log.warning(`directoryMetadataRepository.get:${id}:${description}`);
+        return "No such a directory"
+      } else {
+        log.error(`directoryMetadataRepository.getAll:${id}:${description}`);
+        return null;
+      }
     }
   },
   async delete(id: string | null, key: string, name: string | null, strict_flag : boolean | null) {
@@ -121,15 +130,19 @@ export const directoryMetadataRepository = {
         }
         returning directory, key
       `
-      log.debug(metadata);
       if (metadata.length == 0) {
         return [];
       }
       return metadata;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}`
-      log.error(`directoryMetadataRepository.delete:${id}:${description}`);
-      return null;
+      if (error instanceof sql.PostgresError && error.code === "23503") {
+        log.warning(`directoryMetadataRepository.get:${id}:${description}`);
+        return "No such a directory"
+      } else {
+        log.error(`directoryMetadataRepository.delete:${id}:${description}`);
+        return null;
+      }
     }
   },
   async deleteAll(id: string) {
@@ -143,8 +156,13 @@ export const directoryMetadataRepository = {
       return metadata;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}`
-      log.error(`directoryMetadataRepository.delete:${id}:${description}`);
-      return null;
+      if (error instanceof sql.PostgresError && error.code === "23503") {
+        log.warning(`directoryMetadataRepository.get:${id}:${description}`);
+        return "No such a directory"
+      } else {
+        log.error(`directoryMetadataRepository.delete:${id}:${description}`);
+        return null;
+      }
     }
   }
 }
