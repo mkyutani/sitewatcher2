@@ -41,6 +41,7 @@ async function deleteADirectory(name: string, id: string): Promise<void> {
   const res = await fetch(`${urlBase}/directories/${id}`, {
     method: "DELETE"
   });
+  const text = await res.text();
   if (res.status !== 204) {
     console.log(`Failed to delete a directory: ${name}`);
   } else {
