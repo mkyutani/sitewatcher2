@@ -7,17 +7,21 @@ import { directoryMetadataController } from "./controller/directoryMetadataContr
 
 const router = new Router();
 
-router.get('/api/v1/directories', directoryController.getAll);
-router.get('/api/v1/directories/:id', directoryController.get);
-router.post('/api/v1/directories', directoryController.create);
-router.put('/api/v1/directories/:id', directoryController.update);
-router.delete('/api/v1/directories/:id', directoryController.delete);
+router.post('/api/v1/directories/metadata', directoryMetadataController.create);
+router.get('/api/v1/directories/metadata/:key', directoryMetadataController.get);
+router.put('/api/v1/directories/metadata', directoryMetadataController.update);
+router.delete('/api/v1/directories/metadata/:key', directoryMetadataController.delete);
+router.post('/api/v1/directories/:id/metadata', directoryMetadataController.create);
 router.get('/api/v1/directories/:id/metadata', directoryMetadataController.getAll);
 router.get('/api/v1/directories/:id/metadata/:key', directoryMetadataController.get);
-router.post('/api/v1/directories/:id/metadata', directoryMetadataController.create);
 router.put('/api/v1/directories/:id/metadata', directoryMetadataController.update);
 router.delete('/api/v1/directories/:id/metadata', directoryMetadataController.deleteAll);
 router.delete('/api/v1/directories/:id/metadata/:key', directoryMetadataController.delete);
+router.post('/api/v1/directories', directoryController.create);
+router.get('/api/v1/directories', directoryController.getAll);
+router.get('/api/v1/directories/:id', directoryController.get);
+router.put('/api/v1/directories/:id', directoryController.update);
+router.delete('/api/v1/directories/:id', directoryController.delete);
 
 router.get('/api/v1/sites', siteController.getAll);
 router.get('/api/v1/sites/:id', siteController.get);
