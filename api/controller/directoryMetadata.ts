@@ -1,5 +1,5 @@
 import { RouterContext, helpers } from "../deps.ts";
-import { directoryMetadataService } from "../service/directoriesMetadata.ts";
+import { directoryMetadataService } from "../service/directoryMetadata.ts";
 import { isUuid } from "../util.ts";
 
 export const directoryMetadataController = {

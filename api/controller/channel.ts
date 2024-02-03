@@ -1,6 +1,6 @@
 import { RouterContext, helpers } from "../deps.ts";
-import { ChannelParam } from "../model/channels.ts";
-import { channelService } from "../service/channels.ts";
+import { ChannelParam } from "../model/channel.ts";
+import { channelService } from "../service/channel.ts";
 
 export const channelController = {
   async getAll(ctx: RouterContext<string>) {

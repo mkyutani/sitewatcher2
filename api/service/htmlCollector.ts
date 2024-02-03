@@ -8,7 +8,7 @@
   urlJoin,
   urlParse,
 } from "../deps.ts";
-import { ResourceParam } from "../model/resources.ts";
+import { ResourceParam } from "../model/resource.ts";
 
 export async function collectHtml(source: string): Promise<ResourceParam[] | null> {
   const sourceUrlBase = urlParse(source);

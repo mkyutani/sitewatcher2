@@ -1,4 +1,4 @@
-import { directoryMetadataRepository } from "../repository/directoriesMetadata.ts";
+import { directoryMetadataRepository } from "../repository/directoryMetadata.ts";
 
 export const directoryMetadataService = {
   async create(id: string | null, {...reqBody}: any, name: string | null, strict_flag: boolean | null) {

@@ -1,6 +1,6 @@
 import { RouterContext, helpers } from "../deps.ts";
-import { SiteParam } from "../model/sites.ts";
-import { siteService } from "../service/sites.ts";
+import { SiteParam } from "../model/site.ts";
+import { siteService } from "../service/site.ts";
 import { convertToBoolean, convertToJson, isUuid } from "../util.ts";
 
 export const siteController = {

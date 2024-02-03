@@ -1,6 +1,6 @@
 import sql from "./db.ts"
 import { log } from "../deps.ts";
-import { ChannelParam } from "../model/channels.ts";
+import { ChannelParam } from "../model/channel.ts";
 
 export const channelRepository = {
   async get(id: string) {

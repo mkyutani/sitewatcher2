@@ -1,6 +1,6 @@
 import sql from "./db.ts"
 import { log } from "../deps.ts";
-import { DirectoryParam } from "../model/directories.ts";
+import { DirectoryParam } from "../model/directory.ts";
 
 export const directoryRepository = {
   async get(id: string) {

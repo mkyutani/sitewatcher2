@@ -1,6 +1,6 @@
 import sql from "./db.ts"
 import { log } from "../deps.ts";
-import { SiteParam } from "../model/sites.ts";
+import { SiteParam } from "../model/site.ts";
 
 export const siteRepository = {
   async get(id: string) {

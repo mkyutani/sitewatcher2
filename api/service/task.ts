@@ -1,4 +1,4 @@
-import { taskRepository } from "../repository/tasks.ts";
+import { taskRepository } from "../repository/task.ts";
 
 export const taskService = {
   async get(id: string) {

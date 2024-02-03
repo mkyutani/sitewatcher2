@@ -1,5 +1,5 @@
-import { ChannelParam } from "../model/channels.ts";
-import { channelRepository } from "../repository/channels.ts";
+import { ChannelParam } from "../model/channel.ts";
+import { channelRepository } from "../repository/channel.ts";
 
 export const channelService = {
   async get(id: string) {

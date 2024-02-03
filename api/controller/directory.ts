@@ -1,6 +1,6 @@
 import { RouterContext, helpers, log } from "../deps.ts";
-import { DirectoryParam } from "../model/directories.ts";
-import { directoryService } from "../service/directories.ts";
+import { DirectoryParam } from "../model/directory.ts";
+import { directoryService } from "../service/directory.ts";
 import { convertToBoolean, isUuid } from "../util.ts";
 
 export const directoryController = {

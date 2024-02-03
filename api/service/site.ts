@@ -1,6 +1,6 @@
-import { SiteParam } from "../model/sites.ts";
+import { SiteParam } from "../model/site.ts";
 //import { resourceRepository } from "../repository/resources.ts";
-import { siteRepository } from "../repository/sites.ts";
+import { siteRepository } from "../repository/site.ts";
 //import { collectHtml } from "./htmlCollector.ts";
 
 export const siteService = {

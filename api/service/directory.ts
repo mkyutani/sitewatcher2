@@ -1,5 +1,5 @@
-import { DirectoryParam } from "../model/directories.ts";
-import { directoryRepository } from "../repository/directories.ts";
+import { DirectoryParam } from "../model/directory.ts";
+import { directoryRepository } from "../repository/directory.ts";
 
 export const directoryService = {
   async create({...reqBody}: DirectoryParam) {

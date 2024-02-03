@@ -1,9 +1,9 @@
-import { channelController } from "./controller/channelController.ts";
-import { siteController } from "./controller/sitesController.ts";
-import { directoryController } from "./controller/directoriesController.ts";
+import { channelController } from "./controller/channel.ts";
+import { siteController } from "./controller/site.ts";
+import { directoryController } from "./controller/directory.ts";
 import { Router } from "./deps.ts"
-import { taskController } from "./controller/tasksController.ts";
-import { directoryMetadataController } from "./controller/directoryMetadataController.ts";
+import { taskController } from "./controller/task.ts";
+import { directoryMetadataController } from "./controller/directoryMetadata.ts";
 
 const router = new Router();
 

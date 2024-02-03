@@ -1,5 +1,5 @@
 import { RouterContext, helpers } from "../deps.ts";
-import { taskService } from "../service/tasks.ts";
+import { taskService } from "../service/task.ts";
 
 export const taskController = {
   async getAll(ctx: RouterContext<string>) {
