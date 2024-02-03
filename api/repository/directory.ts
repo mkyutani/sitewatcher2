@@ -28,11 +28,8 @@ export const directoryRepository = {
       }
     }
   },
-  async getAll(name: string | null, strict_flag: boolean | null, sort: string | null) {
+  async getAll(name: string | null, strict_flag: boolean | null) {
     try {
-      if (sort && ["id", "name"].indexOf(sort) == -1) {
-        return "Invalid sort key";
-      }
       const directories = await sql `
         select
           id, name, enabled, created, updated
@@ -40,9 +37,6 @@ export const directoryRepository = {
         ${(name && name.length > 0) ?
           (strict_flag ? sql`where name = ${name}` : sql`where name ilike ${`%${name}%`}`) :
           sql``}
-        ${sort === "name" ?
-          sql`order by name` :
-          sql`order by id`}
       `
       return directories;
     } catch (error) {

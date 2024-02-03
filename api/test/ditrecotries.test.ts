@@ -178,16 +178,6 @@ Deno.test("200: Get all directories with strict flag", async () => {
   assertEquals(json.length, 1);
 });
 
-Deno.test("200: Get all directories sort by name", async () => {
-  const res = await fetch(`${urlBase}/directories?sort=name`);
-  const text = await res.text();
-  assertEquals(res.status, 200);
-  const json = JSON.parse(text);
-  assertEquals(json.length, directories.length);
-  assertEquals(json[0].id, directories[0]);
-  assertEquals(json[json.length - 1].name, "beatle");
-});
-
 Deno.test("200: Update a directory", async () => {
   const id = directories[0];
   const res = await fetch(`${urlBase}/directories/${id}`, {
