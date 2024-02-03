@@ -1,6 +1,6 @@
 import { RouterContext, helpers } from "../deps.ts";
 import { directoryMetadataService } from "../service/directoryMetadata.ts";
-import { isUuid } from "../util.ts";
+import { convertToBoolean, isUuid } from "../util.ts";
 
 export const directoryMetadataController = {
   async create(ctx:RouterContext<string>) {
@@ -11,7 +11,9 @@ export const directoryMetadataController = {
     const reqBody = await reqBodyRaw.value;
     ctx.assert(reqBody, 400, "No data");
     ctx.assert(Object.keys(reqBody).length > 0, 400, "No key-value pairs");
-    const result = await directoryMetadataService.create(id, reqBody as any, name, strict);
+    const strict_flag = convertToBoolean(strict);
+    ctx.assert(strict_flag != null, 400, "Invalid strict flag"); 
+    const result = await directoryMetadataService.create(id, reqBody as any, name, strict_flag);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result);
     ctx.response.body = result;
@@ -19,7 +21,9 @@ export const directoryMetadataController = {
   async get(ctx:RouterContext<string>) {
     const { id, key, name, strict } = helpers.getQuery(ctx, { mergeParams: true });
     ctx.assert(!id || isUuid(id), 400, "Invalid id");
-    const result = await directoryMetadataService.get(id, key, name, strict);
+    const strict_flag = convertToBoolean(strict);
+    ctx.assert(strict_flag != null, 400, "Invalid strict flag"); 
+    const result = await directoryMetadataService.get(id, key, name, strict_flag);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result);
     ctx.response.body = result;
@@ -40,7 +44,9 @@ export const directoryMetadataController = {
     const reqBody = await reqBodyRaw.value;
     ctx.assert(reqBody, 400, "No data");
     ctx.assert(Object.keys(reqBody).length > 0, 400, "No key-value pairs");
-    const result = await directoryMetadataService.update(id, reqBody as any, name, strict);
+    const strict_flag = convertToBoolean(strict);
+    ctx.assert(strict_flag != null, 400, "Invalid strict flag"); 
+    const result = await directoryMetadataService.update(id, reqBody as any, name, strict_flag);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result);
     ctx.response.body = result;
@@ -48,7 +54,9 @@ export const directoryMetadataController = {
   async delete(ctx:RouterContext<string>) {
     const { id, key, name, strict } = helpers.getQuery(ctx, { mergeParams: true });
     ctx.assert(!id || isUuid(id), 400, "Invalid id");
-    const result = await directoryMetadataService.delete(id, key, name, strict);
+    const strict_flag = convertToBoolean(strict);
+    ctx.assert(strict_flag != null, 400, "Invalid strict flag"); 
+    const result = await directoryMetadataService.delete(id, key, name, strict_flag);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result);
     ctx.response.body = null;

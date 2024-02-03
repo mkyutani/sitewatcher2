@@ -16,7 +16,7 @@ export const convertToBoolean = function(value: boolean | string | null): boolea
   else if (typeof value === "boolean") return value;
   else if (typeof value === "string") {
     const value_lower = value.toLowerCase();
-    return (value_lower === "true") ? true : ((value_lower === "false") ? false : null);
+    return (value_lower === "true" || value_lower === "") ? true : ((value_lower === "false") ? false : null);
   }
   else return null;
 }

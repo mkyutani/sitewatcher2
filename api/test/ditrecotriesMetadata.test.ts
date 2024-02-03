@@ -323,7 +323,7 @@ Deno.test("Directory metadata", async (t) => {
   });
 
   await t.step("200: Create directory metadata for directories by strict name", async () => {
-    const res = await fetch(`${urlBase}/directories/metadata?name=yak&strict=true`, {
+    const res = await fetch(`${urlBase}/directories/metadata?name=yak&strict`, {
       method: "POST",
       body: JSON.stringify({
         history: "new"
@@ -385,7 +385,7 @@ Deno.test("Directory metadata", async (t) => {
   });
 
   await t.step("200: Get all directory metadata for directories by strict name", async () => {
-    const res = await fetch(`${urlBase}/directories/metadata?name=yak&strict=true`);
+    const res = await fetch(`${urlBase}/directories/metadata?name=yak&strict`);
     const text = await res.text();
     assertEquals(res.status, 200);
     const json = JSON.parse(text);
@@ -428,7 +428,7 @@ Deno.test("Directory metadata", async (t) => {
   });
 
   await t.step("200: Update directory metadata for directories by strict name", async () => {
-    const res = await fetch(`${urlBase}/directories/metadata?name=yak&strict=true`, {
+    const res = await fetch(`${urlBase}/directories/metadata?name=yak&strict=`, {
       method: "PUT",
       body: JSON.stringify({
         history: ""
@@ -459,7 +459,7 @@ Deno.test("Directory metadata", async (t) => {
   });
 
   await t.step("204: Delete a directory metadata for directories by strict name", async () => {
-    const res = await fetch(`${urlBase}/directories/metadata/history?name=yak&strict=true`, {
+    const res = await fetch(`${urlBase}/directories/metadata/history?name=yak&strict`, {
       method: "DELETE"
     });
     assertEquals(res.status, 204);
