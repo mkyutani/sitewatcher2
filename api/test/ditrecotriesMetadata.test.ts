@@ -366,6 +366,33 @@ Deno.test("Directory metadata", async (t) => {
     console.log(json);
   });
 
+  await t.step("200: Get all directory metadata for all directories", async () => {
+    const res = await fetch(`${urlBase}/directories/metadata`);
+    const text = await res.text();
+    assertEquals(res.status, 200);
+    const json = JSON.parse(text);
+    assertEquals(json.length, 6);
+    console.log(json);
+  });
+
+  await t.step("200: Get all directory metadata for directories by name", async () => {
+    const res = await fetch(`${urlBase}/directories/metadata?name=yak`);
+    const text = await res.text();
+    assertEquals(res.status, 200);
+    const json = JSON.parse(text);
+    assertEquals(json.length, 5);
+    console.log(json);
+  });
+
+  await t.step("200: Get all directory metadata for directories by strict name", async () => {
+    const res = await fetch(`${urlBase}/directories/metadata?name=yak&strict=true`);
+    const text = await res.text();
+    assertEquals(res.status, 200);
+    const json = JSON.parse(text);
+    assertEquals(json.length, 3);
+    console.log(json);
+  });
+
   await t.step("200: Update directory metadata for all directories", async () => {
     const res = await fetch(`${urlBase}/directories/metadata`, {
       method: "PUT",

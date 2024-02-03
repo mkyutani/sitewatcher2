@@ -8,6 +8,7 @@ import { directoryMetadataController } from "./controller/directoryMetadata.ts";
 const router = new Router();
 
 router.post('/api/v1/directories/metadata', directoryMetadataController.create);
+router.get('/api/v1/directories/metadata', directoryMetadataController.get);
 router.get('/api/v1/directories/metadata/:key', directoryMetadataController.get);
 router.put('/api/v1/directories/metadata', directoryMetadataController.update);
 router.delete('/api/v1/directories/metadata/:key', directoryMetadataController.delete);

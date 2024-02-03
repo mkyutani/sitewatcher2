@@ -63,9 +63,15 @@ export const directoryMetadataRepository = {
                 sql`name = ${name}` :
                 sql`name ilike ${`%${name}%`}`
               }
-              where m.key = ${`${key}`} and m.directory = d.id
+              where m.directory = d.id
+              ${key ?
+                sql`and m.key = ${key}` :
+                sql``
+              }
             ` :
-            sql`where m.key = ${`${key}`}`
+            (key) ?
+              sql`where m.key = ${key}` :
+              sql``
         }
       `
       if (id) {
