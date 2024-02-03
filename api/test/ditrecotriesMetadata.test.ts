@@ -1,66 +1,10 @@
 import { assertEquals } from "../deps_test.ts";
+import { TestDirectories, createTestDirectories, deleteTestDirectories, getTestUrlBase } from "../util_test.ts";
 
 Deno.test("Directory metadata", async (t) => {
-  const port = Number(Deno.env.get("API_PORT")) || 8089;
-  const urlBase = `http://localhost:${port}/api/v1`;
+  const urlBase = getTestUrlBase();
 
-  interface Directories {
-    [name: string]: string;
-  };
-  const directories: Directories = {};
-
-  async function requestToCreateDirectory(name: string, enabled: boolean): Promise<string | null> {
-    const res = await fetch(`${urlBase}/directories`, {
-      method: "POST",
-      body: JSON.stringify({
-        name: name,
-        enabled: enabled
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      }
-    });
-    const text = await res.text();
-    if (res.status !== 200) {
-      return null;
-    } else {
-      return JSON.parse(text).id;
-    }
-  }
-
-  async function createADirectory(name: string, enabled: boolean): Promise<boolean> {
-    const id = await requestToCreateDirectory(name, enabled);
-    if (id === null) {
-      return false;
-    } else {
-      directories[name as keyof Directories] = id;
-      return true;
-    }
-  }
-
-  async function createDirectory() {
-    if (!await createADirectory("zebra", true) || !await createADirectory("yak", true) || !await createADirectory("yak2", true)) {
-      console.log("Failed to create directories");
-    }
-  }
-
-  async function deleteADirectory(id: string): Promise<void> {
-    const res = await fetch(`${urlBase}/directories/${id}`, {
-      method: "DELETE"
-    });
-    if (res.status !== 204) {
-      console.log("Failed to delete a directory");
-    }
-  }
-
-  async function deleteDirectory() {
-    for (const name of Object.keys(directories)) {
-      await deleteADirectory(directories[name as keyof Directories]);
-    }
-  }
-
-  await createDirectory();
-  console.log(`Created directories: ${directories}`);
+  const directories: TestDirectories = await createTestDirectories();
 
   await t.step("200: Create directory metadata", async () => {
     const res = await fetch(`${urlBase}/directories/${directories["zebra"]}/metadata`, {
@@ -465,6 +409,5 @@ Deno.test("Directory metadata", async (t) => {
     assertEquals(res.status, 204);
   });
 
-  await deleteDirectory();  
-  console.log(`Deleted directories`);
+  await deleteTestDirectories();  
 });
