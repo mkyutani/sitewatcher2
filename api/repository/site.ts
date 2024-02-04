@@ -22,13 +22,11 @@ export const siteRepository = {
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       if (error instanceof sql.PostgresError && error.code === "22P02") {
-        // Ignore invalid uuid
-        log.warning(`Site:${id}:${description}`);
+        log.warning(`siteRepository.get:${id}:${description}`);
         return {};
-      } else {
-        log.error(`Site:${id}:${description}`);
-        return null;
       }
+      log.error(`siteRepository.get:${id}:${description}`);
+      return null;
     }
   },
   async getAll(name: string | null, strict_flag: boolean | null, sort: string | null) {
@@ -57,7 +55,7 @@ export const siteRepository = {
       return sites;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`Site:${description}`);
+      log.error(`siteRepository.getAll:${description}`);
       return null;
     }
   },
@@ -79,7 +77,9 @@ export const siteRepository = {
       }
       return sites[0];
     } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       if (error instanceof sql.PostgresError) {
+        log.warning(`siteRepository.create:PG${error.code}:${error.message}`);
         switch (parseInt(error.code, 10)) {
         case 23505:
           return "Duplicated";
@@ -87,7 +87,7 @@ export const siteRepository = {
           return "Invalid directory id";
         }
       }
-      log.error(`Site:PG${error.code}:${error.message}:${uri}`);
+      log.error(`siteRepository.create:${description}`);
       return null;
     }
   },
@@ -117,13 +117,17 @@ export const siteRepository = {
       }
     return sites[0];
     } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       if (error instanceof sql.PostgresError) {
+        log.warning(`siteRepository.update:PG${error.code}:${error.message}`);
         switch (parseInt(error.code, 10)) {
+        case 23505:
+          return "Duplicated";
         case 23503:
           return "Invalid directory id";
-        }
+          }
       }
-      log.error(`Site:PG${error.code}:${error.message}:${uri}`);
+      log.error(`siteRepository.update:${id}:${description}`);
       return null;
     }
   },
@@ -141,7 +145,7 @@ export const siteRepository = {
       return sites[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`Site:${id}:${description}`);
+      log.error(`siteRepository.delete:${id}:${description}`);
       return null;
     }
   }

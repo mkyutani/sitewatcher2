@@ -63,6 +63,10 @@ export const siteController = {
       reqBody.metadata = convertToJson(reqBody.metadata)
       ctx.assert(reqBody.metadata, 415, "Metadata is not valid JSON");
     }
+    if (reqBody.enabled) {
+      reqBody.enabled = convertToBoolean(reqBody.enabled);
+      ctx.assert(reqBody.enabled != null, 400, "Invalid enabled flag");
+    }
     const result = await siteService.update(id, reqBody as SiteParam);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result as string);
