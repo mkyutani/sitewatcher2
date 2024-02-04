@@ -7,7 +7,8 @@
         "PGSERVER",
         "PGUSER",
         "sitescontroller",
-        "sitewatcher"
+        "sitewatcher",
+        "xenopus"
     ],
     "deno.enable": true,
     "deno.lint": true,
