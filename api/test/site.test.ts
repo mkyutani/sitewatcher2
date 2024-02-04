@@ -1,9 +1,9 @@
 import { assertEquals } from "../deps_test.ts";
-import { TestDirectories, createTestDirectories, deleteTestDirectories, getTestUrlBase } from "../util_test.ts";
+import { IdNames, createTestDirectories, deleteTestDirectories, getTestUrlBase } from "../util_test.ts";
 
 Deno.test("Site", async (t) => {
   const urlBase = getTestUrlBase();
-  const directories: TestDirectories = await createTestDirectories();
+  const directories: IdNames = await createTestDirectories();
   const sites: string[] = [];
 
   await t.step("200: Create a site", async () => {

@@ -38,9 +38,6 @@ export const siteController = {
     ctx.assert(reqBody.name, 400, "Name is missing");
     ctx.assert(reqBody.directory, 400, "Directory is missing");
     ctx.assert(isUuid(reqBody.directory), 400, "Invalid directory id");
-    ctx.assert(reqBody.metadata, 400, "Metadata is missing");
-    reqBody.metadata = convertToJson(reqBody.metadata)
-    ctx.assert(reqBody.metadata, 415, "Metadata is not valid JSON");
     ctx.assert(reqBody.enabled, 400, "Enabled is missing");
     reqBody.enabled = convertToBoolean(reqBody.enabled);
     ctx.assert(reqBody.enabled != null, 400, "Invalid enabled flag");
@@ -58,10 +55,6 @@ export const siteController = {
     ctx.assert(reqBody, 400, "No data");
     if (reqBody.directory) {
       ctx.assert(isUuid(reqBody.directory), 400, "Invalid directory id");
-    }
-    if (reqBody.metadata) {
-      reqBody.metadata = convertToJson(reqBody.metadata)
-      ctx.assert(reqBody.metadata, 415, "Metadata is not valid JSON");
     }
     if (reqBody.enabled) {
       reqBody.enabled = convertToBoolean(reqBody.enabled);

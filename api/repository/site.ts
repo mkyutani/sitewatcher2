@@ -7,16 +7,12 @@ export const siteRepository = {
     try {
       const sites = await sql `
         select
-          id, uri, name, directory, metadata, enabled, created, updated
+          id, uri, name, directory, enabled, created, updated
         from site
         where id = ${id}
       `
       if (sites.length == 0) {
         return {};
-      }
-      const site = sites[0];
-      if (site.metadata) {
-        site.metadata = JSON.parse(site.metadata);
       }
       return sites[0];
     } catch (error) {
@@ -36,7 +32,7 @@ export const siteRepository = {
       }
       const sites = await sql `
         select
-          id, uri, name, directory, metadata, enabled, created, updated
+          id, uri, name, directory, enabled, created, updated
         from site
         ${(name && name.length > 0) ?
           (strict_flag ? sql`where name = ${name}` : sql`where name ilike ${`%${name}%`}`) :
@@ -47,11 +43,6 @@ export const siteRepository = {
             sql`order by name` :
             sql`order by id`}
       `
-      for (const site of sites) {
-        if (site.metadata) {
-          site.metadata = JSON.parse(site.metadata);
-        }
-      }
       return sites;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
@@ -63,18 +54,14 @@ export const siteRepository = {
     const uri = siteParam?.uri;
     const name = siteParam?.name;
     const directory = siteParam?.directory;
-    const metadata = siteParam?.metadata;
     const enabled = siteParam?.enabled;
     try {
       const sites = await sql `
         insert
-        into site (uri, name, directory, metadata, enabled, created, updated)
-        values (${uri}, ${name}, ${directory}, ${JSON.stringify(metadata)}, ${enabled}, current_timestamp, current_timestamp)
+        into site (uri, name, directory, enabled, created, updated)
+        values (${uri}, ${name}, ${directory}, ${enabled}, current_timestamp, current_timestamp)
         returning id
       `
-      if (sites[0].metadata) {
-        sites[0].metadata = JSON.parse(sites[0].metadata);
-      }
       return sites[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
@@ -95,7 +82,6 @@ export const siteRepository = {
     const uri = siteParam?.uri;
     const name = siteParam?.name;
     const directory = siteParam?.directory;
-    const metadata = siteParam?.metadata;
     const enabled = siteParam?.enabled;
     try {
       const sites = await sql `
@@ -103,7 +89,6 @@ export const siteRepository = {
         set uri = ${uri ? uri : sql`uri`},
           name = ${name ? name : sql`name`},
           directory = ${directory ? directory : sql`directory`},
-          metadata = ${metadata ? JSON.stringify(metadata) : sql`metadata`},
           enabled = ${(enabled !== void 0) ? enabled : sql`enabled`},
           updated = current_timestamp
         where id = ${id}
@@ -112,10 +97,7 @@ export const siteRepository = {
       if (sites.length == 0) {
         return {};
       }
-      if (sites[0].metadata) {
-        sites[0].metadata = JSON.parse(sites[0].metadata);
-      }
-    return sites[0];
+      return sites[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       if (error instanceof sql.PostgresError) {

@@ -13,7 +13,6 @@ create table if not exists site (
   directory uuid not null references directory on delete cascade,
   uri varchar(4096) not null,
   name varchar(256) not null,
-  metadata varchar(4096) not null,
   enabled boolean not null,
   created timestamp not null,
   updated timestamp not null,

@@ -1,9 +1,10 @@
 import { channelController } from "./controller/channel.ts";
-import { siteController } from "./controller/site.ts";
 import { directoryController } from "./controller/directory.ts";
-import { Router } from "./deps.ts"
-import { taskController } from "./controller/task.ts";
 import { directoryMetadataController } from "./controller/directoryMetadata.ts";
+import { Router } from "./deps.ts"
+import { siteController } from "./controller/site.ts";
+import { siteMetadataController } from "./controller/siteMetadata.ts";
+import { taskController } from "./controller/task.ts";
 
 const router = new Router();
 
@@ -24,6 +25,17 @@ router.get('/api/v1/directories/:id', directoryController.get);
 router.put('/api/v1/directories/:id', directoryController.update);
 router.delete('/api/v1/directories/:id', directoryController.delete);
 
+router.post('/api/v1/sites/metadata', siteMetadataController.create);
+router.get('/api/v1/sites/metadata', siteMetadataController.get);
+router.get('/api/v1/sites/metadata/:key', siteMetadataController.get);
+router.put('/api/v1/sites/metadata', siteMetadataController.update);
+router.delete('/api/v1/sites/metadata/:key', siteMetadataController.delete);
+router.post('/api/v1/sites/:id/metadata', siteMetadataController.create);
+router.get('/api/v1/sites/:id/metadata', siteMetadataController.getAll);
+router.get('/api/v1/sites/:id/metadata/:key', siteMetadataController.get);
+router.put('/api/v1/sites/:id/metadata', siteMetadataController.update);
+router.delete('/api/v1/sites/:id/metadata', siteMetadataController.deleteAll);
+router.delete('/api/v1/sites/:id/metadata/:key', siteMetadataController.delete);
 router.get('/api/v1/sites', siteController.getAll);
 router.get('/api/v1/sites/:id', siteController.get);
 //router.get('/api/v1/sites/:id/resources', siteController.getResources);

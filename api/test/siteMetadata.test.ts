@@ -1,13 +1,15 @@
 import { assertEquals } from "../deps_test.ts";
-import { IdNames, createTestDirectories, deleteTestDirectories, getTestUrlBase } from "../util_test.ts";
+import { IdNames, createTestDirectories, createTestSites, deleteTestDirectories, deleteTestSites, getTestUrlBase } from "../util_test.ts";
 
-Deno.test("Directory metadata", async (t) => {
+Deno.test("Site metadata", async (t) => {
   const urlBase = getTestUrlBase();
 
   const directories: IdNames = await createTestDirectories();
+  const sites: IdNames = await createTestSites(directories);
 
-  await t.step("200: Create directory metadata", async () => {
-    const res = await fetch(`${urlBase}/directories/${directories["zebra"]}/metadata`, {
+  await t.step("200: Create site metadata", async () => {
+    console.log(`${urlBase}/sites/${sites["xenopus"]}/metadata`);
+    const res = await fetch(`${urlBase}/sites/${sites["xenopus"]}/metadata`, {
       method: "POST",
       body: JSON.stringify({
         type: "list",
@@ -24,8 +26,8 @@ Deno.test("Directory metadata", async (t) => {
     console.log(json);
   });
 
-  await t.step("200: Create directory metadata with unregistered uuid", async () => {
-    const res = await fetch(`${urlBase}/directories/00000000-0000-0000-0000-000000000000/metadata`, {
+  await t.step("200: Create site metadata with unregistered uuid", async () => {
+    const res = await fetch(`${urlBase}/sites/00000000-0000-0000-0000-000000000000/metadata`, {
       method: "POST",
       body: JSON.stringify({
         type: "list",
@@ -40,8 +42,8 @@ Deno.test("Directory metadata", async (t) => {
     console.log(text)
   });
 
-  await t.step("400: Create directory metadata with invalid uuid", async () => {
-    const res = await fetch(`${urlBase}/directories/00invalid-uuid/metadata`, {
+  await t.step("400: Create site metadata with invalid uuid", async () => {
+    const res = await fetch(`${urlBase}/sites/00invalid-uuid/metadata`, {
       method: "POST",
       body: JSON.stringify({
         type: "list",
@@ -56,8 +58,8 @@ Deno.test("Directory metadata", async (t) => {
     console.log(text)
   });
 
-  await t.step("415: Create a directory metadata with a plain text", async () => {
-    const res = await fetch(`${urlBase}/directories/${directories["zebra"]}/metadata`, {
+  await t.step("415: Create a site metadata with a plain text", async () => {
+    const res = await fetch(`${urlBase}/sites/${sites["xenopus"]}/metadata`, {
       method: "POST",
       body: "plain text",
       headers: {
@@ -69,8 +71,8 @@ Deno.test("Directory metadata", async (t) => {
     console.log(text)
   });
 
-  await t.step("400: Create a directory metadata with no content", async () => {
-    const res = await fetch(`${urlBase}/directories/${directories["zebra"]}/metadata`, {
+  await t.step("400: Create a site metadata with no content", async () => {
+    const res = await fetch(`${urlBase}/sites/${sites["xenopus"]}/metadata`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -81,8 +83,8 @@ Deno.test("Directory metadata", async (t) => {
     console.log(text)
   });
 
-  await t.step("400: Create a directory metadata with null content", async () => {
-    const res = await fetch(`${urlBase}/directories/${directories["zebra"]}/metadata`, {
+  await t.step("400: Create a site metadata with null content", async () => {
+    const res = await fetch(`${urlBase}/sites/${sites["xenopus"]}/metadata`, {
       method: "POST",
       body: null,
       headers: {
@@ -94,8 +96,8 @@ Deno.test("Directory metadata", async (t) => {
     console.log(text)
   });
 
-  await t.step("200: Get a directory metadata", async () => {
-    const res = await fetch(`${urlBase}/directories/${directories["zebra"]}/metadata/type`);
+  await t.step("200: Get a site metadata", async () => {
+    const res = await fetch(`${urlBase}/sites/${sites["xenopus"]}/metadata/type`);
     const text = await res.text();
     assertEquals(res.status, 200);
     const json = JSON.parse(text);
@@ -103,22 +105,22 @@ Deno.test("Directory metadata", async (t) => {
     console.log(json);
   });
 
-  await t.step("200: Get a directory metadata with unregistered uuid", async () => {
-    const res = await fetch(`${urlBase}/directories/00000000-0000-0000-0000-000000000000/metadata/type`);
+  await t.step("200: Get a site metadata with unregistered uuid", async () => {
+    const res = await fetch(`${urlBase}/sites/00000000-0000-0000-0000-000000000000/metadata/type`);
     const text = await res.text();
     assertEquals(res.status, 200);
     console.log(text)
   });
 
-  await t.step("400: Get a directory metadata with invalid uuid", async () => {
-    const res = await fetch(`${urlBase}/directories/invalid-uuid/metadata/type`);
+  await t.step("400: Get a site metadata with invalid uuid", async () => {
+    const res = await fetch(`${urlBase}/sites/invalid-uuid/metadata/type`);
     const text = await res.text();
     assertEquals(res.status, 400);
     console.log(text)
   });
 
-  await t.step("200: Get all directory metadata", async () => {
-    const res = await fetch(`${urlBase}/directories/${directories["zebra"]}/metadata`);
+  await t.step("200: Get all site metadata", async () => {
+    const res = await fetch(`${urlBase}/sites/${sites["xenopus"]}/metadata`);
     const text = await res.text();
     assertEquals(res.status, 200);
     const json = JSON.parse(text);
@@ -126,8 +128,8 @@ Deno.test("Directory metadata", async (t) => {
     console.log(json);
   });
 
-  await t.step("200: Update directory metadata", async () => {
-    const res = await fetch(`${urlBase}/directories/${directories["zebra"]}/metadata`, {
+  await t.step("200: Update site metadata", async () => {
+    const res = await fetch(`${urlBase}/sites/${sites["xenopus"]}/metadata`, {
       method: "PUT",
       body: JSON.stringify({
         type: "new",
@@ -145,8 +147,8 @@ Deno.test("Directory metadata", async (t) => {
     console.log(json);
   });
 
-  await t.step("200: Update directory metadata with unregistered uuid", async () => {
-    const res = await fetch(`${urlBase}/directories/00000000-0000-0000-0000-000000000000/metadata`, {
+  await t.step("200: Update site metadata with unregistered uuid", async () => {
+    const res = await fetch(`${urlBase}/sites/00000000-0000-0000-0000-000000000000/metadata`, {
       method: "PUT",
       body: JSON.stringify({
         type: "new",
@@ -162,8 +164,8 @@ Deno.test("Directory metadata", async (t) => {
     console.log(text)
   });
 
-  await t.step("400: Update directory metadata with invalid uuid", async () => {
-    const res = await fetch(`${urlBase}/directories/00invalid-uuid/metadata`, {
+  await t.step("400: Update site metadata with invalid uuid", async () => {
+    const res = await fetch(`${urlBase}/sites/00invalid-uuid/metadata`, {
       method: "PUT",
       body: JSON.stringify({
         type: "new",
@@ -180,8 +182,8 @@ Deno.test("Directory metadata", async (t) => {
     console.log(text)
   });
 
-  await t.step("415: Update a directory metadata with a plain text", async () => {
-    const res = await fetch(`${urlBase}/directories/${directories["zebra"]}/metadata`, {
+  await t.step("415: Update a site metadata with a plain text", async () => {
+    const res = await fetch(`${urlBase}/sites/${sites["xenopus"]}/metadata`, {
       method: "PUT",
       body: "plain text",
       headers: {
@@ -193,8 +195,8 @@ Deno.test("Directory metadata", async (t) => {
     console.log(text)
   });
 
-  await t.step("400: Update a directory metadata with no content", async () => {
-    const res = await fetch(`${urlBase}/directories/${directories["zebra"]}/metadata`, {
+  await t.step("400: Update a site metadata with no content", async () => {
+    const res = await fetch(`${urlBase}/sites/${sites["xenopus"]}/metadata`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -205,8 +207,8 @@ Deno.test("Directory metadata", async (t) => {
     console.log(text)
   });
   
-  await t.step("400: Update a directory metadata with null content", async () => {
-    const res = await fetch(`${urlBase}/directories/${directories["zebra"]}/metadata`, {
+  await t.step("400: Update a site metadata with null content", async () => {
+    const res = await fetch(`${urlBase}/sites/${sites["xenopus"]}/metadata`, {
       method: "PUT",
       body: null,
       headers: {
@@ -218,22 +220,22 @@ Deno.test("Directory metadata", async (t) => {
     console.log(text)
   });
 
-  await t.step("204: Delete a directory metadata", async () => {
-    const res = await fetch(`${urlBase}/directories/${directories["zebra"]}/metadata/type`, {
+  await t.step("204: Delete a site metadata", async () => {
+    const res = await fetch(`${urlBase}/sites/${sites["xenopus"]}/metadata/type`, {
       method: "DELETE"
     });
     assertEquals(res.status, 204);
   });
 
-  await t.step("204: Delete all directory metadata", async () => {
-    const res = await fetch(`${urlBase}/directories/${directories["zebra"]}/metadata`, {
+  await t.step("204: Delete all site metadata", async () => {
+    const res = await fetch(`${urlBase}/sites/${sites["xenopus"]}/metadata`, {
       method: "DELETE"
     });
     assertEquals(res.status, 204);
   });
 
-  await t.step("200: Create directory metadata for all directories", async () => {
-    const res = await fetch(`${urlBase}/directories/metadata`, {
+  await t.step("200: Create site metadata for all sites", async () => {
+    const res = await fetch(`${urlBase}/sites/metadata`, {
       method: "POST",
       body: JSON.stringify({
         lock: "locked"
@@ -245,12 +247,12 @@ Deno.test("Directory metadata", async (t) => {
     const text = await res.text();
     assertEquals(res.status, 200);
     const json = JSON.parse(text);
-    assertEquals(json.length, Object.keys(directories).length);
+    assertEquals(json.length, Object.keys(sites).length);
     console.log(json);
   });
 
-  await t.step("200: Create directory metadata for directories by name", async () => {
-    const res = await fetch(`${urlBase}/directories/metadata?name=yak`, {
+  await t.step("200: Create site metadata for sites by name", async () => {
+    const res = await fetch(`${urlBase}/sites/metadata?name=whale`, {
       method: "POST",
       body: JSON.stringify({
         condition: "sleeping"
@@ -266,8 +268,8 @@ Deno.test("Directory metadata", async (t) => {
     console.log(json);
   });
 
-  await t.step("200: Create directory metadata for directories by strict name", async () => {
-    const res = await fetch(`${urlBase}/directories/metadata?name=yak&strict`, {
+  await t.step("200: Create site metadata for sites by strict name", async () => {
+    const res = await fetch(`${urlBase}/sites/metadata?name=whale&strict`, {
       method: "POST",
       body: JSON.stringify({
         history: "new"
@@ -283,17 +285,17 @@ Deno.test("Directory metadata", async (t) => {
     console.log(json);
   });
 
-  await t.step("200: Get a directory metadata for all directories", async () => {
-    const res = await fetch(`${urlBase}/directories/metadata/lock`);
+  await t.step("200: Get a site metadata for all sites", async () => {
+    const res = await fetch(`${urlBase}/sites/metadata/lock`);
     const text = await res.text();
     assertEquals(res.status, 200);
     const json = JSON.parse(text);
-    assertEquals(json.length, Object.keys(directories).length);
+    assertEquals(json.length, Object.keys(sites).length);
     console.log(json);
   });
 
-  await t.step("200: Get a directory metadata for directories by name", async () => {
-    const res = await fetch(`${urlBase}/directories/metadata/condition?name=yak`);
+  await t.step("200: Get a site metadata for sites by name", async () => {
+    const res = await fetch(`${urlBase}/sites/metadata/condition?name=whale`);
     const text = await res.text();
     assertEquals(res.status, 200);
     const json = JSON.parse(text);
@@ -301,8 +303,8 @@ Deno.test("Directory metadata", async (t) => {
     console.log(json);
   });
 
-  await t.step("200: Get a directory metadata for directories by strict name", async () => {
-    const res = await fetch(`${urlBase}/directories/metadata/history?name=yak&strict=true`);
+  await t.step("200: Get a site metadata for sites by strict name", async () => {
+    const res = await fetch(`${urlBase}/sites/metadata/history?name=whale&strict=true`);
     const text = await res.text();
     assertEquals(res.status, 200);
     const json = JSON.parse(text);
@@ -310,8 +312,8 @@ Deno.test("Directory metadata", async (t) => {
     console.log(json);
   });
 
-  await t.step("200: Get all directory metadata for all directories", async () => {
-    const res = await fetch(`${urlBase}/directories/metadata`);
+  await t.step("200: Get all site metadata for all sites", async () => {
+    const res = await fetch(`${urlBase}/sites/metadata`);
     const text = await res.text();
     assertEquals(res.status, 200);
     const json = JSON.parse(text);
@@ -319,8 +321,8 @@ Deno.test("Directory metadata", async (t) => {
     console.log(json);
   });
 
-  await t.step("200: Get all directory metadata for directories by name", async () => {
-    const res = await fetch(`${urlBase}/directories/metadata?name=yak`);
+  await t.step("200: Get all site metadata for sites by name", async () => {
+    const res = await fetch(`${urlBase}/sites/metadata?name=whale`);
     const text = await res.text();
     assertEquals(res.status, 200);
     const json = JSON.parse(text);
@@ -328,8 +330,8 @@ Deno.test("Directory metadata", async (t) => {
     console.log(json);
   });
 
-  await t.step("200: Get all directory metadata for directories by strict name", async () => {
-    const res = await fetch(`${urlBase}/directories/metadata?name=yak&strict`);
+  await t.step("200: Get all site metadata for sites by strict name", async () => {
+    const res = await fetch(`${urlBase}/sites/metadata?name=whale&strict`);
     const text = await res.text();
     assertEquals(res.status, 200);
     const json = JSON.parse(text);
@@ -337,8 +339,8 @@ Deno.test("Directory metadata", async (t) => {
     console.log(json);
   });
 
-  await t.step("200: Update directory metadata for all directories", async () => {
-    const res = await fetch(`${urlBase}/directories/metadata`, {
+  await t.step("200: Update site metadata for all sites", async () => {
+    const res = await fetch(`${urlBase}/sites/metadata`, {
       method: "PUT",
       body: JSON.stringify({
         lock: "unlocked"
@@ -350,12 +352,12 @@ Deno.test("Directory metadata", async (t) => {
     const text = await res.text();
     assertEquals(res.status, 200);
     const json = JSON.parse(text);
-    assertEquals(json.length, Object.keys(directories).length);
+    assertEquals(json.length, Object.keys(sites).length);
     console.log(json);
   });
 
-  await t.step("200: Update directory metadata for directories by name", async () => {
-    const res = await fetch(`${urlBase}/directories/metadata?name=yak`, {
+  await t.step("200: Update site metadata for sites by name", async () => {
+    const res = await fetch(`${urlBase}/sites/metadata?name=whale`, {
       method: "PUT",
       body: JSON.stringify({
         condition: "awake"
@@ -371,8 +373,8 @@ Deno.test("Directory metadata", async (t) => {
     console.log(json);
   });
 
-  await t.step("200: Update directory metadata for directories by strict name", async () => {
-    const res = await fetch(`${urlBase}/directories/metadata?name=yak&strict=`, {
+  await t.step("200: Update site metadata for sites by strict name", async () => {
+    const res = await fetch(`${urlBase}/sites/metadata?name=whale&strict=`, {
       method: "PUT",
       body: JSON.stringify({
         history: ""
@@ -388,26 +390,27 @@ Deno.test("Directory metadata", async (t) => {
     console.log(json);
   });
 
-  await t.step("204: Delete a directory metadata for all directories", async () => {
-    const res = await fetch(`${urlBase}/directories/metadata/lock`, {
+  await t.step("204: Delete a site metadata for all sites", async () => {
+    const res = await fetch(`${urlBase}/sites/metadata/lock`, {
       method: "DELETE"
     });
     assertEquals(res.status, 204);
   });
 
-  await t.step("204: Delete a directory metadata for directories by name", async () => {
-    const res = await fetch(`${urlBase}/directories/metadata/condition?name=yak`, {
+  await t.step("204: Delete a site metadata for sites by name", async () => {
+    const res = await fetch(`${urlBase}/sites/metadata/condition?name=whale`, {
       method: "DELETE"
     });
     assertEquals(res.status, 204);
   });
 
-  await t.step("204: Delete a directory metadata for directories by strict name", async () => {
-    const res = await fetch(`${urlBase}/directories/metadata/history?name=yak&strict`, {
+  await t.step("204: Delete a site metadata for sites by strict name", async () => {
+    const res = await fetch(`${urlBase}/sites/metadata/history?name=whale&strict`, {
       method: "DELETE"
     });
     assertEquals(res.status, 204);
   });
 
+  await deleteTestSites();
   await deleteTestDirectories();  
 });
