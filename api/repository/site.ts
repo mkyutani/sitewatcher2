@@ -53,23 +53,16 @@ export const siteRepository = {
       return null;
     }
   },
-  async getAll(name: string | null, strict_flag: boolean | null, sort: string | null) {
+  async getAll(name: string | null, strict_flag: boolean | null) {
     try {
-      if (sort && ["id", "uri", "name"].indexOf(sort) == -1) {
-        return "Invalid sort key";
-      }
       const sites = await sql `
         select
           id, uri, name, directory, enabled, created, updated
         from site
         ${(name && name.length > 0) ?
           (strict_flag ? sql`where name = ${name}` : sql`where name ilike ${`%${name}%`}`) :
-          sql``}
-        ${sort === "uri" ?
-          sql`order by uri` :
-          sort === "name" ?
-            sql`order by name` :
-            sql`order by id`}
+          sql``
+        }
       `
       return sites;
     } catch (error) {

@@ -30,10 +30,10 @@ export const siteController = {
     ctx.response.body = result;
   },
   async getAll(ctx: RouterContext<string>) {
-    const { name, strict, sort } = helpers.getQuery(ctx, { mergeParams: true });
+    const { name, strict } = helpers.getQuery(ctx, { mergeParams: true });
     const strict_flag = convertToBoolean(strict);
     ctx.assert(strict_flag != null, 400, "Invalid strict flag"); 
-    const result = await siteService.getAll(name, strict_flag, sort);
+    const result = await siteService.getAll(name, strict_flag);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result as string);
     ctx.response.body = result;
