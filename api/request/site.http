@@ -3,13 +3,13 @@
 ################
 
 ### Get all Sites
-GET http://localhost:8089/api/v1/sites
+GET http://localhost:18085/api/v1/sites
 
 ### Get Site by ID
-GET http://localhost:8089/api/v1/sites/2ecb3609-fadb-4320-8764-b10e8ae9f912
+GET http://localhost:18085/api/v1/sites/2ecb3609-fadb-4320-8764-b10e8ae9f912
 
 ### Create Site (1)
-POST http://localhost:8089/api/v1/sites
+POST http://localhost:18085/api/v1/sites
 Content-Type: application/json
 
 {
@@ -23,7 +23,7 @@ Content-Type: application/json
 }
 
 ### Create Site (2)
-POST http://localhost:8089/api/v1/sites
+POST http://localhost:18085/api/v1/sites
 Content-Type: application/json
 
 {
@@ -35,13 +35,13 @@ Content-Type: application/json
 }
 
 ### Create Site (0)
-POST http://localhost:8089/api/v1/sites
+POST http://localhost:18085/api/v1/sites
 Content-Type: text/plain
 
 plain text
 
 ### Update Site
-PUT http://localhost:8089/api/v1/sites/3364fa54-5d12-4c5f-b428-bc8e8eebaab0
+PUT http://localhost:18085/api/v1/sites/3364fa54-5d12-4c5f-b428-bc8e8eebaab0
 Content-Type: application/json
 
 {
@@ -53,7 +53,7 @@ Content-Type: application/json
 }
 
 ### Update Site (disabled)
-PUT http://localhost:8089/api/v1/sites/3364fa54-5d12-4c5f-b428-bc8e8eebaab0
+PUT http://localhost:18085/api/v1/sites/3364fa54-5d12-4c5f-b428-bc8e8eebaab0
 Content-Type: application/json
 
 {
@@ -61,29 +61,72 @@ Content-Type: application/json
 }
 
 ### Update Site (no content)
-PUT http://localhost:8089/api/v1/sites/de876013-33df-47bb-ae2c-154faaf63d80
+PUT http://localhost:18085/api/v1/sites/de876013-33df-47bb-ae2c-154faaf63d80
 Content-Type: application/json
 
 {}
 
 ### Update Site (plain text)
-PUT http://localhost:8089/api/v1/sites/de876013-33df-47bb-ae2c-154faaf63d80
+PUT http://localhost:18085/api/v1/sites/de876013-33df-47bb-ae2c-154faaf63d80
 Content-Type: text/plain
 
 plain text
 
 ### Delete Site
-DELETE  http://localhost:8089/api/v1/sites/63821c73-8edf-41f8-b63d-299912060d6c
+DELETE  http://localhost:18085/api/v1/sites/63821c73-8edf-41f8-b63d-299912060d6c
 
 ################
-# Resources
+# Metadata
 ################
 
-### Get Site Resources by ID
-GET http://localhost:8089/api/v1/sites/de876013-33df-47bb-ae2c-154faaf63d80/resources
+### Create metadata
+POST http://localhost:18085/api/v1/sites/189024c3-4eba-45b8-9a2d-80c04d1dd61e/metadata
+Content-Type: application/json
 
-### Update Site Resources by ID
-PUT http://localhost:8089/api/v1/sites/de876013-33df-47bb-ae2c-154faaf63d80/resources
+{
+    "type": "list",
+    "state": "active"
+}
 
-### Delete Site Resources by ID
-DELETE http://localhost:8089/api/v1/sites/de876013-33df-47bb-ae2c-154faaf63d80/resources
+### Get metadata
+GET http://localhost:18085/api/v1/sites/375395e0-dc12-49c4-9b52-eaee3cc3af44/metadata/type
+
+### Get all metadata
+GET http://localhost:18085/api/v1/sites/e463d1cf-feb6-45d4-a19d-7389ca34a14d/metadata
+
+### Update metadata
+PUT http://localhost:18085/api/v1/sites/375395e0-dc12-49c4-9b52-eaee3cc3af44/metadata
+Content-Type: application/json
+
+{
+    "type": "List"
+}
+
+### Delete metadata
+DELETE  http://localhost:18085/api/v1/sites/375395e0-dc12-49c4-9b52-eaee3cc3af44/metadata/type
+
+### Delete all metadata
+DELETE  http://localhost:18085/api/v1/sites/375395e0-dc12-49c4-9b52-eaee3cc3af44/metadata
+
+### Create metadata for all sites
+POST http://localhost:18085/api/v1/sites/metadata
+Content-Type: application/json
+
+{
+    "lock": "locked"
+}
+
+### Get metadata for all sites
+GET http://localhost:18085/api/v1/sites/metadata/state
+
+### Update metadata for all sites
+PUT http://localhost:18085/api/v1/sites/metadata?name=chicken2&strict=true
+Content-Type: application/json
+
+{
+    "lock": "unlocked",
+    "state": "superactive"
+}
+
+### Delete metadata for all sites
+DELETE  http://localhost:18085/api/v1/sites/metadata/state

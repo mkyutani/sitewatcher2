@@ -9,22 +9,22 @@ Deno.test("Site", async (t) => {
   await t.step("200: Create a site", async () => {
     const registrations = [
       {
-        name: "almadillo",
-        uri: "http://almadillo.com",
+        name: "alpaca",
+        uri: "http://alpaca.com",
         directory: directories["zebra"],
         metadata: {},
         enabled: true
       },
       {
-        name: "beatle",
-        uri: "http://beatle.com",
+        name: "beaver",
+        uri: "http://beaver.com",
         directory: directories["zebra"],
         metadata: {},
         enabled: true
       },
       {
-        name: "almadillo-child",
-        uri: "http://almadillo-child.com",
+        name: "alpaca-child",
+        uri: "http://alpaca-child.com",
         directory: directories["zebra"],
         metadata: {},
         enabled: true
@@ -93,7 +93,7 @@ Deno.test("Site", async (t) => {
     const res = await fetch(`${urlBase}/sites`, {
       method: "POST",
       body: JSON.stringify({
-        uri: "http://almadillo.com",
+        uri: "http://alpaca.com",
         directory: directories["zebra"],
         metadata: {},
         enabled: true
@@ -111,8 +111,8 @@ Deno.test("Site", async (t) => {
     const res = await fetch(`${urlBase}/sites`, {
       method: "POST",
       body: JSON.stringify({
-        name: "almadillo",
-        uri: "http://almadillo.com",
+        name: "alpaca",
+        uri: "http://alpaca.com",
         metadata: {},
         enabled: true
       }),
@@ -129,8 +129,8 @@ Deno.test("Site", async (t) => {
     const res = await fetch(`${urlBase}/sites`, {
       method: "POST",
       body: JSON.stringify({
-        name: "almadillo",
-        uri: "http://almadillo.com",
+        name: "alpaca",
+        uri: "http://alpaca.com",
         directory: "invalid-uuid",
         metadata: {},
         enabled: true
@@ -148,8 +148,8 @@ Deno.test("Site", async (t) => {
     const res = await fetch(`${urlBase}/sites`, {
       method: "POST",
       body: JSON.stringify({
-        name: "almadillo9999",
-        uri: "http://almadillo9999.com",
+        name: "alpaca9999",
+        uri: "http://alpaca9999.com",
         directory: "00000000-0000-0000-0000-000000000000",
         metadata: {},
         enabled: true
@@ -167,7 +167,7 @@ Deno.test("Site", async (t) => {
     const res = await fetch(`${urlBase}/sites`, {
       method: "POST",
       body: JSON.stringify({
-        name: "almadillo",
+        name: "alpaca",
         directory: directories["zebra"],
         metadata: {},
         enabled: true
@@ -185,8 +185,8 @@ Deno.test("Site", async (t) => {
     const res = await fetch(`${urlBase}/sites`, {
       method: "POST",
       body: JSON.stringify({
-        name: "almadillo",
-        uri: "http://almadillo.com",
+        name: "alpaca",
+        uri: "http://alpaca.com",
         directory: directories["zebra"],
         metadata: {}
       }),
@@ -203,8 +203,8 @@ Deno.test("Site", async (t) => {
     const res = await fetch(`${urlBase}/sites`, {
       method: "POST",
       body: JSON.stringify({
-        name: "almadillo",
-        uri: "http://almadillo.com",
+        name: "alpaca",
+        uri: "http://alpaca.com",
         directory: directories["zebra"],
         metadata: {},
         enabled: "ambiguous"
@@ -222,8 +222,8 @@ Deno.test("Site", async (t) => {
     const res = await fetch(`${urlBase}/sites`, {
       method: "POST",
       body: JSON.stringify({
-        name: "almadillo",
-        uri: "http://almadillo.com",
+        name: "alpaca",
+        uri: "http://alpaca.com",
         directory: directories["zebra"],
         metadata: {},
         enabled: true
@@ -273,8 +273,8 @@ Deno.test("Site", async (t) => {
     const res = await fetch(`${urlBase}/sites/${id}`, {
       method: "PUT",
       body: JSON.stringify({
-        name: "almadillo2",
-        uri: "http://almadillo2.com",
+        name: "alpaca2",
+        uri: "http://alpaca2.com",
         directory: directories["zebra"],
         metadata: {},
         enabled: true
@@ -334,7 +334,7 @@ Deno.test("Site", async (t) => {
     const res = await fetch(`${urlBase}/sites/${id}`, {
       method: "PUT",
       body: JSON.stringify({
-        uri: "http://almadillo.com",
+        uri: "http://alpaca.com",
         directory: directories["zebra"],
         metadata: {},
         enabled: true
@@ -353,8 +353,8 @@ Deno.test("Site", async (t) => {
     const res = await fetch(`${urlBase}/sites/${id}`, {
       method: "PUT",
       body: JSON.stringify({
-        name: "almadillo",
-        uri: "http://almadillo.com",
+        name: "alpaca",
+        uri: "http://alpaca.com",
         metadata: {},
         enabled: true
       }),
@@ -372,8 +372,8 @@ Deno.test("Site", async (t) => {
     const res = await fetch(`${urlBase}/sites/${id}`, {
       method: "PUT",
       body: JSON.stringify({
-        name: "almadillo",
-        uri: "http://almadillo.com",
+        name: "alpaca",
+        uri: "http://alpaca.com",
         directory: "invalid-uuid",
         metadata: {},
         enabled: true
@@ -392,8 +392,8 @@ Deno.test("Site", async (t) => {
     const res = await fetch(`${urlBase}/sites/${id}`, {
       method: "PUT",
       body: JSON.stringify({
-        name: "almadillo9999",
-        uri: "http://almadillo9999.com",
+        name: "alpaca9999",
+        uri: "http://alpaca9999.com",
         directory: "00000000-0000-0000-0000-000000000000",
         metadata: {},
         enabled: true
@@ -412,7 +412,7 @@ Deno.test("Site", async (t) => {
     const res = await fetch(`${urlBase}/sites/${id}`, {
       method: "PUT",
       body: JSON.stringify({
-        name: "almadillo",
+        name: "alpaca",
         directory: directories["zebra"],
         metadata: {},
         enabled: true
@@ -431,8 +431,8 @@ Deno.test("Site", async (t) => {
     const res = await fetch(`${urlBase}/sites/${id}`, {
       method: "PUT",
       body: JSON.stringify({
-        name: "almadillo",
-        uri: "http://almadillo.com",
+        name: "alpaca",
+        uri: "http://alpaca.com",
         directory: directories["zebra"],
         metadata: {}
       }),
@@ -450,8 +450,8 @@ Deno.test("Site", async (t) => {
     const res = await fetch(`${urlBase}/sites/${id}`, {
       method: "PUT",
       body: JSON.stringify({
-        name: "almadillo",
-        uri: "http://almadillo.com",
+        name: "alpaca",
+        uri: "http://alpaca.com",
         directory: directories["zebra"],
         metadata: {},
         enabled: "ambiguous"
@@ -470,8 +470,8 @@ Deno.test("Site", async (t) => {
     const res = await fetch(`${urlBase}/sites/${id}`, {
       method: "PUT",
       body: JSON.stringify({
-        name: "almadillo",
-        uri: "http://almadillo-child.com",
+        name: "alpaca",
+        uri: "http://alpaca-child.com",
         directory: directories["zebra"],
         metadata: {},
         enabled: true

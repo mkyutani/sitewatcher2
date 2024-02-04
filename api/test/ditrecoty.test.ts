@@ -8,15 +8,15 @@ const directories: string[] = [];
 Deno.test("200: Create a directory", async () => {
   const registrations = [
     {
-      name: "almadillo",
+      name: "alpaca",
       enabled: true
     },
     {
-      name: "beatle",
+      name: "beaver",
       enabled: false
     },
     {
-      name: "almadillo-child",
+      name: "alpaca-child",
       enabled: true
     }
   ];
@@ -94,7 +94,7 @@ Deno.test("400: Create a directory without enabled flag", async () => {
   const res = await fetch(`${urlBase}/directories`, {
     method: "POST",
     body: JSON.stringify({
-      name: "almadillo"
+      name: "alpaca"
     }),
     headers: {
       "Content-Type": "application/json",
@@ -108,7 +108,7 @@ Deno.test("400: Create a directory with invalid enabled flag", async () => {
   const res = await fetch(`${urlBase}/directories`, {
     method: "POST",
     body: JSON.stringify({
-      name: "almadillo",
+      name: "alpaca",
       enabled: "ambiguous"
     }),
     headers: {
@@ -123,7 +123,7 @@ Deno.test("400: Create a duplicated directory", async () => {
   const res = await fetch(`${urlBase}/directories`, {
     method: "POST",
     body: JSON.stringify({
-      name: "almadillo",
+      name: "alpaca",
       enabled: true,
     }),
     headers: {
@@ -163,7 +163,7 @@ Deno.test("200: Get all directories", async () => {
 });
 
 Deno.test("200: Get all directories with name", async () => {
-  const res = await fetch(`${urlBase}/directories?name=almadillo`);
+  const res = await fetch(`${urlBase}/directories?name=alpaca`);
   const text = await res.text();
   assertEquals(res.status, 200);
   const json = JSON.parse(text);
@@ -171,7 +171,7 @@ Deno.test("200: Get all directories with name", async () => {
 });
 
 Deno.test("200: Get all directories with strict flag", async () => {
-  const res = await fetch(`${urlBase}/directories?strict=true&name=almadillo`);
+  const res = await fetch(`${urlBase}/directories?strict=true&name=alpaca`);
   const text = await res.text();
   assertEquals(res.status, 200);
   const json = JSON.parse(text);
@@ -183,7 +183,7 @@ Deno.test("200: Update a directory", async () => {
   const res = await fetch(`${urlBase}/directories/${id}`, {
     method: "PUT",
     body: JSON.stringify({
-      name: "almadillo2",
+      name: "alpaca2",
       enabled: false
     }),
     headers: {
@@ -237,7 +237,7 @@ Deno.test("200: Update a directory without enabled flag", async () => {
   const res = await fetch(`${urlBase}/directories/${id}`, {
     method: "PUT",
     body: JSON.stringify({
-      name: "almadillo3"
+      name: "alpaca3"
     }),
     headers: {
       "Content-Type": "application/json",
@@ -266,7 +266,7 @@ Deno.test("400: Update a directory with invalid uuid", async () => {
   const res = await fetch(`${urlBase}/directories/invalid-uuid`, {
     method: "PUT",
     body: JSON.stringify({
-      name: "almadillo",
+      name: "alpaca",
       enabled: true
     }),
     headers: {
@@ -281,7 +281,7 @@ Deno.test("404: Update a directory with unregistered uuid", async () => {
   const res = await fetch(`${urlBase}/directories/00000000-0000-0000-0000-000000000000`, {
     method: "PUT",
     body: JSON.stringify({
-      name: "almadillo",
+      name: "alpaca",
       enabled: true
     }),
     headers: {
@@ -297,7 +297,7 @@ Deno.test("400: Update a directory with invalid enabled flag", async () => {
   const res = await fetch(`${urlBase}/directories/${id}`, {
     method: "PUT",
     body: JSON.stringify({
-      name: "almadillo4",
+      name: "alpaca4",
       enabled: "ambiguous"
     }),
     headers: {
@@ -313,7 +313,7 @@ Deno.test("400: Update a duplicated directory", async () => {
   const res = await fetch(`${urlBase}/directories/${id}`, {
     method: "PUT",
     body: JSON.stringify({
-      name: "beatle",
+      name: "beaver",
       enabled: true,
     }),
     headers: {
