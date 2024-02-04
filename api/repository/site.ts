@@ -3,6 +3,34 @@ import { log } from "../deps.ts";
 import { SiteParam } from "../model/site.ts";
 
 export const siteRepository = {
+  async create(siteParam: SiteParam) {
+    const uri = siteParam?.uri;
+    const name = siteParam?.name;
+    const directory = siteParam?.directory;
+    const enabled = siteParam?.enabled;
+    try {
+      const sites = await sql `
+        insert
+        into site (uri, name, directory, enabled, created, updated)
+        values (${uri}, ${name}, ${directory}, ${enabled}, current_timestamp, current_timestamp)
+        returning id
+      `
+      return sites[0];
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      if (error instanceof sql.PostgresError) {
+        log.warning(`siteRepository.create:PG${error.code}:${error.message}`);
+        switch (parseInt(error.code, 10)) {
+        case 23505:
+          return "Duplicated";
+        case 23503:
+          return "Invalid directory id";
+        }
+      }
+      log.error(`siteRepository.create:${description}`);
+      return null;
+    }
+  },
   async get(id: string) {
     try {
       const sites = await sql `
@@ -47,34 +75,6 @@ export const siteRepository = {
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       log.error(`siteRepository.getAll:${description}`);
-      return null;
-    }
-  },
-  async create(siteParam: SiteParam) {
-    const uri = siteParam?.uri;
-    const name = siteParam?.name;
-    const directory = siteParam?.directory;
-    const enabled = siteParam?.enabled;
-    try {
-      const sites = await sql `
-        insert
-        into site (uri, name, directory, enabled, created, updated)
-        values (${uri}, ${name}, ${directory}, ${enabled}, current_timestamp, current_timestamp)
-        returning id
-      `
-      return sites[0];
-    } catch (error) {
-      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      if (error instanceof sql.PostgresError) {
-        log.warning(`siteRepository.create:PG${error.code}:${error.message}`);
-        switch (parseInt(error.code, 10)) {
-        case 23505:
-          return "Duplicated";
-        case 23503:
-          return "Invalid directory id";
-        }
-      }
-      log.error(`siteRepository.create:${description}`);
       return null;
     }
   },
