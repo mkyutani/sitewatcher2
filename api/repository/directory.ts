@@ -28,15 +28,20 @@ export const directoryRepository = {
       }
     }
   },
-  async getAll(name: string | null, strict_flag: boolean | null) {
+  async getAll(name: string | null, strict: boolean | null, enabled: boolean | null) {
     try {
       const directories = await sql `
         select
           id, name, enabled, created, updated
         from directory
         ${(name && name.length > 0) ?
-          (strict_flag ? sql`where name = ${name}` : sql`where name ilike ${`%${name}%`}`) :
-          sql``}
+          (strict ? sql`where name = ${name}` : sql`where name ilike ${`%${name}%`}`) :
+          sql``
+        }
+        ${enabled ?
+          ((name && name.length > 0) ? sql`and enabled = true` : sql`where enabled = true`) :
+          sql``
+        }
       `
       return directories;
     } catch (error) {

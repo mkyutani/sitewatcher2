@@ -13,7 +13,7 @@ export const siteController = {
     ctx.assert(reqBody.name, 400, "Name is missing");
     ctx.assert(reqBody.directory, 400, "Directory is missing");
     ctx.assert(isUuid(reqBody.directory), 400, "Invalid directory id");
-    ctx.assert(reqBody.enabled, 400, "Enabled is missing");
+    ctx.assert(reqBody.enabled != null, 400, "Enabled is missing");
     reqBody.enabled = convertToBoolean(reqBody.enabled);
     ctx.assert(reqBody.enabled != null, 400, "Invalid enabled flag");
     const result = await siteService.create(reqBody as SiteParam);
@@ -30,10 +30,12 @@ export const siteController = {
     ctx.response.body = result;
   },
   async getAll(ctx: RouterContext<string>) {
-    const { name, strict } = helpers.getQuery(ctx, { mergeParams: true });
+    const { name, strict, enabled } = helpers.getQuery(ctx, { mergeParams: true });
     const strict_flag = convertToBoolean(strict);
     ctx.assert(strict_flag != null, 400, "Invalid strict flag"); 
-    const result = await siteService.getAll(name, strict_flag);
+    const enabled_flag = convertToBoolean(enabled);
+    ctx.assert(enabled_flag != null, 400, "Invalid enabled flag");
+    const result = await siteService.getAll(name, strict_flag, enabled_flag);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result as string);
     ctx.response.body = result;

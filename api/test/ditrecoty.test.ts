@@ -13,11 +13,11 @@ Deno.test("200: Create a directory", async () => {
     },
     {
       name: "beaver",
-      enabled: false
+      enabled: true
     },
     {
       name: "alpaca-child",
-      enabled: true
+      enabled: false
     }
   ];
   const statuses: number[] = [];
@@ -175,6 +175,15 @@ Deno.test("200: Get all directories with strict flag", async () => {
   const text = await res.text();
   assertEquals(res.status, 200);
   const json = JSON.parse(text);
+  assertEquals(json.length, 1);
+});
+
+Deno.test("200: Get all sites with name and enabled flag", async () => {
+  const res = await fetch(`${urlBase}/directories?name=alpaca&enabled`);
+  const text = await res.text();
+  const json = JSON.parse(text);
+  console.log(`${res.status} ${text}`);
+  assertEquals(res.status, 200);
   assertEquals(json.length, 1);
 });
 

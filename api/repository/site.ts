@@ -53,14 +53,18 @@ export const siteRepository = {
       return null;
     }
   },
-  async getAll(name: string | null, strict_flag: boolean | null) {
+  async getAll(name: string | null, strict: boolean | null, enabled: boolean | null) {
     try {
       const sites = await sql `
         select
           id, uri, name, directory, enabled, created, updated
         from site
         ${(name && name.length > 0) ?
-          (strict_flag ? sql`where name = ${name}` : sql`where name ilike ${`%${name}%`}`) :
+          (strict ? sql`where name = ${name}` : sql`where name ilike ${`%${name}%`}`) :
+          sql``
+        }
+        ${enabled ?
+          ((name && name.length > 0) ? sql`and enabled = true` : sql`where enabled = true`) :
           sql``
         }
       `

@@ -27,7 +27,7 @@ Deno.test("Site", async (t) => {
         uri: "http://alpaca-child.com",
         directory: directories["zebra"],
         metadata: {},
-        enabled: true
+        enabled: false
       }
     ];
     const statuses: number[] = [];
@@ -241,7 +241,7 @@ Deno.test("Site", async (t) => {
     const id = sites[0];
     const res = await fetch(`${urlBase}/sites/${id}`);
     const text = await res.text();
-    console.log(text);
+    console.log(`${res.status} ${text}`);
     assertEquals(res.status, 200);
     assertEquals(JSON.parse(text).id, id);
   });
@@ -249,25 +249,52 @@ Deno.test("Site", async (t) => {
   await t.step("200: Get a site with unregistered uuid", async () => {
     const res = await fetch(`${urlBase}/sites/00000000-0000-0000-0000-000000000000`);
     const text = await res.text();
-    console.log(text)
+    console.log(`${res.status} ${text}`);
     assertEquals(res.status, 404);
   });
 
   await t.step("400: Get a site with invalid uuid", async () => {
     const res = await fetch(`${urlBase}/sites/invalid-uuid`);
     const text = await res.text();
-    console.log(text)
+    console.log(`${res.status} ${text}`);
     assertEquals(res.status, 400);
   });
 
   await t.step("200: Get all sites", async () => {
     const res = await fetch(`${urlBase}/sites`);
     const text = await res.text();
-    console.log(text);
+    console.log(`${res.status} ${text}`);
     assertEquals(res.status, 200);
     assertEquals(JSON.parse(text).length, 3);
   });
 
+  await t.step("200: Get all sites with name", async () => {
+    const res = await fetch(`${urlBase}/sites?name=alpaca`);
+    const text = await res.text();
+    console.log(`${res.status} ${text}`);
+    const json = JSON.parse(text);
+    assertEquals(res.status, 200);
+    assertEquals(json.length, 2);
+  });
+
+  await t.step("200: Get all sites with strict flag", async () => {
+    const res = await fetch(`${urlBase}/sites?strict=true&name=alpaca`);
+    const text = await res.text();
+    console.log(`${res.status} ${text}`);
+    const json = JSON.parse(text);
+    assertEquals(res.status, 200);
+    assertEquals(json.length, 1);
+  });
+
+  await t.step("200: Get all sites with name and enabled flag", async () => {
+    const res = await fetch(`${urlBase}/sites?name=alpaca&enabled`);
+    const text = await res.text();
+    console.log(`${res.status} ${text}`);
+    const json = JSON.parse(text);
+    assertEquals(res.status, 200);
+    assertEquals(json.length, 1);
+  });
+  
   Deno.test("200: Update a site", async () => {
     const id = sites[0];
     const res = await fetch(`${urlBase}/sites/${id}`, {
