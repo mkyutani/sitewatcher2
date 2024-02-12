@@ -34,9 +34,10 @@ export const siteResourceRepository = {
     try {
       const sites = await sql `
         select
-          uri, site, name, reason, created
-        from site_resource
-        where site = ${site}
+          r.uri, r.name, r.site, s.name as site_name, r.reason, r.created
+        from site_resource as r
+        inner join site as s on r.site = s.id
+        where r.site = ${site}
       `
       return sites;
     } catch (error) {
