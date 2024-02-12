@@ -3,6 +3,7 @@ import { directoryMetadataController } from "./controller/directoryMetadata.ts";
 import { Router } from "./deps.ts"
 import { siteController } from "./controller/site.ts";
 import { siteMetadataController } from "./controller/siteMetadata.ts";
+import { siteResourceController } from "./controller/siteResource.ts";
 
 const router = new Router();
 
@@ -34,6 +35,8 @@ router.get('/api/v1/sites/:id/metadata/:key', siteMetadataController.get);
 router.put('/api/v1/sites/:id/metadata', siteMetadataController.update);
 router.delete('/api/v1/sites/:id/metadata', siteMetadataController.deleteAll);
 router.delete('/api/v1/sites/:id/metadata/:key', siteMetadataController.delete);
+router.post('/api/v1/sites/:id/resources', siteResourceController.create);
+router.get('/api/v1/sites/:id/resources', siteResourceController.getAll);
 router.get('/api/v1/sites', siteController.getAll);
 router.get('/api/v1/sites/:id', siteController.get);
 router.post('/api/v1/sites', siteController.create);

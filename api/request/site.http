@@ -15,7 +15,7 @@ Content-Type: application/json
 {
     "uri": "https://www.mhlw.go.jp/stf/new-info/",
     "name": "厚生労働省新着情報",
-    "directory": "769c2f96-4b28-4d05-97db-9c47f460eb6f",
+    "directory": "333e4ccb-cd43-46cb-b092-800cb575c138",
     "metadata": {
         "description": "厚生労働省の新着情報"
     },
@@ -130,3 +130,20 @@ Content-Type: application/json
 
 ### Delete metadata for all sites
 DELETE  http://localhost:18085/api/v1/sites/metadata/state
+
+################
+# Resources
+################
+
+### Create resources
+POST http://localhost:18085/api/v1/sites/55c346b2-30ee-4d24-a93a-9bb9cfa206dd/resources
+Content-Type: application/json
+
+{
+    "uri": "https://resource.com",
+    "name": "Some Resource",
+    "reason": "new"
+}
+
+### Get all resources
+GET http://localhost:18085/api/v1/sites/55c346b2-30ee-4d24-a93a-9bb9cfa206dd/resources

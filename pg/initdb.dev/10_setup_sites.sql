@@ -20,11 +20,11 @@ create table if not exists site (
   unique(uri)
 );
 
-create table if not exists resource (
+create table if not exists site_resource (
   uri varchar(4096) not null,
   site uuid not null references site on delete cascade,
-  name varchar(256) not null,
-  longName varchar(4096) not null,
+  name varchar(4096) not null,
+  reason varchar(256) not null,
   created timestamp not null,
   primary key(uri, site)
 );
