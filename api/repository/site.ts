@@ -57,14 +57,15 @@ export const siteRepository = {
     try {
       const sites = await sql `
         select
-          id, uri, name, directory, enabled, created, updated
-        from site
+          s.id, s.uri, s.name, s.directory, d.name as directory_name, s.enabled, s.created, s.updated
+        from site as s
+        inner join directory as d on s.directory = d.id
         ${(name && name.length > 0) ?
-          (strict ? sql`where name = ${name}` : sql`where name ilike ${`%${name}%`}`) :
+          (strict ? sql`where s.name = ${name}` : sql`where s.name ilike ${`%${name}%`}`) :
           sql``
         }
         ${enabled ?
-          ((name && name.length > 0) ? sql`and enabled = true` : sql`where enabled = true`) :
+          ((name && name.length > 0) ? sql`and s.enabled = true` : sql`where s.enabled = true`) :
           sql``
         }
       `
