@@ -11,7 +11,7 @@ export function getTestUrlBase(): string {
   return urlBase;
 }
 
-async function createADirectory(name: string, enabled: boolean): Promise<boolean> {
+export async function createADirectory(name: string, enabled: boolean): Promise<string | null> {
   const res = await fetch(`${urlBase}/directories`, {
     method: "POST",
     body: JSON.stringify({
@@ -25,41 +25,46 @@ async function createADirectory(name: string, enabled: boolean): Promise<boolean
   const text = await res.text();
   if (res.status !== 200) {
     console.log(`Failed to create directory: ${name}`);
-    return false;
+    return null;
   } else {
     const id = JSON.parse(text).id;
-    directories[name as keyof IdNames] = id;
-    console.log(`Directory created: ${name}`);
-    return true;
+    console.log(`Directory created: ${id} ${name}`);
+    return id;
   }
 }
 
 export async function createTestDirectories(): Promise<IdNames> {
-  await createADirectory("zebra", true);
-  await createADirectory("yak", true);
-  await createADirectory("yak2", true);
+  const id1 = await createADirectory("zebra", true);
+  if (id1)
+    directories["zebra"] = id1;
+  const id2 = await createADirectory("yak", true);
+  if (id2)
+    directories["yak"] = id2;
+  const id3 = await createADirectory("yak2", true);
+  if (id3)
+    directories["yak2"] = id3;
   return directories;
 }
 
-async function deleteADirectory(name: string, id: string): Promise<void> {
+export async function deleteADirectory(id: string): Promise<void> {
   const res = await fetch(`${urlBase}/directories/${id}`, {
     method: "DELETE"
   });
   const text = await res.text();
   if (res.status !== 204) {
-    console.log(`Failed to delete a directory: ${name}`);
+    console.log(`Failed to delete a directory: ${id}`);
   } else {
-    console.log(`Directory deleted: ${name}`);
+    console.log(`Directory deleted: ${id}`);
   }
 }
 
 export async function deleteTestDirectories(): Promise<void> {
   for (const name of Object.keys(directories)) {
-    await deleteADirectory(name, directories[name as keyof IdNames]);
+    await deleteADirectory(directories[name as keyof IdNames]);
   }
 }
 
-async function createASite(name: string, uri: string, directory: string, enabled: boolean): Promise<boolean> {
+export async function createASite(name: string, uri: string, directory: string, enabled: boolean): Promise<string | null> {
   const res = await fetch(`${urlBase}/sites`, {
     method: "POST",
     body: JSON.stringify({
@@ -75,36 +80,41 @@ async function createASite(name: string, uri: string, directory: string, enabled
   const text = await res.text();
   if (res.status !== 200) {
     console.log(`Failed to create site: ${name}`);
-    return false;
+    return null;
   } else {
     const id = JSON.parse(text).id;
-    sites[name as keyof IdNames] = id;
-    console.log(`Site created: ${name}`);
-    return true;
+    console.log(`Site created: ${id} ${name}`);
+    return id;
   }
 }
 
 export async function createTestSites(directories: IdNames): Promise<IdNames> {
-  await createASite("xenopus", "http://xenopus.com/", directories["zebra"], true);
-  await createASite("whale", "http://whale.com/", directories["zebra"], true);
-  await createASite("whale2", "http://whale2.com/", directories["zebra"], true);
+  const id1 = await createASite("xenopus", "http://xenopus.com/", directories["zebra"], true);
+  if (id1)
+    sites["xenopus"] = id1;
+  const id2 = await createASite("whale", "http://whale.com/", directories["zebra"], true);
+  if (id2)
+    sites["whale"] = id2;
+  const id3 = await createASite("whale2", "http://whale2.com/", directories["zebra"], true);
+  if (id3)
+    sites["whale2"] = id3;
   return sites;
 }
 
-async function deleteASite(name: string, id: string): Promise<void> {
+export async function deleteASite(id: string): Promise<void> {
   const res = await fetch(`${urlBase}/sites/${id}`, {
     method: "DELETE"
   });
   const text = await res.text();
   if (res.status !== 204) {
-    console.log(`Failed to delete a site: ${name}`);
+    console.log(`Failed to delete a site: ${id}`);
   } else {
-    console.log(`Site deleted: ${name}`);
+    console.log(`Site deleted: ${id}`);
   }
 }
 
 export async function deleteTestSites(): Promise<void> {
   for (const name of Object.keys(sites)) {
-    await deleteASite(name, sites[name as keyof IdNames]);
+    await deleteASite(sites[name as keyof IdNames]);
   }
 }

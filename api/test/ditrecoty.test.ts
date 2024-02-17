@@ -1,5 +1,5 @@
 import { assertEquals, fail } from "../deps_test.ts";
-import { getTestUrlBase } from "../util_test.ts";
+import { createASite, deleteASite, getTestUrlBase } from "../util_test.ts";
 
 Deno.test("Directory", async (t) => {
   const urlBase = getTestUrlBase();
@@ -185,6 +185,34 @@ Deno.test("Directory", async (t) => {
     console.log(`${res.status} ${text}`);
     assertEquals(res.status, 200);
     assertEquals(json.length, 1);
+  });
+
+  await t.step("200: Get sites by directory", async () => {
+    const site = await createASite("xenopus", "http://xenopus.com/", directories[0], true);
+    if (site === null) {
+      fail();
+    }
+    const id = directories[0];
+    const res = await fetch(`${urlBase}/directories/${id}/sites`);
+    const text = await res.text();
+    assertEquals(res.status, 200);
+    const json = JSON.parse(text);
+    assertEquals(json.length, 1);
+    if (site) {
+      await deleteASite(site);
+    }
+  });
+
+  await t.step("200: Get sites by directory with unregistered uuid", async () => {
+    const res = await fetch(`${urlBase}/directories/00000000-0000-0000-0000-000000000000/sites`);
+    const text = await res.text();
+    assertEquals(res.status, 200);
+  });
+
+  await t.step("400: Get sites by directory with invalid uuid", async () => {
+    const res = await fetch(`${urlBase}/directories/invalid-uuid/sites`);
+    const text = await res.text();
+    assertEquals(res.status, 400);
   });
 
   await t.step("200: Update a directory", async () => {
