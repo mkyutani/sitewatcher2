@@ -11,6 +11,9 @@ export const directoryService = {
   async getAll(name: string | null, strict: boolean | null, enabled: boolean | null) {
     return await directoryRepository.getAll(name, strict, enabled);
   },
+  async getSites(id: string) {
+    return await directoryRepository.getSites(id);
+  },
   async update(id: string, {...reqBody}: DirectoryParam) {
     return await directoryRepository.update(id, reqBody as DirectoryParam);
   },

@@ -38,6 +38,13 @@ export const directoryController = {
     ctx.assert(typeof result !== "string", 400, result as string);
     ctx.response.body = result;
   },
+  async getSites(ctx:RouterContext<string>) {
+    const { id } = helpers.getQuery(ctx, { mergeParams: true });
+    ctx.assert(isUuid(id), 400, "Invalid id");
+    const result = await directoryService.getSites(id);
+    ctx.assert(result, 500, "Unknown");
+    ctx.response.body = result;
+  },
   async update(ctx:RouterContext<string>) {
     const { id } = helpers.getQuery(ctx, { mergeParams: true });
     ctx.assert(isUuid(id), 400, "Invalid id");

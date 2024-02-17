@@ -50,6 +50,27 @@ export const directoryRepository = {
       return null;
     }
   },
+  async getSites(id: string) {
+    try {
+      const sites = await sql `
+        select
+          id, name, uri
+        from site
+        where directory = ${id}
+      `
+      return sites;
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      if (error instanceof sql.PostgresError && error.code === "22P02") {
+        // Ignore invalid uuid
+        log.warning(`directoryRepository.getSites:${id}:${description}`);
+        return null;
+      } else {
+        log.error(`directoryRepository.getSites:${id}:${description}`);
+        return null;
+      }
+    }
+  },
   async create(DirectoryParam: DirectoryParam) {
     const name = DirectoryParam?.name;
     const enabled = DirectoryParam?.enabled;
