@@ -1,7 +1,7 @@
 import { assertEquals, fail } from "../deps_test.ts";
 import { getTestUrlBase } from "../util_test.ts";
 
-Deno.test("Site", async (t) => {
+Deno.test("Directory", async (t) => {
   const urlBase = getTestUrlBase();
   const directories: string[] = [];
 
