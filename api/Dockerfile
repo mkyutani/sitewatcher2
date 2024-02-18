@@ -7,3 +7,8 @@ FROM base AS dev
 WORKDIR /app
 COPY --chown=deno:deno . /app
 CMD ["run", "--allow-net", "--allow-read", "--allow-env", "main.ts"]
+
+FROM base as production
+WORKDIR /app
+COPY --chown=deno:deno . /app
+CMD ["run", "--allow-net", "--allow-read", "--allow-env", "main.ts"]
