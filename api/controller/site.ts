@@ -30,12 +30,15 @@ export const siteController = {
     ctx.response.body = result;
   },
   async getAll(ctx: RouterContext<string>) {
-    const { name, strict, enabled } = helpers.getQuery(ctx, { mergeParams: true });
+    const { name, strict, enabled, directory } = helpers.getQuery(ctx, { mergeParams: true });
     const strict_flag = convertToBoolean(strict);
     ctx.assert(strict_flag != null, 400, "Invalid strict flag"); 
     const enabled_flag = convertToBoolean(enabled);
     ctx.assert(enabled_flag != null, 400, "Invalid enabled flag");
-    const result = await siteService.getAll(name, strict_flag, enabled_flag);
+    if (directory) {
+      ctx.assert(isUuid(directory), 400, "Invalid directory id")
+    }
+    const result = await siteService.getAll(name, directory, strict_flag, enabled_flag);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result as string);
     ctx.response.body = result;

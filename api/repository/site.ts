@@ -54,19 +54,31 @@ export const siteRepository = {
       return null;
     }
   },
-  async getAll(name: string | null, strict: boolean | null, enabled: boolean | null) {
+  async getAll(name: string | null, directory_id: string | null, strict: boolean | null, enabled: boolean | null) {
     try {
       const sites = await sql `
         select
           s.id, s.uri, s.name, s.directory, d.name as directory_name, s.enabled, s.created, s.updated
         from site as s
         inner join directory as d on s.directory = d.id
+        ${directory_id ?
+          sql`where s.directory = ${directory_id}` :
+          sql``
+        }
         ${(name && name.length > 0) ?
-          (strict ? sql`where s.name = ${name}` : sql`where s.name ilike ${`%${name}%`}`) :
+          (strict ?
+            (directory_id ?
+              sql`and s.name = ${name}`:
+              sql`where s.name = ${name}`) :
+            (directory_id ?
+              sql`and s.name ilike ${`%${name}%`}` :
+              sql`where s.name ilike ${`%${name}%`}`)):
           sql``
         }
         ${enabled ?
-          ((name && name.length > 0) ? sql`and s.enabled = true` : sql`where s.enabled = true`) :
+          ((directory_id || (name && name.length > 0)) ?
+            sql`and s.enabled = true` :
+            sql`where s.enabled = true`) :
           sql``
         }
       `
