@@ -10,7 +10,7 @@ export const siteResourceRepository = {
     try {
       const resources = await sql `
         insert
-        into site_resource (uri, site, name, reason, created)
+        into site_resource (uri, site, name, reason, tm)
         values (${uri}, ${site}, ${name}, ${reason}, current_timestamp at time zone 'UTC')
         returning uri, site
       `
@@ -34,7 +34,7 @@ export const siteResourceRepository = {
     try {
       const sites = await sql `
         select
-          r.uri, r.name, r.site, s.name as site_name, r.reason, r.created
+          r.uri, r.name, r.site, s.name as site_name, r.reason, r.tm as time
         from site_resource as r
         inner join site as s on r.site = s.id
         where r.site = ${site}
