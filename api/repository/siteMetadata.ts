@@ -14,8 +14,8 @@ export const siteMetadataRepository = {
           insert
           into site_metadata (site, key, value, created, updated)
           ${id ?
-            sql`values (${id}, ${key}, ${value}, current_timestamp, current_timestamp)` :
-            sql`select id, ${key}, ${value}, current_timestamp, current_timestamp from site
+            sql`values (${id}, ${key}, ${value}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')` :
+            sql`select id, ${key}, ${value}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC' from site
               ${(name && name.length > 0) ?
                 (strict_flag ? sql`where name = ${name}` : sql`where name ilike ${`%${name}%`}`) :
                 sql``}
@@ -23,7 +23,7 @@ export const siteMetadataRepository = {
           on conflict (site, key)
           do update
             set value = ${value},
-            updated = current_timestamp
+            updated = current_timestamp at time zone 'UTC'
           returning site, key, value, created, updated
         `
         if (metadata.length > 0) {

@@ -78,7 +78,7 @@ export const directoryRepository = {
       const directories = await sql `
         insert
         into directory (name, enabled, created, updated)
-        values (${name}, ${enabled}, current_timestamp, current_timestamp)
+        values (${name}, ${enabled}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
         returning id
       `
       return directories[0];
@@ -100,7 +100,7 @@ export const directoryRepository = {
         update directory
         set name = ${name ? name : sql`name`},
           enabled = ${(enabled !== void 0) ? enabled : sql`enabled`},
-          updated = current_timestamp
+          updated = current_timestamp at time zone 'UTC'
         where id = ${id}
         returning *
       `

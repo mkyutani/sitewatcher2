@@ -12,7 +12,7 @@ export const siteRepository = {
       const sites = await sql `
         insert
         into site (uri, name, directory, enabled, created, updated)
-        values (${uri}, ${name}, ${directory}, ${enabled}, current_timestamp, current_timestamp)
+        values (${uri}, ${name}, ${directory}, ${enabled}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
         returning id
       `
       return sites[0];
@@ -101,7 +101,7 @@ export const siteRepository = {
           name = ${name ? name : sql`name`},
           directory = ${directory ? directory : sql`directory`},
           enabled = ${(enabled !== void 0) ? enabled : sql`enabled`},
-          updated = current_timestamp
+          updated = current_timestamp at time zone 'UTC'
         where id = ${id}
         returning *
       `

@@ -11,7 +11,7 @@ export const siteResourceRepository = {
       const resources = await sql `
         insert
         into site_resource (uri, site, name, reason, created)
-        values (${uri}, ${site}, ${name}, ${reason}, current_timestamp)
+        values (${uri}, ${site}, ${name}, ${reason}, current_timestamp at time zone 'UTC')
         returning uri, site
       `
       return resources[0];

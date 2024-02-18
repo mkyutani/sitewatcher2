@@ -14,8 +14,8 @@ export const directoryMetadataRepository = {
           insert
           into directory_metadata (directory, key, value, created, updated)
           ${id ?
-            sql`values (${id}, ${key}, ${value}, current_timestamp, current_timestamp)` :
-            sql`select id, ${key}, ${value}, current_timestamp, current_timestamp from directory
+            sql`values (${id}, ${key}, ${value}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')` :
+            sql`select id, ${key}, ${value}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC' from directory
               ${(name && name.length > 0) ?
                 (strict_flag ? sql`where name = ${name}` : sql`where name ilike ${`%${name}%`}`) :
                 sql``}
@@ -23,7 +23,7 @@ export const directoryMetadataRepository = {
           on conflict (directory, key)
           do update
             set value = ${value},
-            updated = current_timestamp
+            updated = current_timestamp at time zone 'UTC'
           returning directory, key, value, created, updated
         `
         if (metadata.length > 0) {
