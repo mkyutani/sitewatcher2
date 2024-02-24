@@ -8,8 +8,8 @@ export const directoryService = {
   async get(id: string) {
     return await directoryRepository.get(id);
   },
-  async getAll(name: string | null, strict: boolean | null, enabled: boolean | null) {
-    return await directoryRepository.getAll(name, strict, enabled);
+  async getAll(name: string | null, strict: boolean | null, all: boolean | null) {
+    return await directoryRepository.getAll(name, strict, all);
   },
   async getSites(id: string) {
     return await directoryRepository.getSites(id);

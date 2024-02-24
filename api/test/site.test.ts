@@ -23,11 +23,18 @@ Deno.test("Site", async (t) => {
         enabled: true
       },
       {
+        name: "alpaca-dead",
+        uri: "http://alpaca-dead.com",
+        directory: directories["zebra"],
+        metadata: {},
+        enabled: false
+      },
+      {
         name: "alpaca-child",
         uri: "http://alpaca-child.com",
         directory: directories["zebra"],
         metadata: {},
-        enabled: false
+        enabled: true
       }
     ];
     const statuses: number[] = [];
@@ -286,13 +293,13 @@ Deno.test("Site", async (t) => {
     assertEquals(json.length, 1);
   });
 
-  await t.step("200: Get all sites with name and enabled flag", async () => {
-    const res = await fetch(`${urlBase}/sites?name=alpaca&enabled`);
+  await t.step("200: Get all sites with name and all flag", async () => {
+    const res = await fetch(`${urlBase}/sites?name=alpaca&all`);
     const text = await res.text();
     console.log(`${res.status} ${text}`);
     const json = JSON.parse(text);
     assertEquals(res.status, 200);
-    assertEquals(json.length, 1);
+    assertEquals(json.length, 3);
   });
 
   await t.step("200: Get all sites with directory id", async () => {

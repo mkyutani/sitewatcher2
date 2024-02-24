@@ -8,8 +8,8 @@ export const siteService = {
   async get(id: string) {
     return await siteRepository.get(id);
   },
-  async getAll(name: string | null, directory_id: string | null, strict: boolean | null, enabled: boolean | null) {
-    return await siteRepository.getAll(name, directory_id, strict, enabled);
+  async getAll(name: string | null, directory_id: string | null, strict: boolean | null, all: boolean | null) {
+    return await siteRepository.getAll(name, directory_id, strict, all);
   },
   async update(id: string, {...reqBody}: SiteParam) {
     return await siteRepository.update(id, reqBody as SiteParam);

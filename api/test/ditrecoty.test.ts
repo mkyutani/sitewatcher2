@@ -12,12 +12,16 @@ Deno.test("Directory", async (t) => {
         enabled: true
       },
       {
+        name: "alpaca-dead",
+        enabled: false
+      },
+      {
         name: "beaver",
         enabled: true
       },
       {
         name: "alpaca-child",
-        enabled: false
+        enabled: true
       }
     ];
     const statuses: number[] = [];
@@ -159,7 +163,7 @@ Deno.test("Directory", async (t) => {
     const text = await res.text();
     assertEquals(res.status, 200);
     const json = JSON.parse(text);
-    assertEquals(json.length, directories.length);
+    assertEquals(json.length, 3);
   });
 
   await t.step("200: Get all directories with name", async () => {
@@ -178,13 +182,13 @@ Deno.test("Directory", async (t) => {
     assertEquals(json.length, 1);
   });
 
-  await t.step("200: Get all sites with name and enabled flag", async () => {
-    const res = await fetch(`${urlBase}/directories?name=alpaca&enabled`);
+  await t.step("200: Get all sites with name and all flag", async () => {
+    const res = await fetch(`${urlBase}/directories?name=alpaca&all`);
     const text = await res.text();
     const json = JSON.parse(text);
     console.log(`${res.status} ${text}`);
     assertEquals(res.status, 200);
-    assertEquals(json.length, 1);
+    assertEquals(json.length, 3);
   });
 
   await t.step("200: Get sites by directory", async () => {

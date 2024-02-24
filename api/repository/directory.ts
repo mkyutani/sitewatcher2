@@ -28,7 +28,7 @@ export const directoryRepository = {
       }
     }
   },
-  async getAll(name: string | null, strict: boolean | null, enabled: boolean | null) {
+  async getAll(name: string | null, strict: boolean | null, all: boolean | null) {
     try {
       const directories = await sql `
         select
@@ -38,9 +38,9 @@ export const directoryRepository = {
           (strict ? sql`where name = ${name}` : sql`where name ilike ${`%${name}%`}`) :
           sql``
         }
-        ${enabled ?
-          ((name && name.length > 0) ? sql`and enabled = true` : sql`where enabled = true`) :
-          sql``
+        ${all ?
+          sql`` :
+          ((name && name.length > 0) ? sql`and enabled = true` : sql`where enabled = true`)
         }
       `
       return directories;
