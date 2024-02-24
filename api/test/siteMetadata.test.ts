@@ -68,21 +68,26 @@ Deno.test("Site metadata", async (t) => {
     const text = await res.text();
     assertEquals(res.status, 200);
     const json = JSON.parse(text);
-    assertEquals(json.key, "type");
-    assertEquals(json.value, "list");
+    assertEquals(json.length, 2);
     console.log(json);
   });
 
   await t.step("200: Get a site metadata with unregistered key", async () => {
     const res = await fetch(`${urlBase}/sites/${sites["xenopus"]}/metadata?key=unregistered`);
     const text = await res.text();
-    assertEquals(res.status, 204);
+    assertEquals(res.status, 200);
+    const json = JSON.parse(text);
+    assertEquals(json.length, 0);
+    console.log(json);
   });
 
   await t.step("200: Get a site metadata with unregistered uuid", async () => {
     const res = await fetch(`${urlBase}/sites/00000000-0000-0000-0000-000000000000/metadata?key=type`);
     const text = await res.text();
-    assertEquals(res.status, 204);
+    assertEquals(res.status, 200);
+    const json = JSON.parse(text);
+    assertEquals(json.length, 0);
+    console.log(json);
   });
 
   await t.step("400: Get a site metadata with invalid uuid", async () => {

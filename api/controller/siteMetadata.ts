@@ -19,11 +19,7 @@ export const siteMetadataController = {
     const result = await siteMetadataService.get(id, key);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result);
-    if (key && Object.keys(result).length === 0) {
-      ctx.response.body = null;
-    } else {
-      ctx.response.body = result;
-    }
+    ctx.response.body = result;
   },
   async delete(ctx:RouterContext<string>) {
     const { id, key } = helpers.getQuery(ctx, { mergeParams: true });

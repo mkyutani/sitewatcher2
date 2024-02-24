@@ -30,23 +30,11 @@ export const directoryMetadataRepository = {
         from directory_metadata
         where directory = ${id}
         ${key ?
-          sql`
-            and key = ${key}
-            order by id desc
-            limit 1
-          ` :
+          sql`and key = ${key}` :
           sql``
         }
       `
-      if (key) {
-        if (metadata.length === 0) {
-          return {};
-        } else {
-          return metadata[0];
-        }
-      } else {
-        return metadata;
-      }
+      return metadata;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       if (error instanceof sql.PostgresError && error.code === "23503") {
