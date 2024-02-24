@@ -15,7 +15,7 @@ Content-Type: application/json
 GET http://localhost:18085/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
 
 ### Get all directories
-GET http://localhost:18085/api/v1/directories
+GET http://localhost:18085/api/v1/directories?metadata
 
 ### Get sites by directory
 GET http://localhost:18085/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f/sites
@@ -36,13 +36,13 @@ DELETE  http://localhost:18085/api/v1/directories/189024c3-4eba-45b8-9a2d-80c04d
 ################
 
 ### Create metadata
-POST http://localhost:18085/api/v1/directories/b2f39c24-1fed-49d4-89c3-7a5b7279c39f/metadata?key=type&value=list
+POST http://localhost:18085/api/v1/directories/a49149e7-ba0e-4a11-a47c-9b14c66ba021/metadata?key=type&value=list
 
 ### Get metadata
 GET http://localhost:18085/api/v1/directories/b2f39c24-1fed-49d4-89c3-7a5b7279c39f/metadata?key=type
 
 ### Get all metadata
-GET http://localhost:18085/api/v1/directories/b2f39c24-1fed-49d4-89c3-7a5b7279c39f/metadata
+GET http://localhost:18085/api/v1/directories/a49149e7-ba0e-4a11-a47c-9b14c66ba021/metadata
 
 ### Delete metadata
 DELETE  http://localhost:18085/api/v1/directories/b2f39c24-1fed-49d4-89c3-7a5b7279c39f/metadata?key=type

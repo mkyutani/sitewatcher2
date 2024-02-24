@@ -28,7 +28,7 @@ export const directoryRepository = {
       }
     }
   },
-  async getAll(name: string | null, strict: boolean | null, all: boolean | null) {
+  async getAll(name: string | null, strict: boolean | null, all: boolean | null, metadata: boolean | null) {
     try {
       const directories = await sql `
         select
@@ -43,6 +43,18 @@ export const directoryRepository = {
           ((name && name.length > 0) ? sql`and enabled = true` : sql`where enabled = true`)
         }
       `
+
+      if (metadata) {
+        for (const directory of directories) {
+          const data = await sql`
+            select key, value
+            from directory_metadata
+            where directory = ${directory.id}
+          `
+          directory.metadata = data;
+        }
+      }
+
       return directories;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 

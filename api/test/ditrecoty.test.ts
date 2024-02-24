@@ -36,7 +36,18 @@ Deno.test("Directory", async (t) => {
       const text = await res.text();
       statuses.push(res.status);
       if (res.status === 200) {
-        directories.push(JSON.parse(text).id);
+        const id = JSON.parse(text).id;
+        directories.push(id);
+        const metadata_registration = [
+          { "key": "type", "value": "mammal" },
+          { "key": "color", "value": "white" }
+        ];
+        for (const m of metadata_registration) {
+          const res_metadata = await fetch(`${urlBase}/directories/${id}/metadata?key=${m.key}&value=${m.value}`, {
+            method: "POST"
+          });
+          const text_metadata = await res_metadata.text();
+        }  
       }
     }
     assertEquals(statuses.filter(function(n) { return n != 200; }).length, 0);
@@ -182,13 +193,14 @@ Deno.test("Directory", async (t) => {
     assertEquals(json.length, 1);
   });
 
-  await t.step("200: Get all sites with name and all flag", async () => {
-    const res = await fetch(`${urlBase}/directories?name=alpaca&all`);
+  await t.step("200: Get all sites with all flags", async () => {
+    const res = await fetch(`${urlBase}/directories?name=alpaca&strict&all&metadata`);
     const text = await res.text();
     const json = JSON.parse(text);
     console.log(`${res.status} ${text}`);
     assertEquals(res.status, 200);
-    assertEquals(json.length, 3);
+    assertEquals(json.length, 1);
+    assertEquals(json[0].metadata.length, 2);
   });
 
   await t.step("200: Get sites by directory", async () => {

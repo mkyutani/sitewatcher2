@@ -6,34 +6,30 @@ Deno.test("Site", async (t) => {
   const directories: IdNames = await createTestDirectories();
   const sites: string[] = [];
 
-  await t.step("200: Create a site", async () => {
+  await t.step("200: Create a site with metadata", async () => {
     const registrations = [
       {
         name: "alpaca",
         uri: "http://alpaca.com",
         directory: directories["zebra"],
-        metadata: {},
         enabled: true
       },
       {
         name: "beaver",
         uri: "http://beaver.com",
         directory: directories["zebra"],
-        metadata: {},
         enabled: true
       },
       {
         name: "alpaca-dead",
         uri: "http://alpaca-dead.com",
         directory: directories["zebra"],
-        metadata: {},
         enabled: false
       },
       {
         name: "alpaca-child",
         uri: "http://alpaca-child.com",
         directory: directories["zebra"],
-        metadata: {},
         enabled: true
       }
     ];
@@ -52,7 +48,18 @@ Deno.test("Site", async (t) => {
       }
       statuses.push(res.status);
       if (res.status === 200) {
-        sites.push(JSON.parse(text).id);
+        const id = JSON.parse(text).id;
+        sites.push(id);
+        const metadata_registration = [
+          { "key": "type", "value": "mammal" },
+          { "key": "color", "value": "white" }
+        ];
+        for (const m of metadata_registration) {
+          const res_metadata = await fetch(`${urlBase}/sites/${id}/metadata?key=${m.key}&value=${m.value}`, {
+            method: "POST"
+          });
+          const text_metadata = await res_metadata.text();
+        }
       }
     }
     assertEquals(statuses.filter(function(n) { return n != 200; }).length, 0);
@@ -300,6 +307,16 @@ Deno.test("Site", async (t) => {
     const json = JSON.parse(text);
     assertEquals(res.status, 200);
     assertEquals(json.length, 3);
+  });
+
+  await t.step("200: Get all sites with all flags", async () => {
+    const res = await fetch(`${urlBase}/sites?name=alpaca&strict&all&metadata`);
+    const text = await res.text();
+    console.log(`${res.status} ${text}`);
+    const json = JSON.parse(text);
+    assertEquals(res.status, 200);
+    assertEquals(json.length, 1);
+    assertEquals(json[0].metadata.length, 2);
   });
 
   await t.step("200: Get all sites with directory id", async () => {

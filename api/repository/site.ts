@@ -54,7 +54,7 @@ export const siteRepository = {
       return null;
     }
   },
-  async getAll(name: string | null, directory_id: string | null, strict: boolean | null, all: boolean | null) {
+  async getAll(name: string | null, directory_id: string | null, strict: boolean | null, all: boolean | null, metadata: boolean | null) {
     try {
       const sites = await sql `
         select
@@ -82,6 +82,18 @@ export const siteRepository = {
             sql`where s.enabled = true`)
         }
       `
+
+      if (metadata) {
+        for (const site of sites) {
+          const data = await sql`
+            select key, value
+            from site_metadata
+            where site = ${site.id}
+          `
+          site.metadata = data;
+        }
+      }
+
       return sites;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
