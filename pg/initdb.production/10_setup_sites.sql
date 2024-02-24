@@ -30,19 +30,21 @@ create table if not exists site_resource (
 );
 
 create table if not exists directory_metadata (
+  id uuid default gen_random_uuid() not null,
   directory uuid not null references directory on delete cascade,
   key varchar(256) not null,
   value varchar(4096) not null,
   created timestamp not null,
   updated timestamp not null,
-  primary key(directory, key)
+  primary key(id)
 );
 
 create table if not exists site_metadata (
+  id uuid default gen_random_uuid() not null,
   site uuid not null references site on delete cascade,
   key varchar(256) not null,
   value varchar(4096) not null,
   created timestamp not null,
   updated timestamp not null,
-  primary key(site, key)
+  primary key(id)
 );
