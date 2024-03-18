@@ -11,9 +11,6 @@ export const directoryController = {
     const reqBody = await reqBodyRaw.value;
     ctx.assert(reqBody, 400, "Data is empty");
     ctx.assert(reqBody.name, 400, "Name is missing");
-    ctx.assert(reqBody.enabled != null, 400, "Enabled is missing");
-    reqBody.enabled = convertToBoolean(reqBody.enabled);
-    ctx.assert(reqBody.enabled != null, 400, "Invalid enabled flag");
     const result = await directoryService.create(reqBody as DirectoryParam);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result as string);
@@ -28,14 +25,12 @@ export const directoryController = {
     ctx.response.body = result;
   },
   async getAll(ctx: RouterContext<string>) {
-    const { name, strict, all, metadata } = helpers.getQuery(ctx, { mergeParams: true });
+    const { name, strict, metadata } = helpers.getQuery(ctx, { mergeParams: true });
     const strict_flag = convertToBoolean(strict);
     ctx.assert(strict_flag != null, 400, "Invalid strict flag"); 
-    const all_flag = convertToBoolean(all);
-    ctx.assert(all_flag != null, 400, "Invalid all flag");
     const metadata_flag = convertToBoolean(metadata);
     ctx.assert(metadata_flag != null, 400, "Invalid metadata flag");
-    const result = await directoryService.getAll(name, strict_flag, all_flag, metadata_flag);
+    const result = await directoryService.getAll(name, strict_flag, metadata_flag);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result as string);
     ctx.response.body = result;
@@ -55,10 +50,6 @@ export const directoryController = {
     ctx.assert(reqBodyRaw.type === "json", 415, "Invalid content");
     const reqBody = await reqBodyRaw.value;
     ctx.assert(reqBody, 400, "Data is empty");
-    if (reqBody.enabled) {
-      reqBody.enabled = convertToBoolean(reqBody.enabled);
-      ctx.assert(reqBody.enabled != null, 400, "Invalid enabled flag");
-    }
     const result = await directoryService.update(id, reqBody as DirectoryParam);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result as string);

@@ -7,12 +7,11 @@ export const siteRepository = {
     const uri = siteParam?.uri;
     const name = siteParam?.name;
     const directory = siteParam?.directory;
-    const enabled = siteParam?.enabled;
     try {
       const sites = await sql `
         insert
-        into site (uri, name, directory, enabled, created, updated)
-        values (${uri}, ${name}, ${directory}, ${enabled}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
+        into site (uri, name, directory, created, updated)
+        values (${uri}, ${name}, ${directory}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
         returning id
       `
       return sites[0];
@@ -35,7 +34,7 @@ export const siteRepository = {
     try {
       const sites = await sql `
         select
-          s.id, s.uri, s.name, s.directory, d.name as directory_name, s.enabled, s.created, s.updated
+          s.id, s.uri, s.name, s.directory, d.name as directory_name, s.created, s.updated
         from site as s
         inner join directory as d on s.directory = d.id
         where s.id = ${id}
@@ -54,11 +53,11 @@ export const siteRepository = {
       return null;
     }
   },
-  async getAll(name: string | null, directory_id: string | null, strict: boolean | null, all: boolean | null, metadata: boolean | null) {
+  async getAll(name: string | null, directory_id: string | null, strict: boolean | null, metadata: boolean | null) {
     try {
       const sites = await sql `
         select
-          s.id, s.uri, s.name, s.directory, d.name as directory_name, s.enabled, s.created, s.updated
+          s.id, s.uri, s.name, s.directory, d.name as directory_name, s.created, s.updated
         from site as s
         inner join directory as d on s.directory = d.id
         ${directory_id ?
@@ -74,12 +73,6 @@ export const siteRepository = {
               sql`and s.name ilike ${`%${name}%`}` :
               sql`where s.name ilike ${`%${name}%`}`)):
           sql``
-        }
-        ${all ?
-          sql`` :
-          ((directory_id || (name && name.length > 0)) ?
-            sql`and s.enabled = true` :
-            sql`where s.enabled = true`)
         }
       `
 
@@ -105,14 +98,12 @@ export const siteRepository = {
     const uri = siteParam?.uri;
     const name = siteParam?.name;
     const directory = siteParam?.directory;
-    const enabled = siteParam?.enabled;
     try {
       const sites = await sql `
         update site
         set uri = ${uri ? uri : sql`uri`},
           name = ${name ? name : sql`name`},
           directory = ${directory ? directory : sql`directory`},
-          enabled = ${(enabled !== void 0) ? enabled : sql`enabled`},
           updated = current_timestamp at time zone 'UTC'
         where id = ${id}
         returning *

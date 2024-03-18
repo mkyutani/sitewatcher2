@@ -13,9 +13,6 @@ export const siteController = {
     ctx.assert(reqBody.name, 400, "Name is missing");
     ctx.assert(reqBody.directory, 400, "Directory is missing");
     ctx.assert(isUuid(reqBody.directory), 400, "Invalid directory id");
-    ctx.assert(reqBody.enabled != null, 400, "Enabled is missing");
-    reqBody.enabled = convertToBoolean(reqBody.enabled);
-    ctx.assert(reqBody.enabled != null, 400, "Invalid enabled flag");
     const result = await siteService.create(reqBody as SiteParam);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result as string);
@@ -30,17 +27,15 @@ export const siteController = {
     ctx.response.body = result;
   },
   async getAll(ctx: RouterContext<string>) {
-    const { name, strict, all, metadata, directory } = helpers.getQuery(ctx, { mergeParams: true });
+    const { name, strict, metadata, directory } = helpers.getQuery(ctx, { mergeParams: true });
     const strict_flag = convertToBoolean(strict);
     ctx.assert(strict_flag != null, 400, "Invalid strict flag"); 
-    const all_flag = convertToBoolean(all);
-    ctx.assert(all_flag != null, 400, "Invalid all flag");
     const metadata_flag = convertToBoolean(metadata);
     ctx.assert(metadata_flag != null, 400, "Invalid metadata flag");
     if (directory) {
       ctx.assert(isUuid(directory), 400, "Invalid directory id")
     }
-    const result = await siteService.getAll(name, directory, strict_flag, all_flag, metadata_flag);
+    const result = await siteService.getAll(name, directory, strict_flag, metadata_flag);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result as string);
     ctx.response.body = result;
@@ -54,10 +49,6 @@ export const siteController = {
     ctx.assert(reqBody, 400, "No data");
     if (reqBody.directory) {
       ctx.assert(isUuid(reqBody.directory), 400, "Invalid directory id");
-    }
-    if (reqBody.enabled) {
-      reqBody.enabled = convertToBoolean(reqBody.enabled);
-      ctx.assert(reqBody.enabled != null, 400, "Invalid enabled flag");
     }
     const result = await siteService.update(id, reqBody as SiteParam);
     ctx.assert(result, 500, "Unknown");

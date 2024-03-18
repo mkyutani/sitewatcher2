@@ -7,7 +7,7 @@ export const directoryRepository = {
     try {
       const directories = await sql `
         select
-          id, name, enabled, created, updated
+          id, name, created, updated
         from directory
         where id = ${id}
       `
@@ -28,19 +28,15 @@ export const directoryRepository = {
       }
     }
   },
-  async getAll(name: string | null, strict: boolean | null, all: boolean | null, metadata: boolean | null) {
+  async getAll(name: string | null, strict: boolean | null, metadata: boolean | null) {
     try {
       const directories = await sql `
         select
-          id, name, enabled, created, updated
+          id, name, created, updated
         from directory
         ${(name && name.length > 0) ?
           (strict ? sql`where name = ${name}` : sql`where name ilike ${`%${name}%`}`) :
           sql``
-        }
-        ${all ?
-          sql`` :
-          ((name && name.length > 0) ? sql`and enabled = true` : sql`where enabled = true`)
         }
       `
 
@@ -85,12 +81,11 @@ export const directoryRepository = {
   },
   async create(DirectoryParam: DirectoryParam) {
     const name = DirectoryParam?.name;
-    const enabled = DirectoryParam?.enabled;
     try {
       const directories = await sql `
         insert
-        into directory (name, enabled, created, updated)
-        values (${name}, ${enabled}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
+        into directory (name,created, updated)
+        values (${name}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
         returning id
       `
       return directories[0];
@@ -106,12 +101,10 @@ export const directoryRepository = {
   },
   async update(id: string, param: DirectoryParam) {
     const name = param?.name;
-    const enabled = param?.enabled;
     try {
       const directories = await sql `
         update directory
         set name = ${name ? name : sql`name`},
-          enabled = ${(enabled !== void 0) ? enabled : sql`enabled`},
           updated = current_timestamp at time zone 'UTC'
         where id = ${id}
         returning *

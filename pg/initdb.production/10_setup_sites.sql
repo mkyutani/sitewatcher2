@@ -1,7 +1,6 @@
 create table if not exists directory (
   id uuid default gen_random_uuid() not null,
   name varchar(256) not null,
-  enabled boolean not null,
   created timestamp not null,
   updated timestamp not null,
   primary key(id),
@@ -13,7 +12,6 @@ create table if not exists site (
   directory uuid not null references directory on delete cascade,
   uri varchar(4096) not null,
   name varchar(256) not null,
-  enabled boolean not null,
   created timestamp not null,
   updated timestamp not null,
   primary key(id),

@@ -11,12 +11,11 @@ export function getTestUrlBase(): string {
   return urlBase;
 }
 
-export async function createADirectory(name: string, enabled: boolean): Promise<string | null> {
+export async function createADirectory(name: string): Promise<string | null> {
   const res = await fetch(`${urlBase}/directories`, {
     method: "POST",
     body: JSON.stringify({
-      name: name,
-      enabled: enabled
+      name: name
     }),
     headers: {
       "Content-Type": "application/json",
@@ -34,13 +33,13 @@ export async function createADirectory(name: string, enabled: boolean): Promise<
 }
 
 export async function createTestDirectories(): Promise<IdNames> {
-  const id1 = await createADirectory("zebra", true);
+  const id1 = await createADirectory("zebra");
   if (id1)
     directories["zebra"] = id1;
-  const id2 = await createADirectory("yak", true);
+  const id2 = await createADirectory("yak");
   if (id2)
     directories["yak"] = id2;
-  const id3 = await createADirectory("yak2", true);
+  const id3 = await createADirectory("yak2");
   if (id3)
     directories["yak2"] = id3;
   return directories;
@@ -64,14 +63,13 @@ export async function deleteTestDirectories(): Promise<void> {
   }
 }
 
-export async function createASite(name: string, uri: string, directory: string, enabled: boolean): Promise<string | null> {
+export async function createASite(name: string, uri: string, directory: string): Promise<string | null> {
   const res = await fetch(`${urlBase}/sites`, {
     method: "POST",
     body: JSON.stringify({
       name: name,
       uri: uri,
-      directory: directory,
-      enabled: enabled
+      directory: directory
     }),
     headers: {
       "Content-Type": "application/json",
@@ -89,13 +87,13 @@ export async function createASite(name: string, uri: string, directory: string, 
 }
 
 export async function createTestSites(directories: IdNames): Promise<IdNames> {
-  const id1 = await createASite("xenopus", "http://xenopus.com/", directories["zebra"], true);
+  const id1 = await createASite("xenopus", "http://xenopus.com/", directories["zebra"]);
   if (id1)
     sites["xenopus"] = id1;
-  const id2 = await createASite("whale", "http://whale.com/", directories["zebra"], true);
+  const id2 = await createASite("whale", "http://whale.com/", directories["zebra"]);
   if (id2)
     sites["whale"] = id2;
-  const id3 = await createASite("whale2", "http://whale2.com/", directories["zebra"], true);
+  const id3 = await createASite("whale2", "http://whale2.com/", directories["zebra"]);
   if (id3)
     sites["whale2"] = id3;
   return sites;

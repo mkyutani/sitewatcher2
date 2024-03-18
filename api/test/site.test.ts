@@ -11,26 +11,17 @@ Deno.test("Site", async (t) => {
       {
         name: "alpaca",
         uri: "http://alpaca.com",
-        directory: directories["zebra"],
-        enabled: true
+        directory: directories["zebra"]
       },
       {
         name: "beaver",
         uri: "http://beaver.com",
-        directory: directories["zebra"],
-        enabled: true
-      },
-      {
-        name: "alpaca-dead",
-        uri: "http://alpaca-dead.com",
-        directory: directories["zebra"],
-        enabled: false
+        directory: directories["zebra"]
       },
       {
         name: "alpaca-child",
         uri: "http://alpaca-child.com",
-        directory: directories["zebra"],
-        enabled: true
+        directory: directories["zebra"]
       }
     ];
     const statuses: number[] = [];
@@ -109,8 +100,7 @@ Deno.test("Site", async (t) => {
       body: JSON.stringify({
         uri: "http://alpaca.com",
         directory: directories["zebra"],
-        metadata: {},
-        enabled: true
+        metadata: {}
       }),
       headers: {
         "Content-Type": "application/json",
@@ -127,8 +117,7 @@ Deno.test("Site", async (t) => {
       body: JSON.stringify({
         name: "alpaca",
         uri: "http://alpaca.com",
-        metadata: {},
-        enabled: true
+        metadata: {}
       }),
       headers: {
         "Content-Type": "application/json",
@@ -146,8 +135,7 @@ Deno.test("Site", async (t) => {
         name: "alpaca",
         uri: "http://alpaca.com",
         directory: "invalid-uuid",
-        metadata: {},
-        enabled: true
+        metadata: {}
       }),
       headers: {
         "Content-Type": "application/json",
@@ -165,8 +153,7 @@ Deno.test("Site", async (t) => {
         name: "alpaca9999",
         uri: "http://alpaca9999.com",
         directory: "00000000-0000-0000-0000-000000000000",
-        metadata: {},
-        enabled: true
+        metadata: {}
       }),
       headers: {
         "Content-Type": "application/json",
@@ -183,25 +170,6 @@ Deno.test("Site", async (t) => {
       body: JSON.stringify({
         name: "alpaca",
         directory: directories["zebra"],
-        metadata: {},
-        enabled: true
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const text = await res.text();
-    console.log(`${res.status} ${text}`);
-    assertEquals(res.status, 400);
-  });
-
-  await t.step("400: Create a site without enabled flag", async () => {
-    const res = await fetch(`${urlBase}/sites`, {
-      method: "POST",
-      body: JSON.stringify({
-        name: "alpaca",
-        uri: "http://alpaca.com",
-        directory: directories["zebra"],
         metadata: {}
       }),
       headers: {
@@ -212,26 +180,7 @@ Deno.test("Site", async (t) => {
     console.log(`${res.status} ${text}`);
     assertEquals(res.status, 400);
   });
-  
-  await t.step("400: Create a site with invalid enabled flag", async () => {
-    const res = await fetch(`${urlBase}/sites`, {
-      method: "POST",
-      body: JSON.stringify({
-        name: "alpaca",
-        uri: "http://alpaca.com",
-        directory: directories["zebra"],
-        metadata: {},
-        enabled: "ambiguous"
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const text = await res.text();
-    console.log(`${res.status} ${text}`);
-    assertEquals(res.status, 400);
-  });
-  
+
   await t.step("400: Create a duplicated site", async () => {
     const res = await fetch(`${urlBase}/sites`, {
       method: "POST",
@@ -239,8 +188,7 @@ Deno.test("Site", async (t) => {
         name: "alpaca",
         uri: "http://alpaca.com",
         directory: directories["zebra"],
-        metadata: {},
-        enabled: true
+        metadata: {}
       }),
       headers: {
         "Content-Type": "application/json",
@@ -300,25 +248,6 @@ Deno.test("Site", async (t) => {
     assertEquals(json.length, 1);
   });
 
-  await t.step("200: Get all sites with name and all flag", async () => {
-    const res = await fetch(`${urlBase}/sites?name=alpaca&all`);
-    const text = await res.text();
-    console.log(`${res.status} ${text}`);
-    const json = JSON.parse(text);
-    assertEquals(res.status, 200);
-    assertEquals(json.length, 3);
-  });
-
-  await t.step("200: Get all sites with all flags", async () => {
-    const res = await fetch(`${urlBase}/sites?name=alpaca&strict&all&metadata`);
-    const text = await res.text();
-    console.log(`${res.status} ${text}`);
-    const json = JSON.parse(text);
-    assertEquals(res.status, 200);
-    assertEquals(json.length, 1);
-    assertEquals(json[0].metadata.length, 2);
-  });
-
   await t.step("200: Get all sites with directory id", async () => {
     const res = await fetch(`${urlBase}/sites?directory=${directories["zebra"]}`);
     const text = await res.text();
@@ -350,8 +279,7 @@ Deno.test("Site", async (t) => {
         name: "alpaca2",
         uri: "http://alpaca2.com",
         directory: directories["zebra"],
-        metadata: {},
-        enabled: true
+        metadata: {}
       }),
       headers: {
         "Content-Type": "application/json",
@@ -410,8 +338,7 @@ Deno.test("Site", async (t) => {
       body: JSON.stringify({
         uri: "http://alpaca.com",
         directory: directories["zebra"],
-        metadata: {},
-        enabled: true
+        metadata: {}
       }),
       headers: {
         "Content-Type": "application/json",
@@ -429,8 +356,7 @@ Deno.test("Site", async (t) => {
       body: JSON.stringify({
         name: "alpaca",
         uri: "http://alpaca.com",
-        metadata: {},
-        enabled: true
+        metadata: {}
       }),
       headers: {
         "Content-Type": "application/json",
@@ -449,8 +375,7 @@ Deno.test("Site", async (t) => {
         name: "alpaca",
         uri: "http://alpaca.com",
         directory: "invalid-uuid",
-        metadata: {},
-        enabled: true
+        metadata: {}
       }),
       headers: {
         "Content-Type": "application/json",
@@ -469,8 +394,7 @@ Deno.test("Site", async (t) => {
         name: "alpaca9999",
         uri: "http://alpaca9999.com",
         directory: "00000000-0000-0000-0000-000000000000",
-        metadata: {},
-        enabled: true
+        metadata: {}
       }),
       headers: {
         "Content-Type": "application/json",
@@ -488,26 +412,6 @@ Deno.test("Site", async (t) => {
       body: JSON.stringify({
         name: "alpaca",
         directory: directories["zebra"],
-        metadata: {},
-        enabled: true
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const text = await res.text();
-    console.log(`${res.status} ${text}`);
-    assertEquals(res.status, 200);
-  });
-
-  await t.step("400: Update a site without enabled flag", async () => {
-    const id = sites[0];
-    const res = await fetch(`${urlBase}/sites/${id}`, {
-      method: "PUT",
-      body: JSON.stringify({
-        name: "alpaca",
-        uri: "http://alpaca.com",
-        directory: directories["zebra"],
         metadata: {}
       }),
       headers: {
@@ -518,27 +422,7 @@ Deno.test("Site", async (t) => {
     console.log(`${res.status} ${text}`);
     assertEquals(res.status, 200);
   });
-  
-  await t.step("400: Update a site with invalid enabled flag", async () => {
-    const id = sites[0];
-    const res = await fetch(`${urlBase}/sites/${id}`, {
-      method: "PUT",
-      body: JSON.stringify({
-        name: "alpaca",
-        uri: "http://alpaca.com",
-        directory: directories["zebra"],
-        metadata: {},
-        enabled: "ambiguous"
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const text = await res.text();
-    console.log(`${res.status} ${text}`);
-    assertEquals(res.status, 400);
-  });
-  
+
   await t.step("400: Update a duplicated site", async () => {
     const id = sites[0];
     const res = await fetch(`${urlBase}/sites/${id}`, {
@@ -547,8 +431,7 @@ Deno.test("Site", async (t) => {
         name: "alpaca",
         uri: "http://alpaca-child.com",
         directory: directories["zebra"],
-        metadata: {},
-        enabled: true
+        metadata: {}
       }),
       headers: {
         "Content-Type": "application/json",

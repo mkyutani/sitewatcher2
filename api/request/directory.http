@@ -7,8 +7,7 @@ POST http://localhost:18085/api/v1/directories
 Content-Type: application/json
 
 {
-    "name": "armadillo",
-    "enabled": true
+    "name": "armadillo"
 }
 
 ### Get directory by ID

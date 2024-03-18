@@ -8,20 +8,13 @@ Deno.test("Directory", async (t) => {
   await t.step("200: Create a directory", async () => {
     const registrations = [
       {
-        name: "alpaca",
-        enabled: true
+        name: "alpaca"
       },
       {
-        name: "alpaca-dead",
-        enabled: false
+        name: "beaver"
       },
       {
-        name: "beaver",
-        enabled: true
-      },
-      {
-        name: "alpaca-child",
-        enabled: true
+        name: "alpaca-child"
       }
     ];
     const statuses: number[] = [];
@@ -95,36 +88,6 @@ Deno.test("Directory", async (t) => {
     const res = await fetch(`${urlBase}/directories`, {
       method: "POST",
       body: JSON.stringify({
-        enabled: true,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const text = await res.text();
-    assertEquals(res.status, 400);
-  });
-
-  await t.step("400: Create a directory without enabled flag", async () => {
-    const res = await fetch(`${urlBase}/directories`, {
-      method: "POST",
-      body: JSON.stringify({
-        name: "alpaca"
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const text = await res.text();
-    assertEquals(res.status, 400);
-  });
-
-  await t.step("400: Create a directory with invalid enabled flag", async () => {
-    const res = await fetch(`${urlBase}/directories`, {
-      method: "POST",
-      body: JSON.stringify({
-        name: "alpaca",
-        enabled: "ambiguous"
       }),
       headers: {
         "Content-Type": "application/json",
@@ -138,8 +101,7 @@ Deno.test("Directory", async (t) => {
     const res = await fetch(`${urlBase}/directories`, {
       method: "POST",
       body: JSON.stringify({
-        name: "alpaca",
-        enabled: true,
+        name: "alpaca"
       }),
       headers: {
         "Content-Type": "application/json",
@@ -193,18 +155,8 @@ Deno.test("Directory", async (t) => {
     assertEquals(json.length, 1);
   });
 
-  await t.step("200: Get all sites with all flags", async () => {
-    const res = await fetch(`${urlBase}/directories?name=alpaca&strict&all&metadata`);
-    const text = await res.text();
-    const json = JSON.parse(text);
-    console.log(`${res.status} ${text}`);
-    assertEquals(res.status, 200);
-    assertEquals(json.length, 1);
-    assertEquals(json[0].metadata.length, 2);
-  });
-
   await t.step("200: Get sites by directory", async () => {
-    const site = await createASite("xenopus", "http://xenopus.com/", directories[0], true);
+    const site = await createASite("xenopus", "http://xenopus.com/", directories[0]);
     if (site === null) {
       fail();
     }
@@ -236,8 +188,7 @@ Deno.test("Directory", async (t) => {
     const res = await fetch(`${urlBase}/directories/${id}`, {
       method: "PUT",
       body: JSON.stringify({
-        name: "alpaca2",
-        enabled: false
+        name: "alpaca2"
       }),
       headers: {
         "Content-Type": "application/json",
@@ -285,27 +236,11 @@ Deno.test("Directory", async (t) => {
     assertEquals(res.status, 400);
   });
 
-  await t.step("200: Update a directory without enabled flag", async () => {
-    const id = directories[0];
-    const res = await fetch(`${urlBase}/directories/${id}`, {
-      method: "PUT",
-      body: JSON.stringify({
-        name: "alpaca3"
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      }
-    });
-    const text = await res.text();
-    assertEquals(res.status, 200);
-  });
-
   await t.step("200: Update a directory without name", async () => {
     const id = directories[0];
     const res = await fetch(`${urlBase}/directories/${id}`, {
       method: "PUT",
       body: JSON.stringify({
-        enabled: true
       }),
       headers: {
         "Content-Type": "application/json",
@@ -319,8 +254,7 @@ Deno.test("Directory", async (t) => {
     const res = await fetch(`${urlBase}/directories/invalid-uuid`, {
       method: "PUT",
       body: JSON.stringify({
-        name: "alpaca",
-        enabled: true
+        name: "alpaca"
       }),
       headers: {
         "Content-Type": "application/json",
@@ -334,8 +268,7 @@ Deno.test("Directory", async (t) => {
     const res = await fetch(`${urlBase}/directories/00000000-0000-0000-0000-000000000000`, {
       method: "PUT",
       body: JSON.stringify({
-        name: "alpaca",
-        enabled: true
+        name: "alpaca"
       }),
       headers: {
         "Content-Type": "application/json",
@@ -345,29 +278,12 @@ Deno.test("Directory", async (t) => {
     assertEquals(res.status, 404);
   });
 
-  await t.step("400: Update a directory with invalid enabled flag", async () => {
-    const id = directories[0];
-    const res = await fetch(`${urlBase}/directories/${id}`, {
-      method: "PUT",
-      body: JSON.stringify({
-        name: "alpaca4",
-        enabled: "ambiguous"
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const text = await res.text();
-    assertEquals(res.status, 400);
-  });
-
   await t.step("400: Update a duplicated directory", async () => {
     const id = directories[0];
     const res = await fetch(`${urlBase}/directories/${id}`, {
       method: "PUT",
       body: JSON.stringify({
-        name: "beaver",
-        enabled: true,
+        name: "beaver"
       }),
       headers: {
         "Content-Type": "application/json",
