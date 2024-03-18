@@ -62,9 +62,10 @@ export const directoryRepository = {
     try {
       const sites = await sql `
         select
-          id, name, uri
-        from site
-        where directory = ${id}
+          s.id, s.name, s.uri, s.directory, d.name as directory_name, s.created, s.updated
+        from site as s
+        inner join directory as d on s.directory = d.id
+        where s.directory = ${id}
       `
       return sites;
     } catch (error) {
