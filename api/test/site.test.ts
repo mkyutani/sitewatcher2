@@ -99,8 +99,7 @@ Deno.test("Site", async (t) => {
       method: "POST",
       body: JSON.stringify({
         uri: "http://alpaca.com",
-        directory: directories["zebra"],
-        metadata: {}
+        directory: directories["zebra"]
       }),
       headers: {
         "Content-Type": "application/json",
@@ -116,8 +115,7 @@ Deno.test("Site", async (t) => {
       method: "POST",
       body: JSON.stringify({
         name: "alpaca",
-        uri: "http://alpaca.com",
-        metadata: {}
+        uri: "http://alpaca.com"
       }),
       headers: {
         "Content-Type": "application/json",
@@ -134,8 +132,7 @@ Deno.test("Site", async (t) => {
       body: JSON.stringify({
         name: "alpaca",
         uri: "http://alpaca.com",
-        directory: "invalid-uuid",
-        metadata: {}
+        directory: "invalid-uuid"
       }),
       headers: {
         "Content-Type": "application/json",
@@ -152,8 +149,7 @@ Deno.test("Site", async (t) => {
       body: JSON.stringify({
         name: "alpaca9999",
         uri: "http://alpaca9999.com",
-        directory: "00000000-0000-0000-0000-000000000000",
-        metadata: {}
+        directory: "00000000-0000-0000-0000-000000000000"
       }),
       headers: {
         "Content-Type": "application/json",
@@ -169,8 +165,7 @@ Deno.test("Site", async (t) => {
       method: "POST",
       body: JSON.stringify({
         name: "alpaca",
-        directory: directories["zebra"],
-        metadata: {}
+        directory: directories["zebra"]
       }),
       headers: {
         "Content-Type": "application/json",
@@ -187,8 +182,7 @@ Deno.test("Site", async (t) => {
       body: JSON.stringify({
         name: "alpaca",
         uri: "http://alpaca.com",
-        directory: directories["zebra"],
-        metadata: {}
+        directory: directories["zebra"]
       }),
       headers: {
         "Content-Type": "application/json",
@@ -278,8 +272,7 @@ Deno.test("Site", async (t) => {
       body: JSON.stringify({
         name: "alpaca2",
         uri: "http://alpaca2.com",
-        directory: directories["zebra"],
-        metadata: {}
+        directory: directories["zebra"]
       }),
       headers: {
         "Content-Type": "application/json",
@@ -337,8 +330,7 @@ Deno.test("Site", async (t) => {
       method: "PUT",
       body: JSON.stringify({
         uri: "http://alpaca.com",
-        directory: directories["zebra"],
-        metadata: {}
+        directory: directories["zebra"]
       }),
       headers: {
         "Content-Type": "application/json",
@@ -355,8 +347,7 @@ Deno.test("Site", async (t) => {
       method: "PUT",
       body: JSON.stringify({
         name: "alpaca",
-        uri: "http://alpaca.com",
-        metadata: {}
+        uri: "http://alpaca.com"
       }),
       headers: {
         "Content-Type": "application/json",
@@ -374,8 +365,7 @@ Deno.test("Site", async (t) => {
       body: JSON.stringify({
         name: "alpaca",
         uri: "http://alpaca.com",
-        directory: "invalid-uuid",
-        metadata: {}
+        directory: "invalid-uuid"
       }),
       headers: {
         "Content-Type": "application/json",
@@ -393,8 +383,7 @@ Deno.test("Site", async (t) => {
       body: JSON.stringify({
         name: "alpaca9999",
         uri: "http://alpaca9999.com",
-        directory: "00000000-0000-0000-0000-000000000000",
-        metadata: {}
+        directory: "00000000-0000-0000-0000-000000000000"
       }),
       headers: {
         "Content-Type": "application/json",
@@ -411,8 +400,7 @@ Deno.test("Site", async (t) => {
       method: "PUT",
       body: JSON.stringify({
         name: "alpaca",
-        directory: directories["zebra"],
-        metadata: {}
+        directory: directories["zebra"]
       }),
       headers: {
         "Content-Type": "application/json",
@@ -430,8 +418,7 @@ Deno.test("Site", async (t) => {
       body: JSON.stringify({
         name: "alpaca",
         uri: "http://alpaca-child.com",
-        directory: directories["zebra"],
-        metadata: {}
+        directory: directories["zebra"]
       }),
       headers: {
         "Content-Type": "application/json",

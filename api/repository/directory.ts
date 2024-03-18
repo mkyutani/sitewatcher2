@@ -28,7 +28,7 @@ export const directoryRepository = {
       }
     }
   },
-  async getAll(name: string | null, strict: boolean | null, metadata: boolean | null) {
+  async getAll(name: string | null, strict: boolean | null) {
     try {
       const directories = await sql `
         select
@@ -40,15 +40,13 @@ export const directoryRepository = {
         }
       `
 
-      if (metadata) {
-        for (const directory of directories) {
-          const data = await sql`
-            select key, value
-            from directory_metadata
-            where directory = ${directory.id}
-          `
-          directory.metadata = data;
-        }
+      for (const directory of directories) {
+        const data = await sql`
+          select key, value
+          from directory_metadata
+          where directory = ${directory.id}
+        `
+        directory.metadata = data;
       }
 
       return directories;
