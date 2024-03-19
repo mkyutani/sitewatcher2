@@ -65,6 +65,16 @@ export const directoryRepository = {
         inner join directory as d on s.directory = d.id
         where s.directory = ${id}
       `
+
+      for (const site of sites) {
+        const data = await sql`
+          select key, value
+          from site_metadata
+          where site = ${site.id}
+        `
+        site.metadata = data;
+      }
+
       return sites;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
