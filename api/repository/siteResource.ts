@@ -3,7 +3,7 @@ import { log } from "../deps.ts";
 import { SiteResourceParam } from "../model/siteResource.ts";
 
 export const siteResourceRepository = {
-  async create(site: string, siteResourceParam: SiteResourceParam) {
+  async create(site: string, siteResourceParam: SiteResourceParam, initial: boolean | null) {
     const uri = siteResourceParam?.uri;
     const name = siteResourceParam?.name;
     const reason = siteResourceParam?.reason;
@@ -11,8 +11,14 @@ export const siteResourceRepository = {
       const resources = await sql `
         insert
         into site_resource (uri, site, name, reason, tm)
-        values (${uri}, ${site}, ${name}, ${reason}, current_timestamp at time zone 'UTC')
-        returning uri, site
+        values (
+          ${uri}, ${site}, ${name}, ${reason},
+          ${initial ?
+            sql`'epoch'` :
+            sql`current_timestamp at time zone 'UTC'`
+          }
+        )
+        returning uri, site, name, reason, tm
       `
       return resources[0];
     } catch (error) {

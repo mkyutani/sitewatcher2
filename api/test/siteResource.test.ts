@@ -25,7 +25,25 @@ Deno.test("Site resources", async (t) => {
     console.log(json);
   });
 
-  await t.step("200: Create site resources with unregistered uuid", async () => {
+  await t.step("200: Create site resources (initial)", async () => {
+    const res = await fetch(`${urlBase}/sites/${sites["xenopus"]}/resources?initial`, {
+      method: "POST",
+      body: JSON.stringify({
+        uri: "http://resource2.xenopus.com",
+        name: "Xenopus Resource 2",
+        reason: "new"
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
+    const text = await res.text();
+    assertEquals(res.status, 200);
+    const json = JSON.parse(text);
+    console.log(json);
+  });
+
+  await t.step("400: Create site resources with unregistered uuid", async () => {
     const res = await fetch(`${urlBase}/sites/00000000-0000-0000-0000-000000000000/resources`, {
       method: "POST",
       body: JSON.stringify({
@@ -102,7 +120,7 @@ Deno.test("Site resources", async (t) => {
     const text = await res.text();
     assertEquals(res.status, 200);
     const json = JSON.parse(text);
-    assertEquals(json.length, 1);
+    assertEquals(json.length, 2);
     console.log(json);
   });
 
