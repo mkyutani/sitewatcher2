@@ -14,7 +14,15 @@ export const directoryRepository = {
       if (directories.length == 0) {
         return {};
       }
+
       const directory = directories[0];
+
+      directory.metadata = await sql`
+        select key, value
+        from directory_metadata
+        where directory = ${directory.id}
+      `
+
       return directory;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 

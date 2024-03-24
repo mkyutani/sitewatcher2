@@ -42,7 +42,16 @@ export const siteRepository = {
       if (sites.length == 0) {
         return {};
       }
-      return sites[0];
+
+      const site = sites[0]
+
+      site.metadata = await sql`
+        select key, value
+        from site_metadata
+        where site = ${site.id}
+      `
+
+      return site;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       if (error instanceof sql.PostgresError && error.code === "22P02") {
