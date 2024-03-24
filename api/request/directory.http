@@ -19,6 +19,9 @@ GET http://localhost:18085/api/v1/directories
 ### Get sites by directory
 GET http://localhost:18085/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f/sites
 
+### Get resources by directory
+GET http://localhost:18085/api/v1/directories/7cf1d640-1757-42fe-9c19-bb4f49628caf/resources?last=156
+
 ### Update directory
 PUT http://localhost:18085/api/v1/directories/ae8ac08c-2f3e-41b5-8f70-db13b3d4b12f
 Content-Type: application/json
