@@ -15,6 +15,7 @@ export const siteResourceController = {
     ctx.assert(reqBody, 400, "No data");
     ctx.assert(reqBody.uri, 400, "Uri is missing");
     ctx.assert(reqBody.name, 400, "Name is missing");
+    ctx.assert(reqBody.sections, 400, "Sections is missing");
     ctx.assert(reqBody.reason, 400, "Reason is missing");
     const result = await siteResourceService.create(id, reqBody as SiteResourceParam, initial_flag);
     ctx.assert(result, 500, "Unknown");

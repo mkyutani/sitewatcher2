@@ -19,12 +19,19 @@ create table if not exists site (
 );
 
 create table if not exists site_resource (
+  id serial not null,
   uri varchar(4096) not null,
   site uuid not null references site on delete cascade,
-  tm timestamp not null,
   name varchar(4096) not null,
   reason varchar(256) not null,
-  primary key(uri, site, tm)
+  section1 varchar(4096),
+  section2 varchar(4096),
+  section3 varchar(4096),
+  section4 varchar(4096),
+  section5 varchar(4096),
+  section6 varchar(4096),
+  tm timestamp not null,
+  primary key(id)
 );
 
 create table if not exists directory_metadata (

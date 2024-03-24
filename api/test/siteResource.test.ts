@@ -13,6 +13,7 @@ Deno.test("Site resources", async (t) => {
       body: JSON.stringify({
         uri: "http://resource.xenopus.com",
         name: "Xenopus Resource",
+        sections: ["section1", "section2", null, null, null, null],
         reason: "new"
       }),
       headers: {
@@ -31,6 +32,7 @@ Deno.test("Site resources", async (t) => {
       body: JSON.stringify({
         uri: "http://resource2.xenopus.com",
         name: "Xenopus Resource 2",
+        sections: [null, null, null, null, "section5", "section6"],
         reason: "new"
       }),
       headers: {
