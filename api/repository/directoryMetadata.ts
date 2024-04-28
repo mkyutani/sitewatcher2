@@ -26,11 +26,12 @@ export const directoryMetadataRepository = {
     try {
       const metadata = await sql `
         select
-          directory, key, value, created, updated
-        from directory_metadata
-        where directory = ${id}
+          m.directory, d.name as directory_name, m.key, m.value, m.created, m.updated
+        from directory_metadata as m
+        inner join directory as d on m.directory = d.id
+        where m.directory = ${id}
         ${key ?
-          sql`and key = ${key}` :
+          sql`and m.key = ${key}` :
           sql``
         }
       `

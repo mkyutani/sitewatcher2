@@ -26,11 +26,12 @@ export const siteMetadataRepository = {
     try {
       const metadata = await sql `
         select
-          site, key, value, created, updated
-        from site_metadata
-        where site = ${id}
+          m.site, s.name as site_name, m.key, m.value, m.created, m.updated
+        from site_metadata as m
+        inner join site as s on m.site = s.id
+        where m.site = ${id}
         ${key ?
-          sql`and key = ${key}` :
+          sql`and m.key = ${key}` :
           sql``
         }
       `
