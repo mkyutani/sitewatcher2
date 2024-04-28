@@ -6,9 +6,10 @@ import { convertToBoolean, convertToJson, isUuid } from "../util.ts";
 export const siteController = {
   async create(ctx:RouterContext<string>) {
     const reqBodyRaw = await ctx.request.body();
+    ctx.assert(reqBodyRaw, 400, "No data")
     ctx.assert(reqBodyRaw.type === "json", 415, "Invalid content");
     const reqBody = await reqBodyRaw.value;
-    ctx.assert(reqBody, 400, "No data");
+    ctx.assert(reqBody, 400, "Data is empty");
     ctx.assert(reqBody.uri, 400, "Uri is missing");
     ctx.assert(reqBody.name, 400, "Name is missing");
     ctx.assert(reqBody.directory, 400, "Directory is missing");
