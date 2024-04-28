@@ -14,7 +14,7 @@ Deno.test("Directory", async (t) => {
         name: "beaver"
       },
       {
-        name: "alpaca-child"
+        name: "camel"
       }
     ];
     const statuses: number[] = [];
@@ -58,6 +58,7 @@ Deno.test("Directory", async (t) => {
       }
     });
     const text = await res.text();
+    console.log(text);
     assertEquals(res.status, 415);
   });
 
@@ -69,6 +70,7 @@ Deno.test("Directory", async (t) => {
       }
     });
     const text = await res.text();
+    console.log(text);
     assertEquals(res.status, 400);
   });
 
@@ -81,6 +83,7 @@ Deno.test("Directory", async (t) => {
       }
     });
     const text = await res.text();
+    console.log(text);
     assertEquals(res.status, 400);
   });
 
@@ -94,6 +97,7 @@ Deno.test("Directory", async (t) => {
       },
     });
     const text = await res.text();
+    console.log(text);
     assertEquals(res.status, 400);
   });
 
@@ -108,6 +112,7 @@ Deno.test("Directory", async (t) => {
       }
     });
     const text = await res.text();
+    console.log(text);
     assertEquals(res.status, 400);
   });
 
@@ -115,6 +120,8 @@ Deno.test("Directory", async (t) => {
     const id = directories[0];
     const res = await fetch(`${urlBase}/directories/${id}`);
     const text = await res.text();
+    const json = JSON.parse(text);
+    console.log(json);
     assertEquals(res.status, 200);
     assertEquals(JSON.parse(text).id, id);
   });
@@ -122,65 +129,24 @@ Deno.test("Directory", async (t) => {
   await t.step("404: Get a directory with unregistered uuid", async () => {
     const res = await fetch(`${urlBase}/directories/00000000-0000-0000-0000-000000000000`);
     const text = await res.text();
+    console.log(text);
     assertEquals(res.status, 404);
   });
 
   await t.step("400: Get a directory with invalid uuid", async () => {
     const res = await fetch(`${urlBase}/directories/invalid-uuid`);
     const text = await res.text();
+    console.log(text);
     assertEquals(res.status, 400);
   });
 
   await t.step("200: Get all directories", async () => {
     const res = await fetch(`${urlBase}/directories`);
     const text = await res.text();
-    assertEquals(res.status, 200);
     const json = JSON.parse(text);
+    console.log(json);
+    assertEquals(res.status, 200);
     assertEquals(json.length, 3);
-  });
-
-  await t.step("200: Get all directories with name", async () => {
-    const res = await fetch(`${urlBase}/directories?name=alpaca`);
-    const text = await res.text();
-    assertEquals(res.status, 200);
-    const json = JSON.parse(text);
-    assertEquals(json.length, 2);
-  });
-
-  await t.step("200: Get all directories with strict flag", async () => {
-    const res = await fetch(`${urlBase}/directories?strict=true&name=alpaca`);
-    const text = await res.text();
-    assertEquals(res.status, 200);
-    const json = JSON.parse(text);
-    assertEquals(json.length, 1);
-  });
-
-  await t.step("200: Get sites by directory", async () => {
-    const site = await createASite("xenopus", "http://xenopus.com/", directories[0]);
-    if (site === null) {
-      fail();
-    }
-    const id = directories[0];
-    const res = await fetch(`${urlBase}/directories/${id}/sites`);
-    const text = await res.text();
-    assertEquals(res.status, 200);
-    const json = JSON.parse(text);
-    assertEquals(json.length, 1);
-    if (site) {
-      await deleteASite(site);
-    }
-  });
-
-  await t.step("200: Get sites by directory with unregistered uuid", async () => {
-    const res = await fetch(`${urlBase}/directories/00000000-0000-0000-0000-000000000000/sites`);
-    const text = await res.text();
-    assertEquals(res.status, 200);
-  });
-
-  await t.step("400: Get sites by directory with invalid uuid", async () => {
-    const res = await fetch(`${urlBase}/directories/invalid-uuid/sites`);
-    const text = await res.text();
-    assertEquals(res.status, 400);
   });
 
   await t.step("200: Update a directory", async () => {
@@ -195,6 +161,8 @@ Deno.test("Directory", async (t) => {
       }
     });
     const text = await res.text();
+    const json = JSON.parse(text);
+    console.log(json);
     assertEquals(res.status, 200);
   });
 
@@ -208,6 +176,7 @@ Deno.test("Directory", async (t) => {
       }
     });
     const text = await res.text();
+    console.log(text);
     assertEquals(res.status, 415);
   });
 
@@ -220,6 +189,7 @@ Deno.test("Directory", async (t) => {
       }
     });
     const text = await res.text();
+    console.log(text);
     assertEquals(res.status, 400);
   });
 
@@ -233,6 +203,7 @@ Deno.test("Directory", async (t) => {
       }
     });
     const text = await res.text();
+    console.log(text);
     assertEquals(res.status, 400);
   });
 
@@ -247,6 +218,8 @@ Deno.test("Directory", async (t) => {
       }
     });
     const text = await res.text();
+    const json = JSON.parse(text);
+    console.log(json);
     assertEquals(res.status, 200);
   });
 
@@ -261,6 +234,7 @@ Deno.test("Directory", async (t) => {
       }
     });
     const text = await res.text();
+    console.log(text);
     assertEquals(res.status, 400);
   });
 
@@ -275,6 +249,7 @@ Deno.test("Directory", async (t) => {
       }
     });
     const text = await res.text();
+    console.log(text);
     assertEquals(res.status, 404);
   });
 
@@ -290,19 +265,23 @@ Deno.test("Directory", async (t) => {
       }
     });
     const text = await res.text();
+    console.log(text);
     assertEquals(res.status, 400);
   });
 
-  await t.step("204: Delete a directory", async () => {
+  await t.step("200: Delete a directory", async () => {
     const statuses: number[] = [];
     while (directories.length > 0) {
       const id = directories.pop();
       const res = await fetch(`${urlBase}/directories/${id}`, {
         method: "DELETE"
       });
+      const text = await res.text();
+      const json = JSON.parse(text);
+      console.log(json);
       statuses.push(res.status);
     }
-    assertEquals(statuses.filter(function(n) { return n != 204; }).length, 0);
+    assertEquals(statuses.filter(function(n) { return n != 200; }).length, 0);
   });
 
   await t.step("400: Delete a directory with invalid uuid", async () => {
@@ -310,6 +289,7 @@ Deno.test("Directory", async (t) => {
       method: "DELETE"
     }); 
     const text = await res.text();
+    console.log(text);
     assertEquals(res.status, 400);
   });
 
@@ -318,6 +298,7 @@ Deno.test("Directory", async (t) => {
       method: "DELETE"
     }); 
     const text = await res.text();
+    console.log(text);
     assertEquals(res.status, 404);
   });
 

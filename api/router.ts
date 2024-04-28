@@ -10,11 +10,10 @@ const router = new Router();
 router.post('/api/v1/directories/:id/metadata', directoryMetadataController.create);
 router.get('/api/v1/directories/:id/metadata', directoryMetadataController.get);
 router.delete('/api/v1/directories/:id/metadata', directoryMetadataController.delete);
-router.get('/api/v1/directories/:id/sites', directoryController.getSites);
 router.get('/api/v1/directories/:id/resources', directoryController.getResources);
 router.post('/api/v1/directories', directoryController.create);
-router.get('/api/v1/directories', directoryController.getAll);
 router.get('/api/v1/directories/:id', directoryController.get);
+router.get('/api/v1/directories', directoryController.list);
 router.put('/api/v1/directories/:id', directoryController.update);
 router.delete('/api/v1/directories/:id', directoryController.delete);
 

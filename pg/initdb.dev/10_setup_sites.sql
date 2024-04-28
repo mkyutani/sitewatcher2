@@ -34,6 +34,28 @@ create table if not exists site_resource (
   primary key(id)
 );
 
+create table if not exists channel (
+  id uuid default gen_random_uuid() not null,
+  directory uuid not null references directory on delete cascade,
+  name varchar(256) not null,
+  primary key(id),
+  unique(directory, name)
+);
+
+create table if not exists format (
+  channel uuid not null references channel on delete cascade,
+  site uuid not null references site on delete cascade,
+  format varchar(4096) not null,
+  primary key(channel, site)
+);
+
+create table if not exists channel_resource (
+  channel uuid not null references channel on delete cascade,
+  resource serial not null references site_resource on delete cascade,
+  tm timestamp not null,
+  primary key(channel, resource)
+);
+
 create table if not exists directory_metadata (
   id uuid default gen_random_uuid() not null,
   directory uuid not null references directory on delete cascade,

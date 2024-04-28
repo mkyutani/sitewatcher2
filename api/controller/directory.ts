@@ -24,20 +24,10 @@ export const directoryController = {
     ctx.assert(Object.keys(result).length > 0, 404, "");
     ctx.response.body = result;
   },
-  async getAll(ctx: RouterContext<string>) {
-    const { name, strict } = helpers.getQuery(ctx, { mergeParams: true });
-    const strict_flag = convertToBoolean(strict);
-    ctx.assert(strict_flag != null, 400, "Invalid strict flag"); 
-    const result = await directoryService.getAll(name, strict_flag);
+  async list(ctx: RouterContext<string>) {
+    const result = await directoryService.list();
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result as string);
-    ctx.response.body = result;
-  },
-  async getSites(ctx:RouterContext<string>) {
-    const { id } = helpers.getQuery(ctx, { mergeParams: true });
-    ctx.assert(isUuid(id), 400, "Invalid id");
-    const result = await directoryService.getSites(id);
-    ctx.assert(result, 500, "Unknown");
     ctx.response.body = result;
   },
   async getResources(ctx:RouterContext<string>) {
@@ -68,6 +58,6 @@ export const directoryController = {
     const result = await directoryService.delete(id);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(Object.keys(result).length > 0, 404, "");
-    ctx.response.body = null;
+    ctx.response.body = result;
   }
 }

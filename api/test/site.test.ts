@@ -1,5 +1,5 @@
 import { assertEquals } from "../deps_test.ts";
-import { IdNames, createTestDirectories, deleteTestDirectories, getTestUrlBase } from "../util_test.ts";
+import { IdNames, createTestDirectories, deleteTestDirectories, getTestUrlBase, printTestDirectories } from "../util_test.ts";
 
 Deno.test("Site", async (t) => {
   const urlBase = getTestUrlBase();
@@ -55,6 +55,8 @@ Deno.test("Site", async (t) => {
     }
     assertEquals(statuses.filter(function(n) { return n != 200; }).length, 0);
   });
+
+  await printTestDirectories();
 
   await t.step("415: Create a site with a plain text", async () => {
     const res = await fetch(`${urlBase}/sites`, {
@@ -461,5 +463,6 @@ Deno.test("Site", async (t) => {
     assertEquals(res.status, 404);
   });
 
+  await printTestDirectories();
   await deleteTestDirectories();  
 });

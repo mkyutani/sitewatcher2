@@ -50,7 +50,7 @@ export async function deleteADirectory(id: string): Promise<void> {
     method: "DELETE"
   });
   const text = await res.text();
-  if (res.status !== 204) {
+  if (res.status > 400) {
     console.log(`Failed to delete a directory: ${id}`);
   } else {
     console.log(`Directory deleted: ${id}`);
@@ -60,6 +60,25 @@ export async function deleteADirectory(id: string): Promise<void> {
 export async function deleteTestDirectories(): Promise<void> {
   for (const name of Object.keys(directories)) {
     await deleteADirectory(directories[name as keyof IdNames]);
+  }
+}
+
+export async function printADirectory(id: string): Promise<void> {
+  const res = await fetch(`${urlBase}/directories/${id}`, {
+    method: "GET"
+  });
+  if (res.status > 400) {
+    console.log(`Failed to get a directory: ${id}`);
+  } else {
+    const text = await res.text();
+    const json = JSON.parse(text);
+    console.dir(json, { depth: 8 });
+  }
+}
+
+export async function printTestDirectories(): Promise<void> {
+  for (const name of Object.keys(directories)) {
+    await printADirectory(directories[name as keyof IdNames]);
   }
 }
 
@@ -104,7 +123,7 @@ export async function deleteASite(id: string): Promise<void> {
     method: "DELETE"
   });
   const text = await res.text();
-  if (res.status !== 204) {
+  if (res.status > 400) {
     console.log(`Failed to delete a site: ${id}`);
   } else {
     console.log(`Site deleted: ${id}`);

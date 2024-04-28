@@ -4,7 +4,12 @@ import { DirectoryParam } from "../model/directory.ts";
 
 export const directoryRepository = {
   async get(id: string) {
+    const context = {
+      name: "directoryRepository.get"
+    };
+
     try {
+      context.name = "directoryRepository.get.getDirectory";
       const directories = await sql `
         select
           id, name, created, updated
@@ -17,64 +22,24 @@ export const directoryRepository = {
 
       const directory = directories[0];
 
+      context.name = "directoryRepository.get.getMetadata";
       directory.metadata = await sql`
         select key, value
         from directory_metadata
         where directory = ${directory.id}
       `
 
-      return directory;
-    } catch (error) {
-      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      if (error instanceof sql.PostgresError && error.code === "22P02") {
-        // Ignore invalid uuid
-        log.warning(`directoryRepository.get:${id}:${description}`);
-        return {};
-      } else {
-        log.error(`directoryRepository.get:${id}:${description}`);
-        return null;
-      }
-    }
-  },
-  async getAll(name: string | null, strict: boolean | null) {
-    try {
-      const directories = await sql `
-        select
-          id, name, created, updated
-        from directory
-        ${(name && name.length > 0) ?
-          (strict ? sql`where name = ${name}` : sql`where name ilike ${`%${name}%`}`) :
-          sql``
-        }
-      `
-
-      for (const directory of directories) {
-        const data = await sql`
-          select key, value
-          from directory_metadata
-          where directory = ${directory.id}
-        `
-        directory.metadata = data;
-      }
-
-      return directories;
-    } catch (error) {
-      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`directoryRepository.getAll:${description}`);
-      return null;
-    }
-  },
-  async getSites(id: string) {
-    try {
-      const sites = await sql `
+      context.name = "directoryRepository.get.getSites";
+      directory.sites = await sql `
         select
           s.id, s.name, s.uri, s.directory, d.name as directory_name, s.created, s.updated
         from site as s
         inner join directory as d on s.directory = d.id
-        where s.directory = ${id}
+        where s.directory = ${directory.id}
       `
 
-      for (const site of sites) {
+      context.name = "directoryRepository.get.getSiteMetadata";
+      for (const site of directory.sites) {
         const data = await sql`
           select key, value
           from site_metadata
@@ -83,20 +48,42 @@ export const directoryRepository = {
         site.metadata = data;
       }
 
-      return sites;
+      return directory;
     } catch (error) {
-      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}`
       if (error instanceof sql.PostgresError && error.code === "22P02") {
         // Ignore invalid uuid
-        log.warning(`directoryRepository.getSites:${id}:${description}`);
-        return null;
+        log.warning(`${context.name}:${id}:${description}`);
+        return {};
       } else {
-        log.error(`directoryRepository.getSites:${id}:${description}`);
+        log.error(`${context.name}:${id}:${description}`);
         return null;
       }
     }
   },
+  async list() {
+    const context = {
+      name: "directoryRepository.search"
+    };
+
+    try {
+      const directories = await sql `
+        select
+          id, name
+        from directory
+      `
+      return directories;
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      log.error(`${context.name}:${description}`);
+      return null;
+    }
+  },
   async getResources(id: string, last: number) {
+    const context = {
+      name: "directoryRepository.getResources"
+    };
+
     try {
       const resources = await sql `
         select
@@ -125,15 +112,19 @@ export const directoryRepository = {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       if (error instanceof sql.PostgresError && error.code === "22P02") {
         // Ignore invalid uuid
-        log.warning(`directoryRepository.getResources:${id}:${description}`);
+        log.warning(`${context.name}:${id}:${description}`);
         return null;
       } else {
-        log.error(`directoryRepository.getResources:${id}:${description}`);
+        log.error(`${context.name}:${id}:${description}`);
         return null;
       }
     }
   },
   async create(DirectoryParam: DirectoryParam) {
+    const context = {
+      name: "directoryRepository.create"
+    };
+
     const name = DirectoryParam?.name;
     try {
       const directories = await sql `
@@ -148,12 +139,16 @@ export const directoryRepository = {
           return "Duplicated";
       } else {
         const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}`;
-        log.error(`directoryRepository.create:${description}`);
+        log.error(`${context.name}:${description}`);
         return null;
       }
     }
   },
   async update(id: string, param: DirectoryParam) {
+    const context = {
+      name: "directoryRepository.update"
+    };
+
     const name = param?.name;
     try {
       const directories = await sql `
@@ -172,12 +167,16 @@ export const directoryRepository = {
           return "Duplicated";
       } else {
         const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}`;
-        log.error(`directoryRepository.update:${id}:${description}`);
+        log.error(`${context.name}:${id}:${description}`);
         return null;
       }
     }
   },
   async delete(id: string) {
+    const context = {
+      name: "directoryRepository.delete"
+    };
+
     try {
       const directories = await sql `
         delete
@@ -191,7 +190,7 @@ export const directoryRepository = {
       return directories[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`directoryRepository.delete:${id}:${description}`);
+      log.error(`${context.name}:${id}:${description}`);
       return null;
     }
   }
