@@ -9,7 +9,6 @@ export const siteResourceRepository = {
     };
 
     const uri = siteResourceParam?.uri;
-    const name = siteResourceParam?.name;
     const properties = siteResourceParam?.properties;
 
     context.name = "siteResourceRepository.create.map"
@@ -25,9 +24,9 @@ export const siteResourceRepository = {
         context.name = "siteResourceRepository.create.insertResource"
         const new_resources = await sql`
           insert
-          into resource (uri, site, name, tm)
-          values (${uri}, ${site}, ${name}, current_timestamp at time zone 'UTC')
-          returning id, uri, site, name, tm
+          into resource (uri, site, tm)
+          values (${uri}, ${site}, current_timestamp at time zone 'UTC')
+          returning id, uri, site, tm
         `
         const new_resource = new_resources[0];
 
@@ -44,7 +43,6 @@ export const siteResourceRepository = {
         return {
           id: new_resource.id,
           uri: new_resource.uri,
-          name: new_resource.name,
           site: new_resource.site,
           tm: new_resource.tm,
           properties: properties_kv
@@ -76,7 +74,7 @@ export const siteResourceRepository = {
       context.name = "siteResourceRepository.getAll.getResources";
       const resources = await sql `
         select
-          r.id, r.uri, r.site, r.name, r.tm
+          r.id, r.uri, r.site, r.tm
         from resource as r
         inner join site as s on r.site = s.id
         where r.site = ${site}

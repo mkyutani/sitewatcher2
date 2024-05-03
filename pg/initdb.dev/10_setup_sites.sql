@@ -30,7 +30,6 @@ create table if not exists resource (
   id uuid default gen_random_uuid() not null,
   uri varchar(4096) not null,
   site uuid not null references site on delete cascade,
-  name varchar(4096) not null,
   tm timestamp not null,
   primary key(id),
   unique(uri, site)
