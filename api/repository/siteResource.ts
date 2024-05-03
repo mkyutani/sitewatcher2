@@ -40,10 +40,19 @@ export const siteResourceRepository = {
           `
         });
 
+        context.name = `siteResourceRepository.create.getSiteName`
+        const site_names = await sql`
+          select name
+          from site
+          where id = ${new_resource.site}
+        `
+        const site_name = site_names[0]
+
         return {
           id: new_resource.id,
           uri: new_resource.uri,
           site: new_resource.site,
+          site_name: site_name.name,
           tm: new_resource.tm,
           properties: properties_kv
         };
@@ -74,7 +83,7 @@ export const siteResourceRepository = {
       context.name = "siteResourceRepository.getAll.getResources";
       const resources = await sql `
         select
-          r.id, r.uri, r.site, r.tm
+          r.id, r.uri, r.site, s.name as site_name, r.tm
         from resource as r
         inner join site as s on r.site = s.id
         where r.site = ${site}
