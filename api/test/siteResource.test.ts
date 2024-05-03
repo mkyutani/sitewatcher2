@@ -13,27 +13,11 @@ Deno.test("Site resources", async (t) => {
       body: JSON.stringify({
         uri: "http://resource.xenopus.com",
         name: "Xenopus Resource",
-        sections: ["section1", "section2", null, null, null, null],
-        reason: "new"
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      }
-    });
-    const text = await res.text();
-    assertEquals(res.status, 200);
-    const json = JSON.parse(text);
-    console.log(json);
-  });
-
-  await t.step("200: Create site resources (initial)", async () => {
-    const res = await fetch(`${urlBase}/sites/${sites["xenopus"]}/resources?initial`, {
-      method: "POST",
-      body: JSON.stringify({
-        uri: "http://resource2.xenopus.com",
-        name: "Xenopus Resource 2",
-        sections: [null, null, null, null, "section5", "section6"],
-        reason: "new"
+        properties: {
+          s1: "section1",
+          s2: "section2",
+          reason: "new"
+        }
       }),
       headers: {
         "Content-Type": "application/json",
@@ -51,7 +35,9 @@ Deno.test("Site resources", async (t) => {
       body: JSON.stringify({
         uri: "http://resource.xenopus.com",
         name: "Xenopus Resource",
-        reason: "new"
+        properties: {
+          reason: "new"
+        }
       }),
       headers: {
         "Content-Type": "application/json",
@@ -68,7 +54,9 @@ Deno.test("Site resources", async (t) => {
       body: JSON.stringify({
         uri: "http://resource.xenopus.com",
         name: "Xenopus Resource",
-        reason: "new"
+        properties: {
+          reason: "new"
+        }
       }),
       headers: {
         "Content-Type": "application/json",
@@ -122,7 +110,7 @@ Deno.test("Site resources", async (t) => {
     const text = await res.text();
     assertEquals(res.status, 200);
     const json = JSON.parse(text);
-    assertEquals(json.length, 2);
+    assertEquals(json.length, 1);
     console.log(json);
   });
 

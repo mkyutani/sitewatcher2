@@ -15,7 +15,7 @@ Content-Type: application/json
 {
     "uri": "https://www.mhlw.go.jp/stf/new-info/",
     "name": "厚生労働省新着情報",
-    "directory": "437f21c4-faec-41a2-b787-5852e742d6ed",
+    "directory": "89bf38fd-7fe0-42af-aab0-3348e0675cda"
 }
 
 ### Create Site (2)
@@ -25,7 +25,7 @@ Content-Type: application/json
 {
     "uri": "https://www.meti.go.jp/shingikai/index_report.html",
     "name": "経済産業省報告",
-    "directory": "e88d7483-f988-46ac-873f-0e4b71c6c979",
+    "directory": "e88d7483-f988-46ac-873f-0e4b71c6c979"
 }
 
 ### Create Site (0)
@@ -57,6 +57,22 @@ plain text
 
 ### Delete Site
 DELETE  http://localhost:18085/api/v1/sites/63821c73-8edf-41f8-b63d-299912060d6c
+
+################
+# Reosurces
+################
+
+POST http://localhost:18085/api/v1/sites/9c11eefc-b4d8-49be-b3f3-58911b354fc4/resources
+Content-Type: application/json
+
+{
+    "uri": "https://www.mhlw.go.jp/hoge/",
+    "name": "厚生労働省HOGE情報",
+    "properties": {
+        "title": "HOGE情報",
+        "reason": "new"
+    }
+}
 
 ################
 # Metadata

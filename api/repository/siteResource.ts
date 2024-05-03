@@ -3,35 +3,59 @@ import { log } from "../deps.ts";
 import { SiteResourceParam } from "../model/siteResource.ts";
 
 export const siteResourceRepository = {
-  async create(site: string, siteResourceParam: SiteResourceParam, initial: boolean | null) {
+  async create(site: string, siteResourceParam: SiteResourceParam) {
+    const context = {
+      name: "siteResourceRepository.create"
+    };
+
     const uri = siteResourceParam?.uri;
     const name = siteResourceParam?.name;
-    const sections = siteResourceParam?.sections;
-    const reason = siteResourceParam?.reason;
+    const properties = siteResourceParam?.properties;
 
-    const sections_max = sections ? (sections.length < 6 ? sections.length : 6) : 0;
-    for (let sections_ctr = sections_max; sections_ctr < 6; sections_ctr++) {
-      sections.push(null)
-    }
+    context.name = "siteResourceRepository.create.map"
+    const properties_kv = Object.keys(properties).map(key => {
+      return {
+        key: key,
+        value: properties[key]
+      };
+    });
+
     try {
-      const resources = await sql `
-        insert
-        into site_resource (uri, site, name, reason, section1, section2, section3, section4, section5, section6, tm)
-        values (
-          ${uri}, ${site}, ${name}, ${reason},
-          ${sections[0]}, ${sections[1]}, ${sections[2]}, ${sections[3]}, ${sections[4]}, ${sections[5]},
-          ${initial ?
-            sql`'epoch'` :
-            sql`current_timestamp at time zone 'UTC'`
-          }
-        )
-        returning uri, site, name, reason, section1, section2, section3, section4, section5, section6, tm
-      `
-      return resources[0];
+      const resource = await sql.begin(async sql => {
+        context.name = "siteResourceRepository.create.insertResource"
+        const new_resources = await sql`
+          insert
+          into resource (uri, site, name, tm)
+          values (${uri}, ${site}, ${name}, current_timestamp at time zone 'UTC')
+          returning id, uri, site, name, tm
+        `
+        const new_resource = new_resources[0];
+
+        context.name = `siteResourceRepository.create.insertProperty`
+        properties_kv.forEach(async (property) => {
+          await sql`
+            insert
+            into resource_property (resource, key, value)
+            values
+              (${new_resource.id}, ${property.key}, ${property.value})
+          `
+        });
+
+        return {
+          id: new_resource.id,
+          uri: new_resource.uri,
+          name: new_resource.name,
+          site: new_resource.site,
+          tm: new_resource.tm,
+          properties: properties_kv
+        };
+      });
+
+      return resource;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       if (error instanceof sql.PostgresError) {
-        log.warning(`siteResourceRepository.create:PG${error.code}:${error.message}`);
+        log.warning(`${context.name}:PG${error.code}:${error.message}`);
         switch (parseInt(error.code, 10)) {
         case 23505:
           return "Duplicated";
@@ -39,25 +63,40 @@ export const siteResourceRepository = {
           return "Invalid directory id";
         }
       }
-      log.error(`siteResourceRepository.create:${description}`);
+      log.error(`${context.name}:${description}`);
       return null;
     }
   },
   async getAll(site: string) {
+    const context = {
+      name: "siteResourceRepository.getAll"
+    };
+
     try {
-      const sites = await sql `
+      context.name = "siteResourceRepository.getAll.getResources";
+      const resources = await sql `
         select
-          r.uri, r.name, r.site, s.name as site_name, r.reason,
-          r.section1, r.section2, r.section3, r.section4, r.section5, r.section6,  
-          r.tm as time
-        from site_resource as r
+          r.id, r.uri, r.site, r.name, r.tm
+        from resource as r
         inner join site as s on r.site = s.id
         where r.site = ${site}
       `
-      return sites;
+
+      context.name = "siteResourceRepository.getAll.getProperties";
+      for (const resource of resources) {
+        const properties = await sql `
+          select
+            key, value
+          from resource_property
+          where resource = ${resource.id}
+        `
+        resource.properties = properties;
+      }
+
+      return resources;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`siteResourceRepository.getAll:${description}`);
+      log.error(`${context.name}:${description}`);
       return null;
     }
   }

@@ -18,20 +18,29 @@ create table if not exists site (
   unique(uri)
 );
 
-create table if not exists site_resource (
-  id serial not null,
+create table if not exists exclusion (
+  site uuid not null references site on delete cascade,
+  number serial not null,
+  key varchar(256) not null,
+  pattern varchar(4096) not null,
+  primary key(site, number)
+);
+
+create table if not exists resource (
+  id uuid default gen_random_uuid() not null,
   uri varchar(4096) not null,
   site uuid not null references site on delete cascade,
   name varchar(4096) not null,
-  reason varchar(256) not null,
-  section1 varchar(4096),
-  section2 varchar(4096),
-  section3 varchar(4096),
-  section4 varchar(4096),
-  section5 varchar(4096),
-  section6 varchar(4096),
   tm timestamp not null,
-  primary key(id)
+  primary key(id),
+  unique(uri, site)
+);
+
+create table if not exists resource_property (
+  resource uuid not null references resource on delete cascade,
+  key varchar(256) not null,
+  value varchar(4096) not null,
+  primary key(resource, key)
 );
 
 create table if not exists channel (
@@ -49,9 +58,9 @@ create table if not exists format (
   primary key(channel, site)
 );
 
-create table if not exists channel_resource (
+create table if not exists history (
   channel uuid not null references channel on delete cascade,
-  resource serial not null references site_resource on delete cascade,
+  resource uuid not null references resource on delete cascade,
   tm timestamp not null,
   primary key(channel, resource)
 );
