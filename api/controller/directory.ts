@@ -8,7 +8,12 @@ export const directoryController = {
     const reqBodyRaw = await ctx.request.body();
     ctx.assert(reqBodyRaw, 400, "No data")
     ctx.assert(reqBodyRaw.type === "json", 415, "Invalid content");
-    const reqBody = await reqBodyRaw.value;
+    let reqBody;
+    try {
+      reqBody = await reqBodyRaw.value;
+    } catch (error) {
+      ctx.assert(false, 400, "Invalid JSON");
+    }
     ctx.assert(reqBody, 400, "Data is empty");
     ctx.assert(reqBody.name, 400, "Name is missing");
     const result = await directoryService.create(reqBody as DirectoryParam);
@@ -44,7 +49,12 @@ export const directoryController = {
     const reqBodyRaw = await ctx.request.body();
     ctx.assert(reqBodyRaw, 400, "No data")
     ctx.assert(reqBodyRaw.type === "json", 415, "Invalid content");
-    const reqBody = await reqBodyRaw.value;
+    let reqBody;
+    try {
+      reqBody = await reqBodyRaw.value;
+    } catch (error) {
+      ctx.assert(false, 400, "Invalid JSON");
+    }
     ctx.assert(reqBody, 400, "Data is empty");
     const result = await directoryService.update(id, reqBody as DirectoryParam);
     ctx.assert(result, 500, "Unknown");

@@ -8,7 +8,12 @@ export const siteController = {
     const reqBodyRaw = await ctx.request.body();
     ctx.assert(reqBodyRaw, 400, "No data")
     ctx.assert(reqBodyRaw.type === "json", 415, "Invalid content");
-    const reqBody = await reqBodyRaw.value;
+    let reqBody;
+    try {
+      reqBody = await reqBodyRaw.value;
+    } catch (error) {
+      ctx.assert(false, 400, "Invalid JSON");
+    }
     ctx.assert(reqBody, 400, "Data is empty");
     ctx.assert(reqBody.uri, 400, "Uri is missing");
     ctx.assert(reqBody.name, 400, "Name is missing");
@@ -44,7 +49,12 @@ export const siteController = {
     ctx.assert(isUuid(id), 400, "Invalid id");
     const reqBodyRaw = await ctx.request.body();
     ctx.assert(reqBodyRaw.type === "json", 415, "Invalid content");
-    const reqBody = await reqBodyRaw.value;
+    let reqBody;
+    try {
+      reqBody = await reqBodyRaw.value;
+    } catch (error) {
+      ctx.assert(false, 400, "Invalid JSON");
+    }
     ctx.assert(reqBody, 400, "No data");
     if (reqBody.directory) {
       ctx.assert(isUuid(reqBody.directory), 400, "Invalid directory id");

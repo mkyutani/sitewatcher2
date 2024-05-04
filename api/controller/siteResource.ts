@@ -10,7 +10,12 @@ export const siteResourceController = {
     const reqBodyRaw = await ctx.request.body();
     ctx.assert(reqBodyRaw, 400, "No data")
     ctx.assert(reqBodyRaw.type === "json", 415, "Invalid content");
-    const reqBody = await reqBodyRaw.value;
+    let reqBody;
+    try {
+      reqBody = await reqBodyRaw.value;
+    } catch (error) {
+      ctx.assert(false, 400, "Invalid JSON");
+    }
     ctx.assert(reqBody, 400, "Data is empty");
     ctx.assert(reqBody.uri, 400, "Uri is missing");
     ctx.assert(reqBody.properties, 400, "Properties is missing");
