@@ -1,0 +1,28 @@
+################
+# Channels
+################
+
+### Create channel
+POST http://localhost:18085/api/v1/channels
+Content-Type: application/json
+
+{
+    "name": "cheetah"
+}
+
+### Get channel by ID
+GET http://localhost:18085/api/v1/channels/51bd344d-3b64-4efe-81d9-15222041ffaf
+
+### List all channels
+GET http://localhost:18085/api/v1/channels
+
+### Update channel
+PUT http://localhost:18085/api/v1/channels/9592d1cf-024c-4566-b4b8-caac166ed6dc
+Content-Type: application/json
+
+{
+    "name": "cheetah2"
+}
+
+### Delete channel
+DELETE  http://localhost:18085/api/v1/channels/9592d1cf-024c-4566-b4b8-caac166ed6dc
