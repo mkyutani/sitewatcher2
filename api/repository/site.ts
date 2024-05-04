@@ -4,6 +4,10 @@ import { SiteParam } from "../model/site.ts";
 
 export const siteRepository = {
   async create(siteParam: SiteParam) {
+    const context = {
+      name: "siteRepository.create"
+    };
+
     const uri = siteParam?.uri;
     const name = siteParam?.name;
     const directory = siteParam?.directory;
@@ -18,7 +22,7 @@ export const siteRepository = {
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       if (error instanceof sql.PostgresError) {
-        log.warning(`siteRepository.create:PG${error.code}:${error.message}`);
+        log.warning(`${context.name}:PG${error.code}:${error.message}`);
         switch (parseInt(error.code, 10)) {
         case 23505:
           return "Duplicated";
@@ -26,11 +30,15 @@ export const siteRepository = {
           return "Invalid directory id";
         }
       }
-      log.error(`siteRepository.create:${description}`);
+      log.error(`${context.name}:${description}`);
       return null;
     }
   },
   async get(id: string) {
+    const context = {
+      name: "siteRepository.get"
+    };
+
     try {
       const sites = await sql `
         select
@@ -55,53 +63,36 @@ export const siteRepository = {
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       if (error instanceof sql.PostgresError && error.code === "22P02") {
-        log.warning(`siteRepository.get:${id}:${description}`);
+        log.warning(`${context.name}:${id}:${description}`);
         return {};
       }
-      log.error(`siteRepository.get:${id}:${description}`);
+      log.error(`${context.name}:${id}:${description}`);
       return null;
     }
   },
-  async getAll(name: string | null, directory_id: string | null, strict: boolean | null) {
+  async list() {
+    const context = {
+      name: "siteRepository.list"
+    };
+
     try {
       const sites = await sql `
         select
-          s.id, s.uri, s.name, s.directory, d.name as directory_name, s.created, s.updated
-        from site as s
-        inner join directory as d on s.directory = d.id
-        ${directory_id ?
-          sql`where s.directory = ${directory_id}` :
-          sql``
-        }
-        ${(name && name.length > 0) ?
-          (strict ?
-            (directory_id ?
-              sql`and s.name = ${name}`:
-              sql`where s.name = ${name}`) :
-            (directory_id ?
-              sql`and s.name ilike ${`%${name}%`}` :
-              sql`where s.name ilike ${`%${name}%`}`)):
-          sql``
-        }
+          id, name
+        from site
       `
-
-      for (const site of sites) {
-        const data = await sql`
-          select key, value
-          from site_metadata
-          where site = ${site.id}
-        `
-        site.metadata = data;
-      }
-
       return sites;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`siteRepository.getAll:${description}`);
+      log.error(`${context.name}:${description}`);
       return null;
     }
   },
   async update(id: string, siteParam: SiteParam) {
+    const context = {
+      name: "siteRepository.update"
+    };
+
     const uri = siteParam?.uri;
     const name = siteParam?.name;
     const directory = siteParam?.directory;
@@ -122,7 +113,7 @@ export const siteRepository = {
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       if (error instanceof sql.PostgresError) {
-        log.warning(`siteRepository.update:PG${error.code}:${error.message}`);
+        log.warning(`${context.name}:PG${error.code}:${error.message}`);
         switch (parseInt(error.code, 10)) {
         case 23505:
           return "Duplicated";
@@ -130,11 +121,15 @@ export const siteRepository = {
           return "Invalid directory id";
           }
       }
-      log.error(`siteRepository.update:${id}:${description}`);
+      log.error(`${context.name}:${id}:${description}`);
       return null;
     }
   },
   async delete(id: string) {
+    const context = {
+      name: "siteRepository.delete"
+    };
+
     try {
       const sites = await sql `
         delete
@@ -148,7 +143,7 @@ export const siteRepository = {
       return sites[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`siteRepository.delete:${id}:${description}`);
+      log.error(`${context.name}:${id}:${description}`);
       return null;
     }
   }

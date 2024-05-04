@@ -25,7 +25,7 @@ router.post('/api/v1/sites/:id/resources', siteResourceController.create);
 router.get('/api/v1/sites/:id/resources', siteResourceController.getAll);
 router.post('/api/v1/sites', siteController.create);
 router.get('/api/v1/sites/:id', siteController.get);
-router.get('/api/v1/sites', siteController.getAll);
+router.get('/api/v1/sites', siteController.list);
 router.put('/api/v1/sites/:id', siteController.update);
 router.delete('/api/v1/sites/:id', siteController.delete);
 

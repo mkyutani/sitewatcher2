@@ -140,7 +140,7 @@ Deno.test("Directory", async (t) => {
     assertEquals(res.status, 400);
   });
 
-  await t.step("200: Get all directories", async () => {
+  await t.step("200: List all directories", async () => {
     const res = await fetch(`${urlBase}/directories`);
     const text = await res.text();
     const json = JSON.parse(text);

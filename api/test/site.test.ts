@@ -218,53 +218,12 @@ Deno.test("Site", async (t) => {
     assertEquals(res.status, 400);
   });
 
-  await t.step("200: Get all sites", async () => {
+  await t.step("200: List all sites", async () => {
     const res = await fetch(`${urlBase}/sites`);
     const text = await res.text();
     console.log(`${res.status} ${text}`);
     assertEquals(res.status, 200);
     assertEquals(JSON.parse(text).length, 3);
-  });
-
-  await t.step("200: Get all sites with name", async () => {
-    const res = await fetch(`${urlBase}/sites?name=alpaca`);
-    const text = await res.text();
-    console.log(`${res.status} ${text}`);
-    const json = JSON.parse(text);
-    assertEquals(res.status, 200);
-    assertEquals(json.length, 2);
-  });
-
-  await t.step("200: Get all sites with strict flag", async () => {
-    const res = await fetch(`${urlBase}/sites?strict=true&name=alpaca`);
-    const text = await res.text();
-    console.log(`${res.status} ${text}`);
-    const json = JSON.parse(text);
-    assertEquals(res.status, 200);
-    assertEquals(json.length, 1);
-  });
-
-  await t.step("200: Get all sites with directory id", async () => {
-    const res = await fetch(`${urlBase}/sites?directory=${directories["zebra"]}`);
-    const text = await res.text();
-    console.log(`${res.status} ${text}`);
-    const json = JSON.parse(text);
-    assertEquals(res.status, 200);
-    assertEquals(json.length, 3);
-  });
-
-  await t.step("200: Get all site with unregistered uuid", async () => {
-    const res = await fetch(`${urlBase}/sites?directory=00000000-0000-0000-0000-000000000000`);
-    const text = await res.text();
-    console.log(`${res.status} ${text}`);
-    assertEquals(res.status, 200);
-  });
-
-  await t.step("400: Get all site with invalid uuid", async () => {
-    const res = await fetch(`${urlBase}/sites?directory=invalid-uuid`);
-    const text = await res.text();
-    console.log(`${res.status} ${text}`);
-    assertEquals(res.status, 400);
   });
 
   Deno.test("200: Update a site", async () => {
