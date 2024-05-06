@@ -1,6 +1,6 @@
 import sql from "./db.ts"
 import { log } from "../deps.ts";
-import { ChannelDirectoryParam, ChannelParam } from "../model/channel.ts";
+import { ChannelDirectoryParam, ChannelParam, ChannelSiteParam } from "../model/channel.ts";
 
 export const channelRepository = {
   async get(id: string) {
@@ -29,6 +29,15 @@ export const channelRepository = {
         from channel_directory as cd
         inner join directory as d on cd.directory = d.id
         where cd.channel = ${id}
+      `
+
+      context.name = "channelRepository.get.getSites";
+      channel.sites = await sql `
+        select
+          cs.site, s.name as site_name, cs.title, cs.description, cs.created, cs.updated
+        from channel_site as cs
+        inner join site as s on cs.site = s.id
+        where cs.channel = ${id}
       `
 
       return channel;
@@ -203,6 +212,79 @@ export const channelRepository = {
         return {};
       }
       return directories[0];
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      log.error(`${context.name}:${id}:${description}`);
+      return null;
+    }
+  },
+  async addSite(id: string, site_id: string, param: ChannelSiteParam) {
+    const context = {
+      name: "channelRepository.addSite"
+    };
+
+    const title = param?.title;
+    const description = param?.description;
+    try {
+      const channel_sites = await sql `
+        insert
+        into channel_site (channel, site, title, description, created, updated)
+        values (${id}, ${site_id}, ${title}, ${description}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
+        returning channel, site
+      `
+      return channel_sites[0];
+    } catch (error) {
+      if (error instanceof sql.PostgresError && parseInt(error.code, 10) == 23505) {
+          return "Duplicated";
+      } else {
+        const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}`;
+        log.error(`${context.name}:${description}`);
+        return null;
+      }
+    }
+  },
+  async updateSite(id: string, site_id: string, param: ChannelSiteParam) {
+    const context = {
+      name: "channelRepository.updateSite"
+    };
+
+    const title = param?.title;
+    const description = param?.description;
+    try {
+      const channel_sites = await sql `
+        update channel_site
+        set title = ${title ? title : sql`title`},
+          description = ${description ? description : sql`description`},
+          updated = current_timestamp at time zone 'UTC'
+        where channel = ${id} and site = ${site_id}
+        returning channel, site, title, description, created, updated
+      `
+      if (channel_sites.length == 0) {
+        return {};
+      }
+      return channel_sites[0];
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}`;
+      log.error(`${context.name}:${id}:${description}`);
+      return null;
+    }
+  },
+  async deleteSite(id: string, site_id: string) {
+    const context = {
+      name: "channelRepository.deleteSite"
+    };
+
+    try {
+      const channel_sites = await sql `
+        delete
+        from channel_site
+        where channel = ${id} and site = ${site_id}
+        returning channel, site
+      `
+      if (channel_sites.length == 0) {
+        return {};
+      }
+      return channel_sites[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       log.error(`${context.name}:${id}:${description}`);

@@ -255,6 +255,13 @@ Deno.test("Channel", async (t) => {
     const json = JSON.parse(text);
     console.log(json);
     assertEquals(JSON.parse(text).length, 2);
+
+    const res2 = await fetch(`${urlBase}/channels/${id}`);
+    const text2 = await res2.text();
+    assertEquals(res2.status, 200);
+    const json2 = JSON.parse(text2);
+    console.log(json2);
+    assertEquals(json2.id, id);
   });
 
   Deno.test("200: Update a channel directory", async () => {
@@ -269,6 +276,73 @@ Deno.test("Channel", async (t) => {
       headers: {
         "Content-Type": "application/json",
       }
+    });
+    const text = await res.text();
+    assertEquals(res.status, 200);
+    const json = JSON.parse(text);
+    console.log(json);
+  });
+
+  await t.step("200: Add a channel site", async () => {
+    const id = channels[0];
+    const site_id = sites["xenopus"];
+    const res = await fetch(`${urlBase}/channels/${id}/sites/${site_id}`, {
+      method: "POST",
+      body: JSON.stringify({
+        title: "${title}",
+        description: "${description}"
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const text = await res.text();
+    assertEquals(res.status, 200);
+    const json = JSON.parse(text);
+    console.log(json);
+  });
+
+  await t.step("200: List all channels and get channel sites (again)", async () => {
+    const id = channels[0];
+    const res = await fetch(`${urlBase}/channels`);
+    const text = await res.text();
+    assertEquals(res.status, 200);
+    const json = JSON.parse(text);
+    console.log(json);
+    assertEquals(JSON.parse(text).length, 2);
+
+    const res2 = await fetch(`${urlBase}/channels/${id}`);
+    const text2 = await res2.text();
+    assertEquals(res2.status, 200);
+    const json2 = JSON.parse(text2);
+    console.log(json2);
+    assertEquals(json2.id, id);
+  });
+
+  Deno.test("200: Update a channel site", async () => {
+    const id = channels[0];
+    const site_id = sites["xenopus"];
+    const res = await fetch(`${urlBase}/channels/${id}/sites/${site_id}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        title: "title: ${title}",
+        description: "description: ${description}"
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
+    const text = await res.text();
+    assertEquals(res.status, 200);
+    const json = JSON.parse(text);
+    console.log(json);
+  });
+
+  await t.step("200: Delete channel site", async () => {
+    const id = channels[0];
+    const site_id = sites["xenopus"];
+    const res = await fetch(`${urlBase}/channels/${id}/sites/${site_id}`, {
+      method: "DELETE"
     });
     const text = await res.text();
     assertEquals(res.status, 200);
