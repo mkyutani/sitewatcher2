@@ -1,5 +1,5 @@
 import { RouterContext, helpers } from "../deps.ts";
-import { SiteParam } from "../model/site.ts";
+import { SiteParam, SiteResourceParam } from "../model/site.ts";
 import { siteService } from "../service/site.ts";
 import { convertToBoolean, convertToJson, isUuid } from "../util.ts";
 
@@ -66,5 +66,33 @@ export const siteController = {
     ctx.assert(result, 500, "Unknown");
     ctx.assert(Object.keys(result).length > 0, 404, "");
     ctx.response.body = null;
+  },
+  async registerResource(ctx:RouterContext<string>) {
+    const { id } = helpers.getQuery(ctx, { mergeParams: true });
+    ctx.assert(!id || isUuid(id), 400, "Invalid id");
+    const reqBodyRaw = await ctx.request.body();
+    ctx.assert(reqBodyRaw, 400, "No data")
+    ctx.assert(reqBodyRaw.type === "json", 415, "Invalid content");
+    let reqBody;
+    try {
+      reqBody = await reqBodyRaw.value;
+    } catch (error) {
+      ctx.assert(false, 400, "Invalid JSON");
+    }
+    ctx.assert(reqBody, 400, "Data is empty");
+    ctx.assert(reqBody.uri, 400, "Uri is missing");
+    ctx.assert(reqBody.properties, 400, "Properties is missing");
+    const result = await siteService.registerResource(id, reqBody as SiteResourceParam);
+    ctx.assert(result, 500, "Unknown");
+    ctx.assert(typeof result !== "string", 400, result);
+    ctx.response.body = result;
+  },
+  async getAllResources(ctx: RouterContext<string>) {
+    const { id } = helpers.getQuery(ctx, { mergeParams: true });
+    ctx.assert(!id || isUuid(id), 400, "Invalid id");
+    const result = await siteService.getAllResources(id);
+    ctx.assert(result, 500, "Unknown");
+    ctx.assert(typeof result !== "string", 400, result);
+    ctx.response.body = result;
   }
 }

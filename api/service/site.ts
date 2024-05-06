@@ -1,4 +1,4 @@
-import { SiteParam } from "../model/site.ts";
+import { SiteParam, SiteResourceParam } from "../model/site.ts";
 import { siteRepository } from "../repository/site.ts";
 
 export const siteService = {
@@ -16,5 +16,11 @@ export const siteService = {
   },
   async delete(id: string) {
     return await siteRepository.delete(id);
+  },
+  async registerResource(site: string, {...reqBody}: SiteResourceParam) {
+    return await siteRepository.registerResource(site, reqBody as SiteResourceParam);
+  },
+  async getAllResources(site: string) {
+    return await siteRepository.getAllResources(site);
   }
 }

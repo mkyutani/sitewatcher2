@@ -6,7 +6,7 @@ Deno.test("Site", async (t) => {
   const directories: IdNames = await createTestDirectories();
   const sites: string[] = [];
 
-  await t.step("200: Create a site with metadata", async () => {
+  await t.step("200: Create sites with metadata", async () => {
     const registrations = [
       {
         name: "alpaca",
@@ -390,7 +390,119 @@ Deno.test("Site", async (t) => {
     assertEquals(res.status, 400);
   });
 
-  await t.step("204: Delete a site", async () => {
+  await t.step("200: Register a site resource", async () => {
+    const id = sites[0];
+    const res = await fetch(`${urlBase}/sites/${id}/resources`, {
+      method: "POST",
+      body: JSON.stringify({
+        uri: "http://resource.xenopus.com",
+        name: "Xenopus Resource",
+        properties: {
+          s1: "section1",
+          s2: "section2",
+          reason: "new"
+        }
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
+    const text = await res.text();
+    assertEquals(res.status, 200);
+    const json = JSON.parse(text);
+    console.log(json);
+  });
+
+  await t.step("400: Register a site resource with unregistered uuid", async () => {
+    const res = await fetch(`${urlBase}/sites/00000000-0000-0000-0000-000000000000/resources`, {
+      method: "POST",
+      body: JSON.stringify({
+        uri: "http://resource.xenopus.com",
+        name: "Xenopus Resource",
+        properties: {
+          reason: "new"
+        }
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
+    const text = await res.text();
+    assertEquals(res.status, 400);
+    console.log(text)
+  });
+
+  await t.step("400: Register a site resource with invalid uuid", async () => {
+    const res = await fetch(`${urlBase}/sites/00invalid-uuid/resources`, {
+      method: "POST",
+      body: JSON.stringify({
+        uri: "http://resource.xenopus.com",
+        name: "Xenopus Resource",
+        properties: {
+          reason: "new"
+        }
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
+    const text = await res.text();
+    assertEquals(res.status, 400);
+    console.log(text)
+  });
+
+  await t.step("415: Register a site resource with a plain text", async () => {
+    const id = sites[0];
+    const res = await fetch(`${urlBase}/sites/${id}/resources`, {
+      method: "POST",
+      body: "plain text",
+      headers: {
+        "Content-Type": "text/plain",
+      }
+    });
+    const text = await res.text();
+    assertEquals(res.status, 415);
+    console.log(text)
+  });
+
+  await t.step("400: Register a site resource with no content", async () => {
+    const id = sites[0];
+    const res = await fetch(`${urlBase}/sites/${id}/resources`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
+    const text = await res.text();
+    assertEquals(res.status, 400);
+    console.log(text)
+  });
+
+  await t.step("400: Register a site resource with null content", async () => {
+    const id = sites[0];
+    const res = await fetch(`${urlBase}/sites/${id}/resources`, {
+      method: "POST",
+      body: null,
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
+    const text = await res.text();
+    assertEquals(res.status, 400);
+    console.log(text)
+  });
+
+  await t.step("200: Get all site resources", async () => {
+    const id = sites[0];
+    const res = await fetch(`${urlBase}/sites/${id}/resources`);
+    const text = await res.text();
+    assertEquals(res.status, 200);
+    const json = JSON.parse(text);
+    assertEquals(json.length, 1);
+    console.log(json);
+  });
+
+  await t.step("204: Delete sites", async () => {
     const statuses: number[] = [];
     while (sites.length > 0) {
       const id = sites.pop();

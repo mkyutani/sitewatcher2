@@ -3,3 +3,8 @@ export type SiteParam = {
   name: string | null,
   directory: string | null
 };
+
+export type SiteResourceParam = {
+  uri: string,
+  properties: any,
+};
