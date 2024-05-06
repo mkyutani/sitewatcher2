@@ -45,18 +45,31 @@ create table if not exists channel (
 
 create table if not exists channel_directory (
   channel uuid not null references channel on delete cascade,
-  target uuid not null references directory on delete cascade,
-  title_pattern varchar(4096) not null,
-  description_pattern varchar(4096) not null,
-  primary key(channel, target)
+  directory uuid not null references directory on delete cascade,
+  title varchar(4096) not null,
+  description varchar(4096) not null,
+  created timestamp not null,
+  updated timestamp not null,
+  primary key(channel, directory)
 );
 
 create table if not exists channel_site (
   channel uuid not null references channel on delete cascade,
-  target uuid not null references site on delete cascade,
-  title_pattern varchar(4096) not null,
-  description_pattern varchar(4096) not null,
-  primary key(channel, target)
+  site uuid not null references site on delete cascade,
+  title varchar(4096) not null,
+  description varchar(4096) not null,
+  created timestamp not null,
+  updated timestamp not null,
+  primary key(channel, site)
+);
+
+create table if not exists channel_device (
+  channel uuid not null references channel on delete cascade,
+  name varchar(256) not null,
+  interface varchar(256) not null,
+  created timestamp not null,
+  updated timestamp not null,
+  primary key(channel, name)
 );
 
 create table if not exists channel_history (
@@ -67,13 +80,6 @@ create table if not exists channel_history (
   source varchar(4096) not null,
   tm timestamp not null,
   primary key(channel, uri)
-);
-
-create table if not exists channel_device (
-  channel uuid not null references channel on delete cascade,
-  name varchar(256) not null,
-  interface varchar(256) not null,
-  primary key(channel, name)
 );
 
 create table if not exists directory_metadata (

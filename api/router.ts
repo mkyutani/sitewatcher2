@@ -28,22 +28,22 @@ router.get('/api/v1/sites', siteController.list);
 router.put('/api/v1/sites/:id', siteController.update);
 router.delete('/api/v1/sites/:id', siteController.delete);
 
+router.post('/api/v1/channels/:id/directories/:dir', channelController.addDirectory);
+router.put('/api/v1/channels/:id/directories/:dir', channelController.updateDirectory);
+router.delete('/api/v1/channels/:id/directories/:dir', channelController.deleteDirectory);
 /*
-router.post('/api/v1/channels/:ch/directories/:dir', channelController.addDirectory);
 router.get('/api/v1/channels/:id/directories/:dir', channelController.getDirectory);
 router.get('/api/v1/channels/:id/directories', channelController.listDirectories);
-router.put('/api/v1/channels/:ch/directories/:dir', channelController.updateDirectory);
-router.delete('/api/v1/channels/:ch/directories/:dir', channelController.deleteDirectory);
-router.post('/api/v1/channels/:ch/sites/:site', channelController.addSite);
+router.post('/api/v1/channels/:id/sites/:site', channelController.addSite);
 router.get('/api/v1/channels/:id/sites/:site', channelController.getSite);
 router.get('/api/v1/channels/:id/sites', channelController.listSites);
-router.put('/api/v1/channels/:ch/sites/:site', channelController.updateSite);
-router.delete('/api/v1/channels/:ch/sites/:site', channelController.deleteSite);
-router.post('/api/v1/channels/:ch/devices/:dev', channelController.addDevice);
+router.put('/api/v1/channels/:id/sites/:site', channelController.updateSite);
+router.delete('/api/v1/channels/:id/sites/:site', channelController.deleteSite);
+router.post('/api/v1/channels/:id/devices/:dev', channelController.addDevice);
 router.get('/api/v1/channels/:id/devices/:dev', channelController.getDevice);
 router.get('/api/v1/channels/:id/devices', channelController.getDevices);
-router.put('/api/v1/channels/:ch/devices/:dev', channelController.updateDevice);
-router.delete('/api/v1/channels/:ch/devices/:dev', channelController.deleteDevice);
+router.put('/api/v1/channels/:id/devices/:dev', channelController.updateDevice);
+router.delete('/api/v1/channels/:id/devices/:dev', channelController.deleteDevice);
 router.post('/api/v1/channels/:id/collect', channelController.collect);
 */
 router.post('/api/v1/channels', channelController.create);

@@ -1,5 +1,5 @@
 import { RouterContext, helpers, log } from "../deps.ts";
-import { ChannelParam } from "../model/channel.ts";
+import { ChannelDirectoryParam, ChannelParam } from "../model/channel.ts";
 import { channelService } from "../service/channel.ts";
 import { isUuid } from "../util.ts";
 
@@ -35,6 +35,7 @@ export const channelController = {
     ctx.assert(typeof result !== "string", 400, result as string);
     ctx.response.body = result;
   },
+/*
   async getResources(ctx:RouterContext<string>) {
     const { id, last } = helpers.getQuery(ctx, { mergeParams: true });
     ctx.assert(isUuid(id), 400, "Invalid id");
@@ -43,6 +44,7 @@ export const channelController = {
     ctx.assert(result, 500, "Unknown");
     ctx.response.body = result;
   },
+*/
   async update(ctx:RouterContext<string>) {
     const { id } = helpers.getQuery(ctx, { mergeParams: true });
     ctx.assert(isUuid(id), 400, "Invalid id");
@@ -66,6 +68,75 @@ export const channelController = {
     const { id } = helpers.getQuery(ctx, { mergeParams: true });
     ctx.assert(isUuid(id), 400, "Invalid id");
     const result = await channelService.delete(id);
+    ctx.assert(result, 500, "Unknown");
+    ctx.assert(Object.keys(result).length > 0, 404, "");
+    ctx.response.body = result;
+  },
+  async addDirectory(ctx:RouterContext<string>) {
+    const { id, dir } = helpers.getQuery(ctx, { mergeParams: true });
+    ctx.assert(isUuid(id), 400, "Invalid id");
+    ctx.assert(isUuid(dir), 400, "Invalid directory id");
+    const reqBodyRaw = await ctx.request.body();
+    ctx.assert(reqBodyRaw, 400, "No data")
+    ctx.assert(reqBodyRaw.type === "json", 415, "Invalid content");
+    let reqBody;
+    try {
+      reqBody = await reqBodyRaw.value;
+    } catch (error) {
+      ctx.assert(false, 400, "Invalid JSON");
+    }
+    ctx.assert(reqBody, 400, "Data is empty");
+    ctx.assert(reqBody.title, 400, "Title is missing");
+    ctx.assert(reqBody.description, 400, "Description is missing");
+    const result = await channelService.addDirectory(id, dir, reqBody as ChannelDirectoryParam);
+    ctx.assert(result, 500, "Unknown");
+    ctx.assert(typeof result !== "string", 400, result as string);
+    ctx.response.body = result;
+  },
+/*
+  async getDirectory(ctx:RouterContext<string>) {
+    const { id, dir } = helpers.getQuery(ctx, { mergeParams: true });
+    ctx.assert(isUuid(id), 400, "Invalid id");
+    ctx.assert(isUuid(dir), 400, "Invalid directory id");
+    const result = await channelService.getDirectory(id, dir);
+    ctx.assert(result, 500, "Unknown");
+    ctx.assert(Object.keys(result).length > 0, 404, "");
+    ctx.response.body = result;
+  },
+  async listDirectories(ctx: RouterContext<string>) {
+    const { id } = helpers.getQuery(ctx, { mergeParams: true });
+    ctx.assert(isUuid(id), 400, "Invalid id");
+    const result = await channelService.listDirectories(id);
+    ctx.assert(result, 500, "Unknown");
+    ctx.assert(typeof result !== "string", 400, result as string);
+    ctx.response.body = result;
+  },
+*/
+  async updateDirectory(ctx:RouterContext<string>) {
+    const { id, dir } = helpers.getQuery(ctx, { mergeParams: true });
+    ctx.assert(isUuid(id), 400, "Invalid id");
+    ctx.assert(isUuid(dir), 400, "Invalid directory id");
+    const reqBodyRaw = await ctx.request.body();
+    ctx.assert(reqBodyRaw, 400, "No data")
+    ctx.assert(reqBodyRaw.type === "json", 415, "Invalid content");
+    let reqBody;
+    try {
+      reqBody = await reqBodyRaw.value;
+    } catch (error) {
+      ctx.assert(false, 400, "Invalid JSON");
+    }
+    ctx.assert(reqBody, 400, "Data is empty");
+    const result = await channelService.updateDirectory(id, dir, reqBody as ChannelDirectoryParam);
+    ctx.assert(result, 500, "Unknown");
+    ctx.assert(typeof result !== "string", 400, result as string);
+    ctx.assert(Object.keys(result).length > 0, 404, "");
+    ctx.response.body = result;
+  },
+  async deleteDirectory(ctx:RouterContext<string>) {
+    const { id, dir } = helpers.getQuery(ctx, { mergeParams: true });
+    ctx.assert(isUuid(id), 400, "Invalid id");
+    ctx.assert(isUuid(dir), 400, "Invalid directory id");
+    const result = await channelService.deleteDirectory(id, dir);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(Object.keys(result).length > 0, 404, "");
     ctx.response.body = result;
