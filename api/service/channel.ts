@@ -1,4 +1,4 @@
-import { ChannelDirectoryParam, ChannelParam, ChannelSiteParam } from "../model/channel.ts";
+import { ChannelDeviceParam, ChannelDirectoryParam, ChannelParam, ChannelSiteParam } from "../model/channel.ts";
 import { channelRepository } from "../repository/channel.ts";
 
 export const channelService = {
@@ -39,5 +39,14 @@ export const channelService = {
   },
   async deleteSite(id: string, site_id: string) {
     return await channelRepository.deleteSite(id, site_id);
+  },
+  async addDevice(id: string, device_name: string, {...reqBody}: ChannelDeviceParam) {
+    return await channelRepository.addDevice(id, device_name, reqBody as ChannelDeviceParam);
+  },
+  async updateDevice(id: string, device_name: string, {...reqBody}: ChannelDeviceParam) {
+    return await channelRepository.updateDevice(id, device_name, reqBody as ChannelDeviceParam);
+  },
+  async deleteDevice(id: string, device_name: string) {
+    return await channelRepository.deleteDevice(id, device_name);
   }
 }

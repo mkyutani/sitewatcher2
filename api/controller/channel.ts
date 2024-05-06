@@ -1,5 +1,5 @@
 import { RouterContext, helpers, log } from "../deps.ts";
-import { ChannelDirectoryParam, ChannelParam } from "../model/channel.ts";
+import { ChannelDeviceParam, ChannelDirectoryParam, ChannelParam, ChannelSiteParam } from "../model/channel.ts";
 import { channelService } from "../service/channel.ts";
 import { isUuid } from "../util.ts";
 
@@ -138,7 +138,7 @@ export const channelController = {
     ctx.assert(reqBody, 400, "Data is empty");
     ctx.assert(reqBody.title, 400, "Title is missing");
     ctx.assert(reqBody.description, 400, "Description is missing");
-    const result = await channelService.addSite(id, site, reqBody as ChannelDirectoryParam);
+    const result = await channelService.addSite(id, site, reqBody as ChannelSiteParam);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result as string);
     ctx.response.body = result;
@@ -157,7 +157,7 @@ export const channelController = {
       ctx.assert(false, 400, "Invalid JSON");
     }
     ctx.assert(reqBody, 400, "Data is empty");
-    const result = await channelService.updateSite(id, site, reqBody as ChannelDirectoryParam);
+    const result = await channelService.updateSite(id, site, reqBody as ChannelSiteParam);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result as string);
     ctx.assert(Object.keys(result).length > 0, 404, "");
@@ -168,6 +168,54 @@ export const channelController = {
     ctx.assert(isUuid(id), 400, "Invalid id");
     ctx.assert(isUuid(site), 400, "Invalid site id");
     const result = await channelService.deleteSite(id, site);
+    ctx.assert(result, 500, "Unknown");
+    ctx.assert(Object.keys(result).length > 0, 404, "");
+    ctx.response.body = result;
+  },
+  async addDevice(ctx:RouterContext<string>) {
+    const { id, dev } = helpers.getQuery(ctx, { mergeParams: true });
+    ctx.assert(isUuid(id), 400, "Invalid id");
+    const reqBodyRaw = await ctx.request.body();
+    ctx.assert(reqBodyRaw, 400, "No data")
+    ctx.assert(reqBodyRaw.type === "json", 415, "Invalid content");
+    let reqBody;
+    try {
+      reqBody = await reqBodyRaw.value;
+    } catch (error) {
+      ctx.assert(false, 400, "Invalid JSON");
+    }
+    ctx.assert(reqBody, 400, "Data is empty");
+    ctx.assert(reqBody.interface, 400, "Interface is missing");
+    ctx.assert(reqBody.header, 400, "Header is missing");
+    ctx.assert(reqBody.body, 400, "Body is missing");
+    const result = await channelService.addDevice(id, dev, reqBody as ChannelDeviceParam);
+    ctx.assert(result, 500, "Unknown");
+    ctx.assert(typeof result !== "string", 400, result as string);
+    ctx.response.body = result;
+  },
+  async updateDevice(ctx:RouterContext<string>) {
+    const { id, dev } = helpers.getQuery(ctx, { mergeParams: true });
+    ctx.assert(isUuid(id), 400, "Invalid id");
+    const reqBodyRaw = await ctx.request.body();
+    ctx.assert(reqBodyRaw, 400, "No data")
+    ctx.assert(reqBodyRaw.type === "json", 415, "Invalid content");
+    let reqBody;
+    try {
+      reqBody = await reqBodyRaw.value;
+    } catch (error) {
+      ctx.assert(false, 400, "Invalid JSON");
+    }
+    ctx.assert(reqBody, 400, "Data is empty");
+    const result = await channelService.updateDevice(id, dev, reqBody as ChannelDeviceParam);
+    ctx.assert(result, 500, "Unknown");
+    ctx.assert(typeof result !== "string", 400, result as string);
+    ctx.assert(Object.keys(result).length > 0, 404, "");
+    ctx.response.body = result;
+  },
+  async deleteDevice(ctx:RouterContext<string>) {
+    const { id, dev } = helpers.getQuery(ctx, { mergeParams: true });
+    ctx.assert(isUuid(id), 400, "Invalid id");
+    const result = await channelService.deleteDevice(id, dev);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(Object.keys(result).length > 0, 404, "");
     ctx.response.body = result;

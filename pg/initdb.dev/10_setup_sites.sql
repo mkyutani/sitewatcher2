@@ -65,11 +65,13 @@ create table if not exists channel_site (
 
 create table if not exists channel_device (
   channel uuid not null references channel on delete cascade,
-  name varchar(256) not null,
+  device varchar(256) not null,
   interface varchar(256) not null,
+  header varchar(4096) not null,
+  body varchar(4096) not null,
   created timestamp not null,
   updated timestamp not null,
-  primary key(channel, name)
+  primary key(channel, device)
 );
 
 create table if not exists channel_history (

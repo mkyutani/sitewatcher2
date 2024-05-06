@@ -1,6 +1,6 @@
 import sql from "./db.ts"
 import { log } from "../deps.ts";
-import { ChannelDirectoryParam, ChannelParam, ChannelSiteParam } from "../model/channel.ts";
+import { ChannelDeviceParam, ChannelDirectoryParam, ChannelParam, ChannelSiteParam } from "../model/channel.ts";
 
 export const channelRepository = {
   async get(id: string) {
@@ -38,6 +38,14 @@ export const channelRepository = {
         from channel_site as cs
         inner join site as s on cs.site = s.id
         where cs.channel = ${id}
+      `
+
+      context.name = "channelRepository.get.getDevices";
+      channel.devices = await sql `
+        select
+          device, interface, header, body, created, updated
+        from channel_device
+        where channel = ${id}
       `
 
       return channel;
@@ -285,6 +293,82 @@ export const channelRepository = {
         return {};
       }
       return channel_sites[0];
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      log.error(`${context.name}:${id}:${description}`);
+      return null;
+    }
+  },
+  async addDevice(id: string, device_name: string, param: ChannelDeviceParam) {
+    const context = {
+      name: "channelRepository.addDevice"
+    };
+
+    const inf = param?.interface;
+    const header = param?.header;
+    const body = param?.body;
+    try {
+      const channel_devices = await sql `
+        insert
+        into channel_device (channel, device, interface, header, body, created, updated)
+        values (${id}, ${device_name}, ${inf}, ${header}, ${body}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
+        returning channel, device
+      `
+      return channel_devices[0];
+    } catch (error) {
+      if (error instanceof sql.PostgresError && parseInt(error.code, 10) == 23505) {
+          return "Duplicated";
+      } else {
+        const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}`;
+        log.error(`${context.name}:${description}`);
+        return null;
+      }
+    }
+  },
+  async updateDevice(id: string, device_name: string, param: ChannelDeviceParam) {
+    const context = {
+      name: "channelRepository.updateDevice"
+    };
+
+    const inf = param?.interface;
+    const header = param?.header;
+    const body = param?.body;
+    try {
+      const channel_devices = await sql `
+        update channel_device
+        set interface = ${inf ? inf : sql`interface`},
+          header = ${header ? header : sql`header`},
+          body = ${body ? body : sql`body`},
+          updated = current_timestamp at time zone 'UTC'
+        where channel = ${id} and device = ${device_name}
+        returning channel, device, interface, header, body, created, updated
+      `
+      if (channel_devices.length == 0) {
+        return {};
+      }
+      return channel_devices[0];
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}`;
+      log.error(`${context.name}:${id}:${description}`);
+      return null;
+    }
+  },
+  async deleteDevice(id: string, device_name: string) {
+    const context = {
+      name: "channelRepository.deleteDevice"
+    };
+
+    try {
+      const channel_devices = await sql `
+        delete
+        from channel_device
+        where channel = ${id} and device = ${device_name}
+        returning channel, device
+      `
+      if (channel_devices.length == 0) {
+        return {};
+      }
+      return channel_devices[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       log.error(`${context.name}:${id}:${description}`);

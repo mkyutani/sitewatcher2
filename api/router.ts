@@ -34,12 +34,10 @@ router.delete('/api/v1/channels/:id/directories/:dir', channelController.deleteD
 router.post('/api/v1/channels/:id/sites/:site', channelController.addSite);
 router.put('/api/v1/channels/:id/sites/:site', channelController.updateSite);
 router.delete('/api/v1/channels/:id/sites/:site', channelController.deleteSite);
-/*
 router.post('/api/v1/channels/:id/devices/:dev', channelController.addDevice);
-router.get('/api/v1/channels/:id/devices/:dev', channelController.getDevice);
-router.get('/api/v1/channels/:id/devices', channelController.getDevices);
 router.put('/api/v1/channels/:id/devices/:dev', channelController.updateDevice);
 router.delete('/api/v1/channels/:id/devices/:dev', channelController.deleteDevice);
+/*
 router.post('/api/v1/channels/:id/collect', channelController.collect);
 */
 router.post('/api/v1/channels', channelController.create);

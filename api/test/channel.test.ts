@@ -247,24 +247,17 @@ Deno.test("Channel", async (t) => {
     console.log(json);
   });
 
-  await t.step("200: List all channels and get channel directories (again)", async () => {
+  await t.step("200: Get a channel (again)", async () => {
     const id = channels[0];
-    const res = await fetch(`${urlBase}/channels`);
+    const res = await fetch(`${urlBase}/channels/${id}`);
     const text = await res.text();
     assertEquals(res.status, 200);
     const json = JSON.parse(text);
     console.log(json);
-    assertEquals(JSON.parse(text).length, 2);
-
-    const res2 = await fetch(`${urlBase}/channels/${id}`);
-    const text2 = await res2.text();
-    assertEquals(res2.status, 200);
-    const json2 = JSON.parse(text2);
-    console.log(json2);
-    assertEquals(json2.id, id);
+    assertEquals(json.id, id);
   });
 
-  Deno.test("200: Update a channel directory", async () => {
+  await t.step("200: Update a channel directory", async () => {
     const id = channels[0];
     const directory_id = directories["zebra"];
     const res = await fetch(`${urlBase}/channels/${id}/directories/${directory_id}`, {
@@ -302,24 +295,17 @@ Deno.test("Channel", async (t) => {
     console.log(json);
   });
 
-  await t.step("200: List all channels and get channel sites (again)", async () => {
+  await t.step("200: Get a channel (again)", async () => {
     const id = channels[0];
-    const res = await fetch(`${urlBase}/channels`);
+    const res = await fetch(`${urlBase}/channels/${id}`);
     const text = await res.text();
     assertEquals(res.status, 200);
     const json = JSON.parse(text);
     console.log(json);
-    assertEquals(JSON.parse(text).length, 2);
-
-    const res2 = await fetch(`${urlBase}/channels/${id}`);
-    const text2 = await res2.text();
-    assertEquals(res2.status, 200);
-    const json2 = JSON.parse(text2);
-    console.log(json2);
-    assertEquals(json2.id, id);
+    assertEquals(json.id, id);
   });
 
-  Deno.test("200: Update a channel site", async () => {
+  await t.step("200: Update a channel site", async () => {
     const id = channels[0];
     const site_id = sites["xenopus"];
     const res = await fetch(`${urlBase}/channels/${id}/sites/${site_id}`, {
@@ -331,6 +317,67 @@ Deno.test("Channel", async (t) => {
       headers: {
         "Content-Type": "application/json",
       }
+    });
+    const text = await res.text();
+    assertEquals(res.status, 200);
+    const json = JSON.parse(text);
+    console.log(json);
+  });
+
+  await t.step("200: Add a channel device", async () => {
+    const id = channels[0];
+    const device_name = "slack";
+    const res = await fetch(`${urlBase}/channels/${id}/devices/${device_name}`, {
+      method: "POST",
+      body: JSON.stringify({
+        interface: "api-key:slack-channel",
+        header: "${title}",
+        body: "${description}\n{source}"
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const text = await res.text();
+    assertEquals(res.status, 200);
+    const json = JSON.parse(text);
+    console.log(json);
+  });
+
+  await t.step("200: Get a channel (again)", async () => {
+    const id = channels[0];
+    const res = await fetch(`${urlBase}/channels/${id}`);
+    const text = await res.text();
+    assertEquals(res.status, 200);
+    const json = JSON.parse(text);
+    console.log(json);
+    assertEquals(json.id, id);
+  });
+
+  await t.step("200: Update a channel device", async () => {
+    const id = channels[0];
+    const device_name = "slack";
+    const res = await fetch(`${urlBase}/channels/${id}/devices/${device_name}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        header: "${title}",
+        body: "${description}\n{source}"
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
+    const text = await res.text();
+    assertEquals(res.status, 200);
+    const json = JSON.parse(text);
+    console.log(json);
+  });
+
+  await t.step("200: Delete channel device", async () => {
+    const id = channels[0];
+    const device_name = "slack";
+    const res = await fetch(`${urlBase}/channels/${id}/devices/${device_name}`, {
+      method: "DELETE"
     });
     const text = await res.text();
     assertEquals(res.status, 200);

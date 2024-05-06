@@ -11,3 +11,9 @@ export type ChannelSiteParam = {
   title: string | null,
   description: string | null
 };
+
+export type ChannelDeviceParam = {
+  interface: string | null,
+  header: string | null,
+  body: string | null
+};
