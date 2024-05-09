@@ -25,7 +25,7 @@ export const channelRepository = {
       context.name = "channelRepository.get.getDirectories";
       channel.directories = await sql `
         select
-          cd.directory, d.name as directory_name, cd.title, cd.description, cd.created, cd.updated
+          cd.directory as id, d.name as name, cd.title, cd.description, cd.created, cd.updated
         from channel_directory as cd
         inner join directory as d on cd.directory = d.id
         where cd.channel = ${id}
@@ -34,7 +34,7 @@ export const channelRepository = {
       context.name = "channelRepository.get.getSites";
       channel.sites = await sql `
         select
-          cs.site, s.name as site_name, cs.title, cs.description, cs.created, cs.updated
+          cs.site as id, s.name as name, cs.title, cs.description, cs.created, cs.updated
         from channel_site as cs
         inner join site as s on cs.site = s.id
         where cs.channel = ${id}
@@ -43,7 +43,7 @@ export const channelRepository = {
       context.name = "channelRepository.get.getDevices";
       channel.devices = await sql `
         select
-          device, interface, header, body, created, updated
+          device as name, interface, header, body, created, updated
         from channel_device
         where channel = ${id}
       `
@@ -67,12 +67,12 @@ export const channelRepository = {
     };
 
     try {
-      const directories = await sql `
+      const channels = await sql `
         select
           id, name
         from channel
       `
-      return directories;
+      return channels;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       log.error(`${context.name}:${description}`);
@@ -86,13 +86,13 @@ export const channelRepository = {
 
     const name = channelParam?.name;
     try {
-      const directories = await sql `
+      const channels = await sql `
         insert
         into channel (name,created, updated)
         values (${name}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
         returning id
       `
-      return directories[0];
+      return channels[0];
     } catch (error) {
       if (error instanceof sql.PostgresError && parseInt(error.code, 10) == 23505) {
           return "Duplicated";
@@ -110,17 +110,17 @@ export const channelRepository = {
 
     const name = param?.name;
     try {
-      const directories = await sql `
+      const channels = await sql `
         update channel
         set name = ${name ? name : sql`name`},
           updated = current_timestamp at time zone 'UTC'
         where id = ${id}
         returning id, name, created, updated
       `
-      if (directories.length == 0) {
+      if (channels.length == 0) {
         return {};
       }
-      return directories[0];
+      return channels[0];
     } catch (error) {
       if (error instanceof sql.PostgresError && parseInt(error.code, 10) == 23505) {
           return "Duplicated";
@@ -137,16 +137,16 @@ export const channelRepository = {
     };
 
     try {
-      const directories = await sql `
+      const channels = await sql `
         delete
         from channel
         where id = ${id}
         returning id
       `
-      if (directories.length == 0) {
+      if (channels.length == 0) {
         return {};
       }
-      return directories[0];
+      return channels[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       log.error(`${context.name}:${id}:${description}`);
