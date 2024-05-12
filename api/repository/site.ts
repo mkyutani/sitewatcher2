@@ -206,10 +206,9 @@ export const siteRepository = {
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       if (error instanceof sql.PostgresError) {
-        log.warning(`${context.name}:PG${error.code}:${error.message}`);
         switch (parseInt(error.code, 10)) {
         case 23505:
-          return "Duplicated";
+          return {}
         case 23503:
           return "Invalid directory id";
         }

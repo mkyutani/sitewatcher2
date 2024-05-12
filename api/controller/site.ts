@@ -85,7 +85,11 @@ export const siteController = {
     const result = await siteService.registerResource(id, reqBody as SiteResourceParam);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result);
-    ctx.response.body = result;
+    if (Object.keys(result).length === 0) {
+      ctx.response.body = null;
+    } else {
+      ctx.response.body = result;
+    }
   },
   async getAllResources(ctx: RouterContext<string>) {
     const { id } = helpers.getQuery(ctx, { mergeParams: true });
