@@ -48,5 +48,8 @@ export const channelService = {
   },
   async deleteDevice(id: string, device_name: string) {
     return await channelRepository.deleteDevice(id, device_name);
+  },
+  async collect(id: string) {
+    return await channelRepository.collect(id);
   }
 }
