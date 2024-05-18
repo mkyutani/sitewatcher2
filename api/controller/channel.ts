@@ -107,6 +107,10 @@ export const channelController = {
       ctx.assert(false, 400, "Invalid JSON");
     }
     ctx.assert(reqBody, 400, "Data is empty");
+    if (reqBody.priority) {
+      ctx.assert(!isNaN(reqBody.priority), 400, "Priority must be a number");
+      ctx.assert(reqBody.priority.length === 24, 400, "Priority must be a 24-digit number");
+    }
     const result = await channelService.updateDirectory(id, dir, reqBody as ChannelDirectoryParam);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result as string);
@@ -157,6 +161,10 @@ export const channelController = {
       ctx.assert(false, 400, "Invalid JSON");
     }
     ctx.assert(reqBody, 400, "Data is empty");
+    if (reqBody.priority) {
+      ctx.assert(!isNaN(reqBody.priority), 400, "Priority must be a number");
+      ctx.assert(reqBody.priority.length === 24, 400, "Priority must be a 24-digit number");
+    }
     const result = await channelService.updateSite(id, site, reqBody as ChannelSiteParam);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result as string);
