@@ -398,12 +398,12 @@ export const channelRepository = {
             from (
               select s.channel, r.uri, s.site, s.site_name, rpt.value as title, rpd.value as description
               from (
-                select cd.channel, s1.id, s1.id as site, s1.name as site_name, cd.title, cd.description, s1.priority
+                select cd.channel, s1.id, s1.id as site, s1.name as site_name, cd.title, cd.description, cd.priority
                 from channel_directory as cd
                 inner join site as s1 on s1.directory=cd.directory
                 where cd.channel=${id}
                 union
-                select cs.channel, s2.id, s2.id as site, s2.name as site_name, cs.title, cs.description, s2.priority
+                select cs.channel, s2.id, s2.id as site, s2.name as site_name, cs.title, cs.description, cs.priority
                 from channel_site as cs
                 inner join site as s2 on s2.id=cs.site
                 where cs.channel=${id}
