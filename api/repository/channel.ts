@@ -25,19 +25,21 @@ export const channelRepository = {
       context.name = "channelRepository.get.getDirectories";
       channel.directories = await sql `
         select
-          cd.directory as id, d.name as name, cd.title, cd.description, cd.created, cd.updated
+          cd.directory as id, d.name as name, cd.title, cd.description, cd.priority, cd.created, cd.updated
         from channel_directory as cd
         inner join directory as d on cd.directory = d.id
         where cd.channel = ${id}
+        order by cd.priority
       `
 
       context.name = "channelRepository.get.getSites";
       channel.sites = await sql `
         select
-          cs.site as id, s.name as name, cs.title, cs.description, cs.created, cs.updated
+          cs.site as id, s.name as name, cs.title, cs.description, cs.priority, cs.created, cs.updated
         from channel_site as cs
         inner join site as s on cs.site = s.id
         where cs.channel = ${id}
+        order by cs.priority
       `
 
       context.name = "channelRepository.get.getDevices";
@@ -163,8 +165,10 @@ export const channelRepository = {
     try {
       const channel_directories = await sql `
         insert
-        into channel_directory (channel, directory, title, description, created, updated)
-        values (${id}, ${directory_id}, ${title}, ${description}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
+        into channel_directory (channel, directory, title, description, priority, created, updated)
+        values (${id}, ${directory_id}, ${title}, ${description},
+          to_char(current_timestamp, 'YYYYMMDDHH24MMSSUS')||'0000',
+          current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
         returning channel, directory
       `
       return channel_directories[0];
@@ -185,11 +189,13 @@ export const channelRepository = {
 
     const title = param?.title;
     const description = param?.description;
+    const priority = param?.priority;
     try {
       const directories = await sql `
         update channel_directory
         set title = ${title ? title : sql`title`},
           description = ${description ? description : sql`description`},
+          priority = ${priority ? priority : sql`priority`},
           updated = current_timestamp at time zone 'UTC'
         where channel = ${id} and directory = ${directory_id}
         returning channel, directory, title, description, created, updated
@@ -236,8 +242,10 @@ export const channelRepository = {
     try {
       const channel_sites = await sql `
         insert
-        into channel_site (channel, site, title, description, created, updated)
-        values (${id}, ${site_id}, ${title}, ${description}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
+        into channel_site (channel, site, title, description, priority, created, updated)
+        values (${id}, ${site_id}, ${title}, ${description},
+          to_char(current_timestamp, 'YYYYMMDDHH24MMSSUS')||'0000',
+          current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
         returning channel, site
       `
       return channel_sites[0];
@@ -258,11 +266,13 @@ export const channelRepository = {
 
     const title = param?.title;
     const description = param?.description;
+    const priority = param?.priority;
     try {
       const channel_sites = await sql `
         update channel_site
         set title = ${title ? title : sql`title`},
           description = ${description ? description : sql`description`},
+          priority = ${priority ? priority : sql`priority`},
           updated = current_timestamp at time zone 'UTC'
         where channel = ${id} and site = ${site_id}
         returning channel, site, title, description, created, updated
@@ -388,12 +398,12 @@ export const channelRepository = {
             from (
               select s.channel, r.uri, s.site, s.site_name, rpt.value as title, rpd.value as description
               from (
-                select cd.channel, s1.id, s1.id as site, s1.name as site_name, cd.title, cd.description, s1.created as priority
+                select cd.channel, s1.id, s1.id as site, s1.name as site_name, cd.title, cd.description, s1.priority
                 from channel_directory as cd
                 inner join site as s1 on s1.directory=cd.directory
                 where cd.channel=${id}
                 union
-                select cs.channel, s2.id, s2.id as site, s2.name as site_name, cs.title, cs.description, s2.created as priority
+                select cs.channel, s2.id, s2.id as site, s2.name as site_name, cs.title, cs.description, s2.priority
                 from channel_site as cs
                 inner join site as s2 on s2.id=cs.site
                 where cs.channel=${id}

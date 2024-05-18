@@ -48,6 +48,7 @@ create table if not exists channel_directory (
   directory uuid not null references directory on delete cascade,
   title varchar(4096) not null,
   description varchar(4096) not null,
+  priority char(32) not null,
   created timestamp not null,
   updated timestamp not null,
   primary key(channel, directory)
@@ -58,6 +59,7 @@ create table if not exists channel_site (
   site uuid not null references site on delete cascade,
   title varchar(4096) not null,
   description varchar(4096) not null,
+  priority char(32) not null,
   created timestamp not null,
   updated timestamp not null,
   primary key(channel, site)
