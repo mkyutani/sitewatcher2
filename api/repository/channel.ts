@@ -382,34 +382,39 @@ export const channelRepository = {
 
     try {
       const history_items = await sql `
-        insert into channel_history (channel, uri, title, description, source, tm)
-          select ${id}, u.uri, u.name, u.title, u.site_name, current_timestamp
-          from (
-            select r.uri, s.site, s.site_name, rpn.value as name, rpt.value as title
+        with ch as (
+          insert into channel_history (channel, uri, title, description, source, tm)
+            select u.channel, u.uri, u.title, u.description, u.site_name, current_timestamp
             from (
-              select s1.id, s1.id as site, s1.name as site_name, s1.created as priority
-              from channel_directory as cd
-              inner join site as s1 on s1.directory=cd.directory
-              where cd.channel=${id}
-              union
-              select s2.id, s2.id as site, s2.name as site_name, s2.created as priority
-              from channel_site as cs
-              inner join site as s2 on s2.id=cs.site
-              where cs.channel=${id}
-            ) as s
-            inner join resource as r on r.site=s.id
-            inner join resource_property as rpn on rpn.resource=r.id and rpn.key='name'
-            inner join resource_property as rpt on rpt.resource=r.id and rpt.key='title'
-            order by s.priority
-          ) as u
-        where not exists (
-          select uri
-          from channel_history as ch
-          where u.uri = ch.uri
+              select s.channel, r.uri, s.site, s.site_name, rpt.value as title, rpd.value as description
+              from (
+                select cd.channel, s1.id, s1.id as site, s1.name as site_name, cd.title, cd.description, s1.created as priority
+                from channel_directory as cd
+                inner join site as s1 on s1.directory=cd.directory
+                where cd.channel=${id}
+                union
+                select cs.channel, s2.id, s2.id as site, s2.name as site_name, cs.title, cs.description, s2.created as priority
+                from channel_site as cs
+                inner join site as s2 on s2.id=cs.site
+                where cs.channel=${id}
+              ) as s
+              inner join resource as r on r.site=s.id
+              inner join resource_property as rpt on rpt.resource=r.id and rpt.key=s.title
+              inner join resource_property as rpd on rpd.resource=r.id and rpd.key=s.description
+              order by s.priority
+            ) as u
+          where not exists (
+            select uri
+            from channel_history as ch
+            where u.uri = ch.uri
+          )
+          on conflict do nothing
+          returning channel, uri, title, description, source, tm
         )
-        on conflict do nothing
-        returning channel, uri, title, description, source, tm
-      `
+        select ch.channel, c.name as channel_name, ch.uri, ch.title, ch.description, ch.source, ch.tm
+        from ch
+        inner join channel as c on c.id=ch.channel
+        `
       return history_items;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
