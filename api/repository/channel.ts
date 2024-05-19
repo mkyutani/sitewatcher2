@@ -393,22 +393,22 @@ export const channelRepository = {
     try {
       const history_items = await sql `
         with ch as (
-          insert into channel_history (channel, uri, resource, title, description, site_name, tm)
-            select u.channel, u.uri, u.source, u.title, u.description, u.site_name, current_timestamp
+          insert into channel_history (channel, uri, resource, title, description, tm)
+            select u.channel, u.uri, u.resource, u.title, u.description, current_timestamp
             from (
-              select s.channel, r.uri, s.site, s.site_name, r.id as source, rpt.value as title, rpd.value as description
+              select s.channel, r.uri, s.site, s.site_name, r.id as resource, rpt.value as title, rpd.value as description
               from (
                 select cd.channel, s1.id, s1.id as site, s1.name as site_name, cd.title, cd.description, cd.priority
                 from channel_directory as cd
-                inner join site as s1 on s1.directory=cd.directory
-                where cd.channel=${id}
+                inner join site as s1 on s1.directory = cd.directory
+                where cd.channel = ${id}
                 union
                 select cs.channel, s2.id, s2.id as site, s2.name as site_name, cs.title, cs.description, cs.priority
                 from channel_site as cs
-                inner join site as s2 on s2.id=cs.site
-                where cs.channel=${id}
+                inner join site as s2 on s2.id = cs.site
+                where cs.channel = ${id}
               ) as s
-              inner join resource as r on r.site=s.id
+              inner join resource as r on r.site = s.id
               inner join resource_property as rpt on rpt.resource=r.id and rpt.key=s.title
               inner join resource_property as rpd on rpd.resource=r.id and rpd.key=s.description
               order by s.priority
@@ -419,11 +419,14 @@ export const channelRepository = {
             where u.uri = ch.uri
           )
           on conflict do nothing
-          returning channel, uri, resource, title, description, site_name, tm
+          returning channel, uri, resource, title, description, tm
         )
-        select ch.channel, c.name as channel_name, ch.uri, ch.resource, ch.title, ch.description, ch.site_name, ch.tm
+        select ch.channel, c.name as channel_name, ch.resource, ch.uri, r.site, s.name as site_name, s.directory, d.name as directory_name, ch.title, ch.description, ch.tm
         from ch
-        inner join channel as c on c.id=ch.channel
+        inner join channel as c on c.id = ch.channel
+        inner join resource as r on r.id = ch.resource
+        inner join site as s on s.id = r.site
+        inner join directory as d on d.id = s.directory
         `
       return history_items;
     } catch (error) {
@@ -434,17 +437,38 @@ export const channelRepository = {
   },
   async getResources(id: string) {
     const context = {
-      name: "channelRepository.collectResources"
+      name: "channelRepository.getResources"
     };
 
     try {
       const history_items = await sql `
-        select ch.channel, c.name as channel_name, ch.uri, ch.resource, ch.title, ch.description, ch.site_name, ch.tm
+        select ch.channel, c.name as channel_name, ch.resource, ch.uri, s.id as site, s.name as site_name, d.id as directory, d.name as directory_name, ch.title, ch.description, ch.tm
         from channel_history as ch
-        inner join channel as c on c.id=ch.channel
-        where channel=${id}
+        inner join channel as c on c.id = ch.channel
+        inner join resource as r on r.id = ch.resource
+        inner join site as s on s.id = r.site
+        inner join directory as d on d.id = s.directory
+        where channel = ${id}
         order by tm desc
       `
+
+      for (const history_item of history_items) {
+        context.name = "channelRepository.getResources.collectKeyValues";
+        history_item.kv = await sql `
+          select r.key, r.value
+          from resource_property as r
+          where r.resource = ${history_item.resource}
+        `
+        history_item.kv.push({key: "_channel", value: history_item.channel});
+        history_item.kv.push({key: "_channel_name", value: history_item.channel_name});
+        history_item.kv.push({key: "_resource", value: history_item.resource});
+        history_item.kv.push({key: "_uri", value: history_item.uri});
+        history_item.kv.push({key: "_site", value: history_item.site});
+        history_item.kv.push({key: "_site_name", value: history_item.site_name});
+        history_item.kv.push({key: "_directory", value: history_item.directory});
+        history_item.kv.push({key: "_directory_name", value: history_item.directory_name});
+      }
+
       return history_items;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
