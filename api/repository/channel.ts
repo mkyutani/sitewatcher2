@@ -385,18 +385,18 @@ export const channelRepository = {
       return null;
     }
   },
-  async collect(id: string) {
+  async collectResources(id: string) {
     const context = {
-      name: "channelRepository.collect"
+      name: "channelRepository.collectResources"
     };
 
     try {
       const history_items = await sql `
         with ch as (
-          insert into channel_history (channel, uri, title, description, source, tm)
-            select u.channel, u.uri, u.title, u.description, u.site_name, current_timestamp
+          insert into channel_history (channel, uri, resource, title, description, site_name, tm)
+            select u.channel, u.uri, u.source, u.title, u.description, u.site_name, current_timestamp
             from (
-              select s.channel, r.uri, s.site, s.site_name, rpt.value as title, rpd.value as description
+              select s.channel, r.uri, s.site, s.site_name, r.id as source, rpt.value as title, rpd.value as description
               from (
                 select cd.channel, s1.id, s1.id as site, s1.name as site_name, cd.title, cd.description, cd.priority
                 from channel_directory as cd
@@ -419,12 +419,32 @@ export const channelRepository = {
             where u.uri = ch.uri
           )
           on conflict do nothing
-          returning channel, uri, title, description, source, tm
+          returning channel, uri, resource, title, description, site_name, tm
         )
-        select ch.channel, c.name as channel_name, ch.uri, ch.title, ch.description, ch.source, ch.tm
+        select ch.channel, c.name as channel_name, ch.uri, ch.resource, ch.title, ch.description, ch.site_name, ch.tm
         from ch
         inner join channel as c on c.id=ch.channel
         `
+      return history_items;
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      log.error(`${context.name}:${id}:${description}`);
+      return null;
+    }
+  },
+  async getResources(id: string) {
+    const context = {
+      name: "channelRepository.collectResources"
+    };
+
+    try {
+      const history_items = await sql `
+        select ch.channel, c.name as channel_name, ch.uri, ch.resource, ch.title, ch.description, ch.site_name, ch.tm
+        from channel_history as ch
+        inner join channel as c on c.id=ch.channel
+        where channel=${id}
+        order by tm desc
+      `
       return history_items;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
