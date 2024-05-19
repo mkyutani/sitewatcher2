@@ -442,8 +442,8 @@ export const channelRepository = {
         order by timestamp desc
       `
 
+      context.name = "channelRepository.getResources.collectKeyValues";
       for (const history_item of history_items) {
-        context.name = "channelRepository.getResources.collectKeyValues";
         history_item.kv = await sql `
           select r.key, r.value
           from resource_property as r
@@ -460,6 +460,30 @@ export const channelRepository = {
       }
 
       return history_items;
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      log.error(`${context.name}:${id}:${description}`);
+      return null;
+    }
+  },
+  async getTimestamps(id: string) {
+    const context = {
+      name: "channelRepository.getTimestamps"
+    };
+
+    try {
+      const timestamps = await sql `
+        select distinct ch.timestamp
+        from channel_history as ch
+        inner join channel as c on c.id = ch.channel
+        where ch.channel = ${id}
+        order by timestamp desc
+      `
+
+      return {
+        id: id,
+        timestamps: timestamps
+      };
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       log.error(`${context.name}:${id}:${description}`);

@@ -54,5 +54,8 @@ export const channelService = {
   },
   async getResources(id: string) {
     return await channelRepository.getResources(id);
+  },
+  async getTimestamps(id: string) {
+    return await channelRepository.getTimestamps(id);
   }
 }

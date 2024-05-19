@@ -39,6 +39,7 @@ router.put('/api/v1/channels/:id/devices/:dev', channelController.updateDevice);
 router.delete('/api/v1/channels/:id/devices/:dev', channelController.deleteDevice);
 router.post('/api/v1/channels/:id/resources', channelController.collectResources);
 router.get('/api/v1/channels/:id/resources', channelController.getResources);
+router.get('/api/v1/channels/:id/timestamps', channelController.getTimestamps);
 router.post('/api/v1/channels', channelController.create);
 router.get('/api/v1/channels/:id', channelController.get);
 router.get('/api/v1/channels', channelController.list);
