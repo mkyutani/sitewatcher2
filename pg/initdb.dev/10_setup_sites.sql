@@ -80,9 +80,7 @@ create table if not exists channel_history (
   channel uuid not null references channel on delete cascade,
   resource uuid not null references resource on delete cascade,
   uri varchar(4096) not null,
-  title varchar(4096) not null,
-  description varchar(4096) not null,
-  tm timestamp not null,
+  timestamp char(20) not null,
   primary key(channel, uri)
 );
 
