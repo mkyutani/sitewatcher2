@@ -473,10 +473,9 @@ export const channelRepository = {
 
     try {
       const timestamps = await sql `
-        select distinct ch.timestamp
-        from channel_history as ch
-        inner join channel as c on c.id = ch.channel
-        where ch.channel = ${id}
+        select distinct timestamp
+        from channel_history
+        where channel = ${id}
         order by timestamp desc
       `
 
