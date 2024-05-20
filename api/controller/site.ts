@@ -1,5 +1,5 @@
 import { RouterContext, helpers } from "../deps.ts";
-import { SiteParam, SiteResourceParam } from "../model/site.ts";
+import { SiteParam, SiteResourceParam, SiteRuleParam } from "../model/site.ts";
 import { siteService } from "../service/site.ts";
 import { convertToBoolean, convertToJson, isUuid } from "../util.ts";
 
@@ -98,5 +98,61 @@ export const siteController = {
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result);
     ctx.response.body = result;
+  },
+  async createRule(ctx:RouterContext<string>) {
+    const { id, name } = helpers.getQuery(ctx, { mergeParams: true });
+    ctx.assert(isUuid(id), 400, "Invalid id");
+    const reqBodyRaw = await ctx.request.body();
+    ctx.assert(reqBodyRaw.type === "json", 415, "Invalid content");
+    let reqBody;
+    try {
+      reqBody = await reqBodyRaw.value;
+    } catch (error) {
+      ctx.assert(false, 400, "Invalid JSON");
+    }
+    ctx.assert(reqBody, 400, "No data");
+    ctx.assert(reqBody.weight, 400, "Weight is missing");
+    ctx.assert(!isNaN(reqBody.weight), 400, "Invalid weight");
+    ctx.assert(reqBody.value, 400, "Value is missing");
+    const result = await siteService.createRule(id, name, reqBody as SiteRuleParam);
+    ctx.assert(result, 500, "Unknown");
+    ctx.assert(typeof result !== "string", 400, result);
+    ctx.response.body = result;
+  },
+  async getRules(ctx:RouterContext<string>) {
+    const { id, name } = helpers.getQuery(ctx, { mergeParams: true });
+    ctx.assert(isUuid(id), 400, "Invalid id");
+    const result = await siteService.getRules(id, name);
+    ctx.assert(result, 500, "Unknown");
+    ctx.assert(typeof result !== "string", 400, result);
+    ctx.response.body = result;
+  },
+  async updateRule(ctx:RouterContext<string>) {
+    const { id, name, weight } = helpers.getQuery(ctx, { mergeParams: true });
+    ctx.assert(isUuid(id), 400, "Invalid id");
+    const reqBodyRaw = await ctx.request.body();
+    ctx.assert(reqBodyRaw.type === "json", 415, "Invalid content");
+    let reqBody;
+    try {
+      reqBody = await reqBodyRaw.value;
+    } catch (error) {
+      ctx.assert(false, 400, "Invalid JSON");
+    }
+    ctx.assert(reqBody, 400, "No data");
+    if (reqBody.weight) {
+      ctx.assert(!isNaN(reqBody.weight), 400, "Invalid weight");
+    }
+    const result = await siteService.updateRule(id, name, weight, reqBody as SiteRuleParam);
+    ctx.assert(result, 500, "Unknown");
+    ctx.assert(typeof result !== "string", 400, result);
+    ctx.response.body = result;
+  },
+  async deleteRule(ctx:RouterContext<string>) {
+    const { id, name, weight } = helpers.getQuery(ctx, { mergeParams: true });
+    ctx.assert(isUuid(id), 400, "Invalid id");
+    const result = await siteService.deleteRule(id, name, weight);
+    ctx.assert(result, 500, "Unknown");
+    ctx.assert(typeof result !== "string", 400, result);
+    ctx.response.body = null;
   }
 }

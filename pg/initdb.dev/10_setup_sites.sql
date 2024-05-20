@@ -18,6 +18,18 @@ create table if not exists site (
   unique(uri)
 );
 
+create table if not exists site_rule (
+  id uuid default gen_random_uuid() not null,
+  site uuid not null references site on delete cascade,
+  name varchar(256) not null,
+  weight int not null,
+  value varchar(4096) not null,
+  created timestamp not null,
+  updated timestamp not null,
+  primary key(id),
+  unique(site, name, weight)
+);
+
 create table if not exists resource (
   id uuid default gen_random_uuid() not null,
   uri varchar(4096) not null,
@@ -82,24 +94,4 @@ create table if not exists channel_history (
   uri varchar(4096) not null,
   timestamp char(20) not null,
   primary key(channel, uri)
-);
-
-create table if not exists directory_metadata (
-  id uuid default gen_random_uuid() not null,
-  directory uuid not null references directory on delete cascade,
-  key varchar(256) not null,
-  value varchar(4096) not null,
-  created timestamp not null,
-  updated timestamp not null,
-  primary key(id)
-);
-
-create table if not exists site_metadata (
-  id uuid default gen_random_uuid() not null,
-  site uuid not null references site on delete cascade,
-  key varchar(256) not null,
-  value varchar(4096) not null,
-  created timestamp not null,
-  updated timestamp not null,
-  primary key(id)
 );

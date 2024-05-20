@@ -8,3 +8,8 @@ export type SiteResourceParam = {
   uri: string,
   properties: any,
 };
+
+export type SiteRuleParam = {
+  weight: number | null,
+  value: string | null,
+};

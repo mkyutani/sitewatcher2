@@ -1,4 +1,4 @@
-import { SiteParam, SiteResourceParam } from "../model/site.ts";
+import { SiteParam, SiteResourceParam, SiteRuleParam } from "../model/site.ts";
 import { siteRepository } from "../repository/site.ts";
 
 export const siteService = {
@@ -22,5 +22,17 @@ export const siteService = {
   },
   async getAllResources(site: string) {
     return await siteRepository.getAllResources(site);
+  },
+  async createRule(id: string, name: string, {...reqBody}: SiteRuleParam) {
+    return await siteRepository.createRule(id, name, reqBody);
+  },
+  async getRules(id: string, name: string) {
+    return await siteRepository.getRules(id, name);
+  },
+  async updateRule(id: string, name: string, weight: number, {...reqBody}: SiteRuleParam) {
+    return await siteRepository.updateRule(id, name, weight, reqBody);
+  },
+  async deleteRule(id: string, name: string, weight: number) {
+    return await siteRepository.deleteRule(id, name, weight);
   }
 }

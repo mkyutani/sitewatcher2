@@ -1,6 +1,6 @@
 import sql from "./db.ts"
 import { log } from "../deps.ts";
-import { SiteParam, SiteResourceParam } from "../model/site.ts";
+import { SiteParam, SiteResourceParam, SiteRuleParam } from "../model/site.ts";
 
 export const siteRepository = {
   async create(siteParam: SiteParam) {
@@ -51,15 +51,7 @@ export const siteRepository = {
         return {};
       }
 
-      const site = sites[0]
-
-      site.metadata = await sql`
-        select key, value
-        from site_metadata
-        where site = ${site.id}
-      `
-
-      return site;
+      return sites[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       if (error instanceof sql.PostgresError && error.code === "22P02") {
@@ -247,6 +239,118 @@ export const siteRepository = {
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       log.error(`${context.name}:${description}`);
+      return null;
+    }
+  },
+  async createRule(site: string, name: string, siteRuleParam: SiteRuleParam) {
+    const context = {
+      name: "siteResourceRepository.createRule"
+    };
+
+    const weight = siteRuleParam?.weight;
+    const value = siteRuleParam?.value;
+    try {
+      const site_rules = await sql `
+        insert
+        into site_rule (site, name, weight, value, created, updated)
+        values (${site}, ${name}, ${weight}, ${value}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
+        returning id
+      `
+      return site_rules[0];
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      if (error instanceof sql.PostgresError) {
+        log.warning(`${context.name}:PG${error.code}:${error.message}`);
+        switch (parseInt(error.code, 10)) {
+        case 23505:
+          return "Duplicated";
+        case 23503:
+          return "Invalid site id";
+        }
+      }
+      log.error(`${context.name}:${description}`);
+      return null;
+    }
+  },
+  async getRules(site: string, name: string) {
+    const context = {
+      name: "siteResourceRepository.createRule"
+    };
+
+    try {
+      const site_rules = await sql `
+        select
+          sr.id, sr.site, s.name as site_name, sr.name, sr.weight, sr.value, s.created, s.updated
+        from site_rule as sr
+        inner join site as s on sr.site = s.id
+        where sr.site = ${site} and sr.name = ${name}
+        order by sr.weight
+      `
+      return site_rules;
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      if (error instanceof sql.PostgresError && error.code === "22P02") {
+        log.warning(`${context.name}:${site}.${name}:${description}`);
+        return {};
+      }
+      log.error(`${context.name}:${site}.${name}:${description}`);
+      return null;
+    }
+  },
+  async updateRule(site: string, name: string, weight: number, siteRuleParam: SiteRuleParam) {
+    const context = {
+      name: "siteResourceRepository.createRule"
+    };
+
+    const new_weight = siteRuleParam?.weight;
+    const value = siteRuleParam?.value;
+    try {
+      const site_rules = await sql `
+        update site
+        set weight = ${weight ? weight : sql`weight`},
+          value = ${value ? value : sql`value`},
+          updated = current_timestamp at time zone 'UTC'
+        where site = ${site} and name = ${name} and weight = ${weight}
+        returning id, site, name, weight, value, created, updated
+      `
+      if (site_rules.length == 0) {
+        return {};
+      }
+      return site_rules[0];
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      if (error instanceof sql.PostgresError) {
+        log.warning(`${context.name}:PG${error.code}:${error.message}`);
+        switch (parseInt(error.code, 10)) {
+        case 23505:
+          return "Duplicated";
+        case 23503:
+          return "Invalid site id";
+          }
+      }
+      log.error(`${context.name}:${site}.${name}.${weight}:${description}`);
+      return null;
+    }
+  },
+  async deleteRule(site: string, name: string, weight: number) {
+    const context = {
+      name: "siteResourceRepository.createRule"
+    };
+
+    try {
+      const site_rules = await sql `
+        delete
+        from site_rule
+        where site = ${site} and name = ${name} and weight = ${weight}
+        returning id
+      `
+      if (site_rules.length == 0) {
+        return {};
+      }
+      return site_rules[0];
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      log.error(`${context.name}:${site}.${name}.${weight}:${description}`);
       return null;
     }
   }

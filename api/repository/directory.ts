@@ -22,13 +22,6 @@ export const directoryRepository = {
 
       const directory = directories[0];
 
-      context.name = "directoryRepository.get.getMetadata";
-      directory.metadata = await sql`
-        select key, value
-        from directory_metadata
-        where directory = ${directory.id}
-      `
-
       context.name = "directoryRepository.get.getSites";
       directory.sites = await sql `
         select
@@ -37,16 +30,6 @@ export const directoryRepository = {
         inner join directory as d on s.directory = d.id
         where s.directory = ${directory.id}
       `
-
-      context.name = "directoryRepository.get.getSiteMetadata";
-      for (const site of directory.sites) {
-        const data = await sql`
-          select key, value
-          from site_metadata
-          where site = ${site.id}
-        `
-        site.metadata = data;
-      }
 
       return directory;
     } catch (error) {
