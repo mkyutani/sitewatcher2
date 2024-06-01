@@ -13,7 +13,7 @@ router.delete('/api/v1/directories/:id', directoryController.delete);
 
 router.post('/api/v1/sites/:id/rules/:name', siteController.createRule);
 router.put('/api/v1/sites/:id/rules/:name/:weight', siteController.updateRule);
-router.get('/api/v1/sites/:id/rules/:name', siteController.getRules);
+router.get('/api/v1/sites/:id/rules', siteController.getRules);
 router.delete('/api/v1/sites/:id/rules/:name/:weight', siteController.deleteRule);
 router.post('/api/v1/sites/:id/resources', siteController.registerResource);
 router.get('/api/v1/sites/:id/resources', siteController.getAllResources);

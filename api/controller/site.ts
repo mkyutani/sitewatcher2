@@ -120,9 +120,9 @@ export const siteController = {
     ctx.response.body = result;
   },
   async getRules(ctx:RouterContext<string>) {
-    const { id, name } = helpers.getQuery(ctx, { mergeParams: true });
+    const { id } = helpers.getQuery(ctx, { mergeParams: true });
     ctx.assert(isUuid(id), 400, "Invalid id");
-    const result = await siteService.getRules(id, name);
+    const result = await siteService.getRules(id);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result);
     ctx.response.body = result;

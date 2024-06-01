@@ -272,7 +272,7 @@ export const siteRepository = {
       return null;
     }
   },
-  async getRules(site: string, name: string) {
+  async getRules(site: string) {
     const context = {
       name: "siteResourceRepository.createRule"
     };
@@ -283,17 +283,17 @@ export const siteRepository = {
           sr.id, sr.site, s.name as site_name, sr.name, sr.weight, sr.value, s.created, s.updated
         from site_rule as sr
         inner join site as s on sr.site = s.id
-        where sr.site = ${site} and sr.name = ${name}
-        order by sr.weight
+        where sr.site = ${site}
+        order by sr.name, sr.weight
       `
       return site_rules;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       if (error instanceof sql.PostgresError && error.code === "22P02") {
-        log.warning(`${context.name}:${site}.${name}:${description}`);
+        log.warning(`${context.name}:${site}:${description}`);
         return {};
       }
-      log.error(`${context.name}:${site}.${name}:${description}`);
+      log.error(`${context.name}:${site}:${description}`);
       return null;
     }
   },
