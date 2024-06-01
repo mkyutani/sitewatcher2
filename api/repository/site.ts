@@ -141,23 +141,66 @@ export const siteRepository = {
   },
   async registerResource(site: string, siteResourceParam: SiteResourceParam) {
     const context = {
-      name: "siteResourceRepository.create"
+      name: "siteResourceRepository.registerResource"
     };
 
     const uri = siteResourceParam?.uri;
     const properties = siteResourceParam?.properties;
 
-    context.name = "siteResourceRepository.create.map"
-    const properties_kv = Object.keys(properties).map(key => {
-      return {
-        key: key,
-        value: properties[key]
-      };
-    });
-
     try {
+      context.name = "siteResourceRepository.registerResource.getRules"
+      const match_rules = await sql `
+        select
+          weight, value
+        from site_rule
+        where site = ${site} and name = 'match'
+        order by weight
+      `
+
+      context.name = "siteResourceRepository.registerResource.testToMatchRules"
+      let result = true;
+      for (const match_rule of match_rules) {
+        const rule = {
+          sep_index: 0,
+          var: "",
+          op: "+",
+          val: ""
+        };
+        rule.sep_index = match_rule.value.indexOf(":");
+        rule.var = match_rule.value.slice(0, rule.sep_index);
+        rule.val = match_rule.value.slice(rule.sep_index + 1);
+        if (rule.val[0] === "+") {
+          rule.op = "+";
+          rule.val = rule.val.slice(1);
+        } else if (rule.val[0] === "-") {
+            rule.op = "-";
+          rule.val = rule.val.slice(1);
+        }
+        if (rule.op === "+" && !properties[rule.var].match(rule.val)) {
+          log.info(`${context.name}:fail:${rule.op}:${properties[rule.var]}:${rule.val}:${properties[rule.var].match(rule.val)}`);
+          result = false;
+          break;
+        } else if (rule.op === "-" && properties[rule.var].match(rule.val)) {
+          log.info(`${context.name}:fail:${rule.op}:${properties[rule.var]}:${rule.val}:${properties[rule.var].match(rule.val)}`);
+          result = false;
+          break;
+        }
+      }
+      if (!result) {
+        return {};
+      }
+
+      context.name = "siteResourceRepository.registerResource.map"
+      const properties_kv = Object.keys(properties).map(key => {
+        return {
+          key: key,
+          value: properties[key]
+        };
+      });
+
+      context.name = "siteResourceRepository.registerResource.startTransaction"
       const resource = await sql.begin(async sql => {
-        context.name = "siteResourceRepository.create.insertResource"
+        context.name = "siteResourceRepository.registerResource.insertResource"
         const new_resources = await sql`
           insert
           into resource (uri, site, tm)
@@ -166,7 +209,7 @@ export const siteRepository = {
         `
         const new_resource = new_resources[0];
 
-        context.name = `siteResourceRepository.create.insertProperty`
+        context.name = `siteResourceRepository.registerResource.insertProperty`
         properties_kv.forEach(async (property) => {
           await sql`
             insert
@@ -176,7 +219,7 @@ export const siteRepository = {
           `
         });
 
-        context.name = `siteResourceRepository.create.getSiteName`
+        context.name = `siteResourceRepository.registerResource.getSiteName`
         const site_names = await sql`
           select name
           from site
