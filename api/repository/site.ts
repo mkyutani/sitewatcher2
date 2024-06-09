@@ -146,7 +146,6 @@ export const siteRepository = {
 
     const uri = siteResourceParam?.uri;
     const properties = siteResourceParam?.properties;
-    properties._uri = uri;
 
     try {
       context.name = "siteResourceRepository.registerResource.getRules"
