@@ -146,48 +146,58 @@ export const siteRepository = {
 
     const uri = siteResourceParam?.uri;
     const properties = siteResourceParam?.properties;
+    properties._uri = uri;
 
     try {
       context.name = "siteResourceRepository.registerResource.getRules"
-      const match_rules = await sql `
+      const excluding_rules = await sql `
         select
           weight, value
         from site_rule
-        where site = ${site} and name = 'match'
+        where site = ${site} and category = (select id from site_rule_category where name = 'exclude')
+        order by weight
+      `
+
+      const including_rules = await sql `
+        select
+          weight, value
+        from site_rule
+        where site = ${site} and category = (select id from site_rule_category where name = 'include')
         order by weight
       `
 
       context.name = "siteResourceRepository.registerResource.testToMatchRules"
-      let result = true;
-      for (const match_rule of match_rules) {
-        const rule = {
-          sep_index: 0,
-          var: "",
-          op: "+",
-          val: ""
-        };
-        rule.sep_index = match_rule.value.indexOf(":");
-        rule.var = match_rule.value.slice(0, rule.sep_index);
-        rule.val = match_rule.value.slice(rule.sep_index + 1);
-        if (rule.val[0] === "+") {
-          rule.op = "+";
-          rule.val = rule.val.slice(1);
-        } else if (rule.val[0] === "-") {
-            rule.op = "-";
-          rule.val = rule.val.slice(1);
+      if (excluding_rules.length > 0) {
+        for (const match_rule of excluding_rules) {
+          const rule_sep_index = match_rule.value.indexOf(":");
+          const rule_var = match_rule.value.slice(0, rule_sep_index);
+          const rule_val = match_rule.value.slice(rule_sep_index + 1);
+          const rule_re = new RegExp(rule_val);
+          if (properties[rule_var] && rule_re.test(properties[rule_var])) {
+            log.info(`${context.name}:excluded-by:${rule_val}:${properties[rule_var]}`);
+            return {};
+          }
         }
-        if (rule.op === "+" && !properties[rule.var].match(rule.val)) {
-          log.info(`${context.name}:fail:${rule.op}:${properties[rule.var]}:${rule.val}:${properties[rule.var].match(rule.val)}`);
-          result = false;
-          break;
-        } else if (rule.op === "-" && properties[rule.var].match(rule.val)) {
-          log.info(`${context.name}:fail:${rule.op}:${properties[rule.var]}:${rule.val}:${properties[rule.var].match(rule.val)}`);
-          result = false;
-          break;
-        }
+        log.info(`${context.name}:NOT-excluded-by:${properties['name']}`);
       }
-      if (!result) {
-        return {};
+
+      if (including_rules.length > 0) {
+        let result = false;
+        for (const match_rule of including_rules) {
+          const rule_sep_index = match_rule.value.indexOf(":");
+          const rule_var = match_rule.value.slice(0, rule_sep_index);
+          const rule_val = match_rule.value.slice(rule_sep_index + 1);
+          const rule_re = new RegExp(rule_val);
+          if (properties[rule_var] && rule_re.test(properties[rule_var])) {
+            log.info(`${context.name}:included-by:${rule_val}:${properties[rule_var]}`);
+            result = true;
+            break;
+          }
+        }
+        if (!result) {
+          log.info(`${context.name}:NOT-included-by:${properties['name']}`);
+          return {};
+        }
       }
 
       context.name = "siteResourceRepository.registerResource.map"
@@ -295,8 +305,8 @@ export const siteRepository = {
     try {
       const site_rules = await sql `
         insert
-        into site_rule (site, name, weight, value, created, updated)
-        values (${site}, ${name}, ${weight}, ${value}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
+        into site_rule (site, category, weight, value, created, updated)
+        values (${site}, (select id from site_rule_category where name=${name}), ${weight}, ${value}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
         returning id
       `
       return site_rules[0];
@@ -323,11 +333,12 @@ export const siteRepository = {
     try {
       const site_rules = await sql `
         select
-          sr.id, sr.site, s.name as site_name, sr.name, sr.weight, sr.value, s.created, s.updated
+          sr.id, sr.site, s.name as site_name, src.name as rule_category_name, sr.weight, sr.value, s.created, s.updated
         from site_rule as sr
         inner join site as s on sr.site = s.id
+        inner join site_rule_category as src on sr.category = src.id
         where sr.site = ${site}
-        order by sr.name, sr.weight
+        order by src.name, sr.weight
       `
       return site_rules;
     } catch (error) {
@@ -349,12 +360,13 @@ export const siteRepository = {
     const value = siteRuleParam?.value;
     try {
       const site_rules = await sql `
-        update site
+        update site_rule as sr
         set weight = ${weight ? weight : sql`weight`},
           value = ${value ? value : sql`value`},
           updated = current_timestamp at time zone 'UTC'
-        where site = ${site} and name = ${name} and weight = ${weight}
-        returning id, site, name, weight, value, created, updated
+        from site_rule_category as src
+        where sr.site = ${site} and sr.category = src.id and src.name = ${name} and sr.weight = ${weight}
+        returning sr.id, sr.site, src.name, sr.weight, sr.value, sr.created, sr.updated
       `
       if (site_rules.length == 0) {
         return {};
@@ -384,7 +396,7 @@ export const siteRepository = {
       const site_rules = await sql `
         delete
         from site_rule
-        where site = ${site} and name = ${name} and weight = ${weight}
+        where site = ${site} and category = (select id from site_rule_category where name = ${name}) and weight = ${weight}
         returning id
       `
       if (site_rules.length == 0) {

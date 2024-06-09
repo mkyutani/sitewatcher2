@@ -18,16 +18,28 @@ create table if not exists site (
   unique(uri)
 );
 
+create table if not exists site_rule_category (
+  id int not null,
+  name varchar(256) not null,
+  description varchar(4096) not null,
+  primary key(id),
+  unique(name)
+);
+insert into site_rule_category (id, name, description)
+values
+  (1, 'include', 'includes site resources'),
+  (2, 'exclude', 'excludes site resources');
+
 create table if not exists site_rule (
   id uuid default gen_random_uuid() not null,
   site uuid not null references site on delete cascade,
-  name varchar(256) not null,
+  category int not null references site_rule_category on delete cascade,
   weight int not null,
   value varchar(4096) not null,
   created timestamp not null,
   updated timestamp not null,
   primary key(id),
-  unique(site, name, weight)
+  unique(site, category, weight)
 );
 
 create table if not exists resource (
