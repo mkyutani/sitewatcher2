@@ -50,6 +50,14 @@ export const channelRepository = {
         where channel = ${id}
       `
 
+      context.name = "channelRepository.get.getTimestamps";
+      channel.timestamps = await sql `
+        select distinct timestamp
+        from channel_history
+        where channel = ${id}
+        order by timestamp
+      `
+
       return channel;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}`
@@ -460,29 +468,6 @@ export const channelRepository = {
       }
 
       return history_items;
-    } catch (error) {
-      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`${context.name}:${id}:${description}`);
-      return null;
-    }
-  },
-  async getTimestamps(id: string) {
-    const context = {
-      name: "channelRepository.getTimestamps"
-    };
-
-    try {
-      const timestamps = await sql `
-        select distinct timestamp
-        from channel_history
-        where channel = ${id}
-        order by timestamp desc
-      `
-
-      return {
-        id: id,
-        timestamps: timestamps
-      };
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       log.error(`${context.name}:${id}:${description}`);
