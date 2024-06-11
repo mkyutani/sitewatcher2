@@ -175,7 +175,7 @@ export const channelRepository = {
         insert
         into channel_directory (channel, directory, title, description, priority, created, updated)
         values (${id}, ${directory_id}, ${title}, ${description},
-          to_char(current_timestamp, 'YYYYMMDDHH24MMSSUS')||'0000',
+          to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MMSSUS')||'0000',
           current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
         returning channel, directory
       `
@@ -252,7 +252,7 @@ export const channelRepository = {
         insert
         into channel_site (channel, site, title, description, priority, created, updated)
         values (${id}, ${site_id}, ${title}, ${description},
-          to_char(current_timestamp, 'YYYYMMDDHH24MMSSUS')||'0000',
+          to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MMSSUS')||'0000',
           current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
         returning channel, site
       `
@@ -401,7 +401,7 @@ export const channelRepository = {
     try {
       const history_items = await sql `
         insert into channel_history (channel, uri, resource, timestamp)
-          select u.channel, u.uri, u.resource, to_char(current_timestamp, 'YYYYMMDDHH24MMSSUS')
+          select u.channel, u.uri, u.resource, to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MMSSUS')
           from (
             select s.channel, r.uri, s.site, s.site_name, r.id as resource
             from (

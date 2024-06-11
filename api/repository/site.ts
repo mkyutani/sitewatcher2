@@ -212,13 +212,14 @@ export const siteRepository = {
         context.name = "siteResourceRepository.registerResource.insertResource"
         const new_resources = await sql`
           insert
-          into resource (uri, site, tm)
-          values (${uri}, ${site}, current_timestamp at time zone 'UTC')
-          returning id, uri, site, tm
+          into resource (uri, site, timestamp)
+          values (${uri}, ${site}, to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MMSSUS'))
+          returning id, uri, site, timestamp
         `
         const new_resource = new_resources[0];
 
         context.name = `siteResourceRepository.registerResource.insertProperty`
+        properties_kv.push({ key: "timestamp", value: new_resource.timestamp });
         properties_kv.forEach(async (property) => {
           await sql`
             insert
@@ -241,7 +242,7 @@ export const siteRepository = {
           uri: new_resource.uri,
           site: new_resource.site,
           site_name: site_name.name,
-          tm: new_resource.tm,
+          timestamp: new_resource.timestamp,
           properties: properties_kv
         };
       });
@@ -270,7 +271,7 @@ export const siteRepository = {
       context.name = "siteResourceRepository.getAll.getResources";
       const resources = await sql `
         select
-          r.id, r.uri, r.site, s.name as site_name, r.tm
+          r.id, r.uri, r.site, s.name as site_name, r.timestamp
         from resource as r
         inner join site as s on r.site = s.id
         where r.site = ${site}
