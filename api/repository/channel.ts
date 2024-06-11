@@ -465,6 +465,7 @@ export const channelRepository = {
         history_item.kv.push({key: "_site_name", value: history_item.site_name});
         history_item.kv.push({key: "_directory", value: history_item.directory});
         history_item.kv.push({key: "_directory_name", value: history_item.directory_name});
+        history_item.kv.push({key: "_timestamp", value: history_item.timestamp});
       }
 
       return history_items;
