@@ -35,16 +35,6 @@ export const channelController = {
     ctx.assert(typeof result !== "string", 400, result as string);
     ctx.response.body = result;
   },
-/*
-  async getResources(ctx:RouterContext<string>) {
-    const { id, last } = helpers.getQuery(ctx, { mergeParams: true });
-    ctx.assert(isUuid(id), 400, "Invalid id");
-    const last_position = last ? last : 0;
-    const result = await channelService.getResources(id, last_position);
-    ctx.assert(result, 500, "Unknown");
-    ctx.response.body = result;
-  },
-*/
   async update(ctx:RouterContext<string>) {
     const { id } = helpers.getQuery(ctx, { mergeParams: true });
     ctx.assert(isUuid(id), 400, "Invalid id");

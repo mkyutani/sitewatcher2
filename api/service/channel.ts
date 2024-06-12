@@ -11,11 +11,6 @@ export const channelService = {
   async list() {
     return await channelRepository.list();
   },
-/*
-  async getResources(id: string, last: number) {
-    return await channelRepository.getResources(id, last);
-  },
-*/
   async update(id: string, {...reqBody}: ChannelParam) {
     return await channelRepository.update(id, reqBody as ChannelParam);
   },
