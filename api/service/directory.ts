@@ -11,9 +11,6 @@ export const directoryService = {
   async list() {
     return await directoryRepository.list();
   },
-  async getResources(id: string, last: number) {
-    return await directoryRepository.getResources(id, last);
-  },
   async update(id: string, {...reqBody}: DirectoryParam) {
     return await directoryRepository.update(id, reqBody as DirectoryParam);
   },

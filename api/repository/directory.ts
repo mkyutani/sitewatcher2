@@ -62,47 +62,6 @@ export const directoryRepository = {
       return null;
     }
   },
-  async getResources(id: string, last: number) {
-    const context = {
-      name: "directoryRepository.getResources"
-    };
-
-    try {
-      const resources = await sql `
-        select
-          s.directory, d.name as directory_name, s.id as site, s.name as site_name, s.uri as site_uri,
-          u.id, u.uri, u.name, u.reason, u.section1, u.section2, u.section3, u.section4, u.section5, u.section6, u.tm as time
-        from site as s
-        inner join directory as d
-        on s.directory = d.id
-        inner join (
-          select
-            r.id, r.uri, r.name, r.reason, r.section1, r.section2, r.section3, r.section4, r.section5, r.section6, r.tm, r.site
-          from site_resource as r
-          inner join (
-            select uri, max(id) as id
-            from site_resource
-            where id > ${last}
-            group by uri
-          ) as g
-          on r.id = g.id
-        ) as u
-        on s.id = u.site
-        where s.directory = ${id};
-      `
-      return resources;
-    } catch (error) {
-      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      if (error instanceof sql.PostgresError && error.code === "22P02") {
-        // Ignore invalid uuid
-        log.warning(`${context.name}:${id}:${description}`);
-        return null;
-      } else {
-        log.error(`${context.name}:${id}:${description}`);
-        return null;
-      }
-    }
-  },
   async create(DirectoryParam: DirectoryParam) {
     const context = {
       name: "directoryRepository.create"
