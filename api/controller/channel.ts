@@ -184,8 +184,9 @@ export const channelController = {
     }
     ctx.assert(reqBody, 400, "Data is empty");
     ctx.assert(reqBody.interface, 400, "Interface is missing");
-    ctx.assert(reqBody.header, 400, "Header is missing");
-    ctx.assert(reqBody.body, 400, "Body is missing");
+    ctx.assert(reqBody.tag, 400, "API key is missing");
+    ctx.assert(reqBody.tag, 400, "Tag is missing");
+    ctx.assert(reqBody.template, 400, "Template is missing");
     const result = await channelService.addDevice(id, dev, reqBody as ChannelDeviceParam);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result as string);

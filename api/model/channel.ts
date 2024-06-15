@@ -16,6 +16,7 @@ export type ChannelSiteParam = {
 
 export type ChannelDeviceParam = {
   interface: string | null,
-  header: string | null,
-  body: string | null
+  apikey: string | null,
+  tag: string | null,
+  template: string | null
 };

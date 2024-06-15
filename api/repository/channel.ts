@@ -45,7 +45,7 @@ export const channelRepository = {
       context.name = "channelRepository.get.getDevices";
       channel.devices = await sql `
         select
-          device as name, interface, header, body, created, updated
+          name, interface, apikey, tag, template, created, updated
         from channel_device
         where channel = ${id}
       `
@@ -323,14 +323,15 @@ export const channelRepository = {
     };
 
     const inf = param?.interface;
-    const header = param?.header;
-    const body = param?.body;
+    const tag = param?.tag;
+    const apikey = param?.apikey;
+    const template = param?.template;
     try {
       const channel_devices = await sql `
         insert
-        into channel_device (channel, device, interface, header, body, created, updated)
-        values (${id}, ${device_name}, ${inf}, ${header}, ${body}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
-        returning channel, device
+        into channel_device (channel, name, interface, tag, apikey, template, created, updated)
+        values (${id}, ${device_name}, ${inf}, ${tag}, ${apikey}, ${template}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
+        returning channel, name
       `
       return channel_devices[0];
     } catch (error) {
@@ -349,17 +350,19 @@ export const channelRepository = {
     };
 
     const inf = param?.interface;
-    const header = param?.header;
-    const body = param?.body;
+    const tag = param?.tag;
+    const apikey = param?.apikey;
+    const template = param?.template;
     try {
       const channel_devices = await sql `
         update channel_device
         set interface = ${inf ? inf : sql`interface`},
-          header = ${header ? header : sql`header`},
-          body = ${body ? body : sql`body`},
+          tag = ${tag ? tag : sql`tag`},
+          apikey = ${apikey ? apikey : sql`apikey`},
+          template = ${template ? template : sql`template`},
           updated = current_timestamp at time zone 'UTC'
-        where channel = ${id} and device = ${device_name}
-        returning channel, device, interface, header, body, created, updated
+        where channel = ${id} and name = ${device_name}
+        returning channel, name, interface, tag, apikey, template, created, updated
       `
       if (channel_devices.length == 0) {
         return {};
@@ -380,8 +383,8 @@ export const channelRepository = {
       const channel_devices = await sql `
         delete
         from channel_device
-        where channel = ${id} and device = ${device_name}
-        returning channel, device
+        where channel = ${id} and name = ${device_name}
+        returning channel, name
       `
       if (channel_devices.length == 0) {
         return {};

@@ -90,14 +90,23 @@ create table if not exists channel_site (
 );
 
 create table if not exists channel_device (
+  id uuid default gen_random_uuid() not null,
   channel uuid not null references channel on delete cascade,
-  device varchar(256) not null,
+  name varchar(256) not null,
   interface varchar(256) not null,
-  header varchar(4096) not null,
-  body varchar(4096) not null,
+  apikey varchar(256) not null,
+  tag varchar(256) not null,
+  template varchar(4096) not null,
   created timestamp not null,
   updated timestamp not null,
-  primary key(channel, device)
+  primary key(id),
+  unique(channel, name)
+);
+
+create table if not exists channel_device_log (
+  device uuid not null references channel_device on delete cascade,
+  timestamp char(20) not null,
+  primary key(device, timestamp)
 );
 
 create table if not exists channel_history (

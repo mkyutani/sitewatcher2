@@ -330,9 +330,10 @@ Deno.test("Channel", async (t) => {
     const res = await fetch(`${urlBase}/channels/${id}/devices/${device_name}`, {
       method: "POST",
       body: JSON.stringify({
-        interface: "api-key:slack-channel",
-        header: "${title}",
-        body: "${description}\n{source}"
+        interface: "slack",
+        apikey: "xoxb-000000000000-000000000000-000000000000-000000000000",
+        tag: "#slack-channel",
+        template: "${description}\n{source}"
       }),
       headers: {
         "Content-Type": "application/json",
@@ -360,8 +361,7 @@ Deno.test("Channel", async (t) => {
     const res = await fetch(`${urlBase}/channels/${id}/devices/${device_name}`, {
       method: "PUT",
       body: JSON.stringify({
-        header: "${title}",
-        body: "${description}\n{source}"
+        template: "${title}\n${description}\n{source}"
       }),
       headers: {
         "Content-Type": "application/json",
