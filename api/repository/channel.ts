@@ -175,7 +175,7 @@ export const channelRepository = {
         insert
         into channel_directory (channel, directory, title, description, priority, created, updated)
         values (${id}, ${directory_id}, ${title}, ${description},
-          to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MMSSUS')||'0000',
+          to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MISSUS')||'0000',
           current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
         returning channel, directory
       `
@@ -252,7 +252,7 @@ export const channelRepository = {
         insert
         into channel_site (channel, site, title, description, priority, created, updated)
         values (${id}, ${site_id}, ${title}, ${description},
-          to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MMSSUS')||'0000',
+          to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MISSUS')||'0000',
           current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
         returning channel, site
       `
@@ -404,7 +404,7 @@ export const channelRepository = {
     try {
       const history_items = await sql `
         insert into channel_history (channel, uri, resource, timestamp)
-          select u.channel, u.uri, u.resource, to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MMSSUS')
+          select u.channel, u.uri, u.resource, to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MISSUS')
           from (
             select s.channel, r.uri, s.site, s.site_name, r.id as resource
             from (
@@ -429,6 +429,79 @@ export const channelRepository = {
         on conflict do nothing
         returning channel, uri, resource, timestamp
       `
+      return history_items;
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      log.error(`${context.name}:${id}:${description}`);
+      return null;
+    }
+  },
+  async getResourcesByDevice(id: string, device_name: string) {
+    const context = {
+      name: "channelRepository.getResourcesByDevice"
+    };
+
+    try {
+      const history_items = await sql.begin(async sql => {
+        context.name = "channelRepository.getResourcesByDevice.getDevice";
+        const channel_devices = await sql `
+          select id
+          from channel_device
+          where channel = ${id} and name = ${device_name}
+        `
+        const channel_device_id = channel_devices[0].id;
+
+        context.name = "channelRepository.getResourcesByDevice.getLastTimestamp";
+        const device_log_timestamps = await sql `
+          select max(timestamp) as timestamp
+          from channel_device_log
+          where device = ${channel_device_id}
+        `
+
+        context.name = "channelRepository.getResourcesByDevice.setLastTimestamp";
+        const updated_timestamps = await sql `
+          insert into channel_device_log (device, timestamp)
+          values (${channel_device_id}, to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MISSUS'))
+        `
+
+        if (device_log_timestamps.length === 0) {
+          return [];
+        } else {
+          const last_timestamp = device_log_timestamps[0].timestamp;
+          context.name = "channelRepository.getResourcesByDevice.getLatestResources";
+          const history_items = await sql `
+            select ch.channel, c.name as channel_name, ch.resource, ch.uri, s.id as site, s.name as site_name, d.id as directory, d.name as directory_name, ch.timestamp
+            from channel_history as ch
+            inner join channel as c on c.id = ch.channel
+            inner join resource as r on r.id = ch.resource
+            inner join site as s on s.id = r.site
+            inner join directory as d on d.id = s.directory
+            where ch.channel = ${id} and ch.timestamp > ${last_timestamp}
+            order by timestamp desc
+          `
+
+          context.name = "channelRepository.getResources.collectKeyValues";
+          for (const history_item of history_items) {
+            history_item.kv = await sql `
+              select r.key, r.value
+              from resource_property as r
+              where r.resource = ${history_item.resource}
+            `
+            history_item.kv.push({key: "_channel", value: history_item.channel});
+            history_item.kv.push({key: "_channel_name", value: history_item.channel_name});
+            history_item.kv.push({key: "_resource", value: history_item.resource});
+            history_item.kv.push({key: "_uri", value: history_item.uri});
+            history_item.kv.push({key: "_site", value: history_item.site});
+            history_item.kv.push({key: "_site_name", value: history_item.site_name});
+            history_item.kv.push({key: "_directory", value: history_item.directory});
+            history_item.kv.push({key: "_directory_name", value: history_item.directory_name});
+            history_item.kv.push({key: "_timestamp", value: history_item.timestamp});
+          }
+
+          log.info(history_items);
+          return history_items;
+        }
+      });
       return history_items;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 

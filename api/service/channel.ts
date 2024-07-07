@@ -1,3 +1,4 @@
+import { log } from "../deps.ts";
 import { ChannelDeviceParam, ChannelDirectoryParam, ChannelParam, ChannelSiteParam } from "../model/channel.ts";
 import { channelRepository } from "../repository/channel.ts";
 
@@ -46,6 +47,11 @@ export const channelService = {
   },
   async collectResources(id: string) {
     return await channelRepository.collectResources(id);
+  },
+  async getResourcesByDevice(id: string, device_name: string) {
+    const a = await channelRepository.getResourcesByDevice(id, device_name);
+    log.info(a);
+    return a;
   },
   async getResources(id: string) {
     return await channelRepository.getResources(id);

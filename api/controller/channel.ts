@@ -226,6 +226,15 @@ export const channelController = {
     ctx.assert(result, 500, "Unknown");
     ctx.response.body = result;
   },
+  async getResourcesByDevice(ctx:RouterContext<string>) {
+    const { id, dev } = helpers.getQuery(ctx, { mergeParams: true });
+    ctx.assert(isUuid(id), 400, "Invalid id");
+    const result = await channelService.getResourcesByDevice(id, dev);
+    log.info(result);
+    ctx.assert(result, 500, "Unknown");
+    log.info('1');
+    ctx.response.body = result;
+  },
   async getResources(ctx:RouterContext<string>) {
     const { id } = helpers.getQuery(ctx, { mergeParams: true });
     ctx.assert(isUuid(id), 400, "Invalid id");

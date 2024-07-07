@@ -213,7 +213,7 @@ export const siteRepository = {
         const new_resources = await sql`
           insert
           into resource (uri, site, timestamp)
-          values (${uri}, ${site}, to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MMSSUS'))
+          values (${uri}, ${site}, to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MISSUS'))
           returning id, uri, site, timestamp
         `
         const new_resource = new_resources[0];
