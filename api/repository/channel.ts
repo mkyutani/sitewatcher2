@@ -498,7 +498,6 @@ export const channelRepository = {
             history_item.kv.push({key: "_timestamp", value: history_item.timestamp});
           }
 
-          log.info(history_items);
           return history_items;
         }
       });
