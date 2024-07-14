@@ -9,7 +9,9 @@
         "PGUSER",
         "sitescontroller",
         "sitewatcher",
-        "xenopus"
+        "xenopus",
+        "YYYYMMDDHH",
+        "YYYYMMDDHH24MISSUS"
     ],
     "deno.enable": true,
     "deno.lint": true,
