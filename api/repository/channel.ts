@@ -510,7 +510,7 @@ export const channelRepository = {
       return null;
     }
   },
-  async getResources(id: string) {
+  async getResources(id: string, timestamp: string | null) {
     const context = {
       name: "channelRepository.getResources"
     };
@@ -524,7 +524,11 @@ export const channelRepository = {
         inner join site as s on s.id = r.site
         inner join directory as d on d.id = s.directory
         where channel = ${id}
-        order by timestamp desc
+        ${timestamp ? sql`
+          and timestamp = ${timestamp}
+        ` : sql`
+          order by timestamp desc
+        `}
       `
 
       context.name = "channelRepository.getResources.collectKeyValues";

@@ -1,7 +1,7 @@
 import { RouterContext, helpers, log } from "../deps.ts";
 import { ChannelDeviceParam, ChannelDirectoryParam, ChannelParam, ChannelSiteParam } from "../model/channel.ts";
 import { channelService } from "../service/channel.ts";
-import { convertToBoolean, isUuid } from "../util.ts";
+import { convertToBoolean, isTimestamp, isUuid } from "../util.ts";
 
 export const channelController = {
   async create(ctx:RouterContext<string>) {
@@ -236,9 +236,16 @@ export const channelController = {
     ctx.response.body = result;
   },
   async getResources(ctx:RouterContext<string>) {
-    const { id } = helpers.getQuery(ctx, { mergeParams: true });
+    const { id, t } = helpers.getQuery(ctx, { mergeParams: true });
     ctx.assert(isUuid(id), 400, "Invalid id");
-    const result = await channelService.getResources(id);
+    let timestamp;
+    if (typeof t === "string") {
+      timestamp = isTimestamp(t);
+      ctx.assert(timestamp, 400, "Invalid timestamp");
+    } else {
+      timestamp = null;
+    }
+    const result = await channelService.getResources(id, timestamp);
     ctx.assert(result, 500, "Unknown");
     ctx.response.body = result;
   }

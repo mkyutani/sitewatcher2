@@ -51,7 +51,7 @@ export const channelService = {
   async getResourcesByDevice(id: string, device_name: string, logFlag: boolean | null) {
     return await channelRepository.getResourcesByDevice(id, device_name, logFlag);
   },
-  async getResources(id: string) {
-    return await channelRepository.getResources(id);
+  async getResources(id: string, timestamp: string | null) {
+    return await channelRepository.getResources(id, timestamp);
   }
 }
