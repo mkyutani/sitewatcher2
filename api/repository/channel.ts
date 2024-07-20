@@ -436,7 +436,7 @@ export const channelRepository = {
       return null;
     }
   },
-  async getResourcesByDevice(id: string, device_name: string) {
+  async getResourcesByDevice(id: string, device_name: string, logFlag: boolean | null) {
     const context = {
       name: "channelRepository.getResourcesByDevice"
     };
@@ -456,12 +456,6 @@ export const channelRepository = {
           select max(timestamp) as timestamp
           from channel_device_log
           where device = ${channel_device_id}
-        `
-
-        context.name = "channelRepository.getResourcesByDevice.setLastTimestamp";
-        const updated_timestamps = await sql `
-          insert into channel_device_log (device, timestamp)
-          values (${channel_device_id}, to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MISSUS'))
         `
 
         if (device_log_timestamps.length === 0) {
@@ -498,6 +492,14 @@ export const channelRepository = {
             history_item.kv.push({key: "_timestamp", value: history_item.timestamp});
           }
 
+          if (logFlag) {
+            context.name = "channelRepository.getResourcesByDevice.setLastTimestamp";
+            const updated_timestamps = await sql `
+              insert into channel_device_log (device, timestamp)
+              values (${channel_device_id}, to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MISSUS'))
+            `
+          }
+  
           return history_items;
         }
       });
