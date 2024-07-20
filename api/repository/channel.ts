@@ -523,11 +523,11 @@ export const channelRepository = {
         inner join resource as r on r.id = ch.resource
         inner join site as s on s.id = r.site
         inner join directory as d on d.id = s.directory
-        where channel = ${id}
+        where c.id = ${id}
         ${timestamp ? sql`
-          and timestamp = ${timestamp}
+          and ch.timestamp = ${timestamp}
         ` : sql`
-          order by timestamp desc
+          order by ch.timestamp desc
         `}
       `
 
