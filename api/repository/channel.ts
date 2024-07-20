@@ -510,10 +510,12 @@ export const channelRepository = {
       return null;
     }
   },
-  async getResources(id: string) {
+  async getResources(id: string, timestamp: string | null) {
     const context = {
       name: "channelRepository.getResources"
     };
+
+    log.info(`[${timestamp}]`)
 
     try {
       const history_items = await sql `
@@ -523,8 +525,12 @@ export const channelRepository = {
         inner join resource as r on r.id = ch.resource
         inner join site as s on s.id = r.site
         inner join directory as d on d.id = s.directory
-        where channel = ${id}
-        order by timestamp desc
+        where c.id = ${id}
+        ${timestamp ? sql`
+          and ch.timestamp = ${timestamp}
+        ` : sql`
+          order by ch.timestamp desc
+        `}
       `
 
       context.name = "channelRepository.getResources.collectKeyValues";
