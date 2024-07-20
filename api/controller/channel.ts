@@ -238,14 +238,10 @@ export const channelController = {
   async getResources(ctx:RouterContext<string>) {
     const { id, t } = helpers.getQuery(ctx, { mergeParams: true });
     ctx.assert(isUuid(id), 400, "Invalid id");
-    let timestamp;
     if (typeof t === "string") {
-      timestamp = isTimestamp(t);
-      ctx.assert(timestamp, 400, "Invalid timestamp");
-    } else {
-      timestamp = null;
+      ctx.assert(isTimestamp(t), 400, "Invalid timestamp");
     }
-    const result = await channelService.getResources(id, timestamp);
+    const result = await channelService.getResources(id, t);
     ctx.assert(result, 500, "Unknown");
     ctx.response.body = result;
   }

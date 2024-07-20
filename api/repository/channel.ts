@@ -515,6 +515,8 @@ export const channelRepository = {
       name: "channelRepository.getResources"
     };
 
+    log.info(`[${timestamp}]`)
+
     try {
       const history_items = await sql `
         select ch.channel, c.name as channel_name, ch.resource, ch.uri, s.id as site, s.name as site_name, d.id as directory, d.name as directory_name, ch.timestamp
