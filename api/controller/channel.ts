@@ -233,6 +233,7 @@ export const channelController = {
     ctx.assert(logFlag !== null, 400, "Invalid log flag");
     const result = await channelService.getResourcesByDevice(id, dev, logFlag);
     ctx.assert(result, 500, "Unknown");
+    ctx.assert(typeof result !== "string", 400, result as string);
     ctx.response.body = result;
   },
   async getResources(ctx:RouterContext<string>) {

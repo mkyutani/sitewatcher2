@@ -449,6 +449,9 @@ export const channelRepository = {
           from channel_device
           where channel = ${id} and name = ${device_name}
         `
+        if (channel_devices.length === 0) {
+          return "No such a device";
+        }
         const channel_device_id = channel_devices[0].id;
 
         context.name = "channelRepository.getResourcesByDevice.getLastTimestamp";
