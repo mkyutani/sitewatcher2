@@ -436,7 +436,7 @@ export const channelRepository = {
       return null;
     }
   },
-  async getResourcesByDevice(id: string, device_name: string, logFlag: boolean | null) {
+  async getResourcesByDevice(id: string, device_name: string, logFlag: boolean | null, timestamp: string | null) {
     const context = {
       name: "channelRepository.getResourcesByDevice"
     };
@@ -462,6 +462,11 @@ export const channelRepository = {
         `
 
         if (device_log_timestamps.length === 0) {
+          context.name = "channelRepository.getResourcesByDevice.getResourcesInitially";
+          const updated_timestamps = await sql `
+            insert into channel_device_log (device, timestamp)
+            values (${channel_device_id}, to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MISSUS'))
+          `
           return [];
         } else {
           const last_timestamp = device_log_timestamps[0].timestamp;
@@ -473,8 +478,13 @@ export const channelRepository = {
             inner join resource as r on r.id = ch.resource
             inner join site as s on s.id = r.site
             inner join directory as d on d.id = s.directory
-            where ch.channel = ${id} and ch.timestamp > ${last_timestamp}
-            order by timestamp desc
+            where ch.channel = ${id}
+            ${timestamp ? sql`
+              and ch.timestamp = ${timestamp}
+            ` : sql`
+              and ch.timestamp > ${last_timestamp}
+              order by ch.timestamp desc
+            `}
           `
 
           context.name = "channelRepository.getResources.collectKeyValues";
