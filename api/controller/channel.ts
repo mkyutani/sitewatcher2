@@ -227,14 +227,12 @@ export const channelController = {
     ctx.response.body = result;
   },
   async getResourcesByDevice(ctx:RouterContext<string>) {
-    const { id, dev, log, t } = helpers.getQuery(ctx, { mergeParams: true });
+    const { id, dev, t } = helpers.getQuery(ctx, { mergeParams: true });
     ctx.assert(isUuid(id), 400, "Invalid id");
-    const logFlag = convertToBoolean(log);
-    ctx.assert(logFlag !== null, 400, "Invalid log flag");
     if (typeof t === "string") {
       ctx.assert(isTimestamp(t), 400, "Invalid timestamp");
     }
-    const result = await channelService.getResourcesByDevice(id, dev, logFlag, t);
+    const result = await channelService.getResourcesByDevice(id, dev, t);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result as string);
     ctx.response.body = result;

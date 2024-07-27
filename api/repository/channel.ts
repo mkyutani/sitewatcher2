@@ -436,7 +436,7 @@ export const channelRepository = {
       return null;
     }
   },
-  async getResourcesByDevice(id: string, device_name: string, logFlag: boolean | null, timestamp: string | null) {
+  async getResourcesByDevice(id: string, device_name: string, timestamp: string | null) {
     const context = {
       name: "channelRepository.getResourcesByDevice"
     };
@@ -454,67 +454,74 @@ export const channelRepository = {
         }
         const channel_device_id = channel_devices[0].id;
 
-        context.name = "channelRepository.getResourcesByDevice.getLastTimestamp";
-        const device_log_timestamps = await sql `
-          select max(timestamp) as timestamp
-          from channel_device_log
-          where device = ${channel_device_id}
-        `
+        const latest_timestamp = await (async () => {
+          context.name = "channelRepository.getResourcesByDevice.getLatestTimestamp";
+          if (timestamp) {
+            return null;
+          } else {
+            const latest_device_log = await sql `
+              select max(timestamp) as timestamp
+              from channel_device_log
+              where device = ${channel_device_id}
+            `
 
-        if (device_log_timestamps.length === 0) {
-          context.name = "channelRepository.getResourcesByDevice.getResourcesInitially";
+            return latest_device_log[0].timestamp;
+          }
+        })();
+
+        if (!timestamp && !latest_timestamp) {
+          context.name = "channelRepository.getResourcesByDevice.setOnlyLogOnInitialCall";
           const updated_timestamps = await sql `
             insert into channel_device_log (device, timestamp)
             values (${channel_device_id}, to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MISSUS'))
           `
           return [];
-        } else {
-          const last_timestamp = device_log_timestamps[0].timestamp;
-          context.name = "channelRepository.getResourcesByDevice.getLatestResources";
-          const history_items = await sql `
-            select ch.channel, c.name as channel_name, ch.resource, ch.uri, s.id as site, s.name as site_name, d.id as directory, d.name as directory_name, ch.timestamp
-            from channel_history as ch
-            inner join channel as c on c.id = ch.channel
-            inner join resource as r on r.id = ch.resource
-            inner join site as s on s.id = r.site
-            inner join directory as d on d.id = s.directory
-            where ch.channel = ${id}
-            ${timestamp ? sql`
-              and ch.timestamp = ${timestamp}
-            ` : sql`
-              and ch.timestamp > ${last_timestamp}
-              order by ch.timestamp desc
-            `}
-          `
-
-          context.name = "channelRepository.getResources.collectKeyValues";
-          for (const history_item of history_items) {
-            history_item.kv = await sql `
-              select r.key, r.value
-              from resource_property as r
-              where r.resource = ${history_item.resource}
-            `
-            history_item.kv.push({key: "_channel", value: history_item.channel});
-            history_item.kv.push({key: "_channel_name", value: history_item.channel_name});
-            history_item.kv.push({key: "_resource", value: history_item.resource});
-            history_item.kv.push({key: "_uri", value: history_item.uri});
-            history_item.kv.push({key: "_site", value: history_item.site});
-            history_item.kv.push({key: "_site_name", value: history_item.site_name});
-            history_item.kv.push({key: "_directory", value: history_item.directory});
-            history_item.kv.push({key: "_directory_name", value: history_item.directory_name});
-            history_item.kv.push({key: "_timestamp", value: history_item.timestamp});
-          }
-
-          if (logFlag) {
-            context.name = "channelRepository.getResourcesByDevice.setLastTimestamp";
-            const updated_timestamps = await sql `
-              insert into channel_device_log (device, timestamp)
-              values (${channel_device_id}, to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MISSUS'))
-            `
-          }
-  
-          return history_items;
         }
+
+        context.name = "channelRepository.getResourcesByDevice.getLatestResources";
+        const history_items = await sql `
+          select ch.channel, c.name as channel_name, ch.resource, ch.uri, s.id as site, s.name as site_name, d.id as directory, d.name as directory_name, ch.timestamp
+          from channel_history as ch
+          inner join channel as c on c.id = ch.channel
+          inner join resource as r on r.id = ch.resource
+          inner join site as s on s.id = r.site
+          inner join directory as d on d.id = s.directory
+          where ch.channel = ${id}
+          ${timestamp ? sql`
+            and ch.timestamp = ${timestamp}
+          ` : sql`
+            and ch.timestamp > ${latest_timestamp}
+            order by ch.timestamp desc
+          `}
+        `
+
+        context.name = "channelRepository.getResources.collectKeyValues";
+        for (const history_item of history_items) {
+          history_item.kv = await sql `
+            select r.key, r.value
+            from resource_property as r
+            where r.resource = ${history_item.resource}
+          `
+          history_item.kv.push({key: "_channel", value: history_item.channel});
+          history_item.kv.push({key: "_channel_name", value: history_item.channel_name});
+          history_item.kv.push({key: "_resource", value: history_item.resource});
+          history_item.kv.push({key: "_uri", value: history_item.uri});
+          history_item.kv.push({key: "_site", value: history_item.site});
+          history_item.kv.push({key: "_site_name", value: history_item.site_name});
+          history_item.kv.push({key: "_directory", value: history_item.directory});
+          history_item.kv.push({key: "_directory_name", value: history_item.directory_name});
+          history_item.kv.push({key: "_timestamp", value: history_item.timestamp});
+        }
+
+        if (!timestamp && latest_timestamp !== null) {
+          context.name = "channelRepository.getResourcesByDevice.setLatestTimestamp";
+          const updated_timestamps = await sql `
+            insert into channel_device_log (device, timestamp)
+            values (${channel_device_id}, to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MISSUS'))
+          `
+        }
+
+        return history_items;
       });
       return history_items;
     } catch (error) {
@@ -527,8 +534,6 @@ export const channelRepository = {
     const context = {
       name: "channelRepository.getResources"
     };
-
-    log.info(`[${timestamp}]`)
 
     try {
       const history_items = await sql `
