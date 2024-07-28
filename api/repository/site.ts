@@ -40,18 +40,34 @@ export const siteRepository = {
     };
 
     try {
-      const sites = await sql `
-        select
-          s.id, s.uri, s.name, s.directory, d.name as directory_name, s.created, s.updated
-        from site as s
-        inner join directory as d on s.directory = d.id
-        where s.id = ${id}
-      `
-      if (sites.length == 0) {
-        return {};
-      }
+      const site = await sql.begin(async sql => {
+        context.name = "siteRepository.get.getSites";
+        const sites = await sql `
+          select
+            s.id, s.uri, s.name, s.directory, d.name as directory_name, s.created, s.updated
+          from site as s
+          inner join directory as d on s.directory = d.id
+          where s.id = ${id}
+        `
+        if (sites.length == 0) {
+          return {};
+        }
 
-      return sites[0];
+        const site = sites[0];
+
+        context.name = "siteRepository.get.getRules";
+        site.rules = await sql `
+          select
+            sr.id, src.name as rule_category_name, sr.weight, sr.value, sr.created, sr.updated
+          from site_rule as sr
+          inner join site_rule_category as src on sr.category = src.id
+          where sr.site = ${id}
+          order by src.name, sr.weight
+        `
+
+        return site;
+      });
+      return site;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       if (error instanceof sql.PostgresError && error.code === "22P02") {
