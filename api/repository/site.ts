@@ -341,32 +341,6 @@ export const siteRepository = {
       return null;
     }
   },
-  async getRules(site: string) {
-    const context = {
-      name: "siteResourceRepository.createRule"
-    };
-
-    try {
-      const site_rules = await sql `
-        select
-          sr.id, sr.site, s.name as site_name, src.name as rule_category_name, sr.weight, sr.value, s.created, s.updated
-        from site_rule as sr
-        inner join site as s on sr.site = s.id
-        inner join site_rule_category as src on sr.category = src.id
-        where sr.site = ${site}
-        order by src.name, sr.weight
-      `
-      return site_rules;
-    } catch (error) {
-      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      if (error instanceof sql.PostgresError && error.code === "22P02") {
-        log.warning(`${context.name}:${site}:${description}`);
-        return {};
-      }
-      log.error(`${context.name}:${site}:${description}`);
-      return null;
-    }
-  },
   async updateRule(site: string, name: string, weight: number, siteRuleParam: SiteRuleParam) {
     const context = {
       name: "siteResourceRepository.createRule"
