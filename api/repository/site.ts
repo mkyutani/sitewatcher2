@@ -176,57 +176,6 @@ export const siteRepository = {
     const properties = siteResourceParam?.properties;
 
     try {
-      context.name = "siteResourceRepository.registerResource.getRules"
-      const excluding_rules = await sql `
-        select
-          weight, value
-        from site_rule
-        where site = ${site} and category = (select id from site_rule_category where name = 'exclude')
-        order by weight
-      `
-
-      const including_rules = await sql `
-        select
-          weight, value
-        from site_rule
-        where site = ${site} and category = (select id from site_rule_category where name = 'include')
-        order by weight
-      `
-
-      context.name = "siteResourceRepository.registerResource.testToMatchRules"
-      if (excluding_rules.length > 0) {
-        for (const match_rule of excluding_rules) {
-          const rule_sep_index = match_rule.value.indexOf(":");
-          const rule_var = match_rule.value.slice(0, rule_sep_index);
-          const rule_val = match_rule.value.slice(rule_sep_index + 1);
-          const rule_re = new RegExp(rule_val);
-          if (properties[rule_var] && rule_re.test(properties[rule_var])) {
-            log.info(`${context.name}:excluded-by:${rule_val}:${properties[rule_var]}`);
-            return {};
-          }
-        }
-        log.info(`${context.name}:NOT-excluded-by:${properties['name']}`);
-      }
-
-      if (including_rules.length > 0) {
-        let result = false;
-        for (const match_rule of including_rules) {
-          const rule_sep_index = match_rule.value.indexOf(":");
-          const rule_var = match_rule.value.slice(0, rule_sep_index);
-          const rule_val = match_rule.value.slice(rule_sep_index + 1);
-          const rule_re = new RegExp(rule_val);
-          if (properties[rule_var] && rule_re.test(properties[rule_var])) {
-            log.info(`${context.name}:included-by:${rule_val}:${properties[rule_var]}`);
-            result = true;
-            break;
-          }
-        }
-        if (!result) {
-          log.info(`${context.name}:NOT-included-by:${properties['name']}`);
-          return {};
-        }
-      }
-
       context.name = "siteResourceRepository.registerResource.map"
       const properties_kv = Object.keys(properties).map(key => {
         return {
