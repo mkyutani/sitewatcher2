@@ -26,9 +26,6 @@ export const siteService = {
   async createRule(id: string, name: string, {...reqBody}: SiteRuleParam) {
     return await siteRepository.createRule(id, name, reqBody);
   },
-  async getRules(id: string) {
-    return await siteRepository.getRules(id);
-  },
   async updateRule(id: string, name: string, weight: number, {...reqBody}: SiteRuleParam) {
     return await siteRepository.updateRule(id, name, weight, reqBody);
   },
