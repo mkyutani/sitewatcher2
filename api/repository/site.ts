@@ -55,6 +55,17 @@ export const siteRepository = {
 
         const site = sites[0];
 
+        context.name = "siteRepository.get.getRuleCategory";
+        const rule_categories = await sql `
+          select
+            name
+          from site_rule_category
+        `
+
+        for (const rule_category of rule_categories) {
+          site[rule_category.name] = [];
+        }
+
         context.name = "siteRepository.get.getRules";
         site.rules = await sql `
           select
@@ -64,6 +75,11 @@ export const siteRepository = {
           where sr.site = ${id}
           order by src.name, sr.weight
         `
+
+        for (const rule of site.rules) {
+          site[rule.rule_category_name].push(rule);
+          delete rule.rule_category_name;
+        }
 
         return site;
       });
