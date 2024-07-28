@@ -55,19 +55,8 @@ export const siteRepository = {
 
         const site = sites[0];
 
-        context.name = "siteRepository.get.getRuleCategory";
-        const rule_categories = await sql `
-          select
-            name
-          from site_rule_category
-        `
-
-        for (const rule_category of rule_categories) {
-          site[rule_category.name] = [];
-        }
-
         context.name = "siteRepository.get.getRules";
-        site.rules = await sql `
+        const rules = await sql `
           select
             sr.id, src.name as rule_category_name, sr.weight, sr.value, sr.created, sr.updated
           from site_rule as sr
@@ -76,8 +65,15 @@ export const siteRepository = {
           order by src.name, sr.weight
         `
 
-        for (const rule of site.rules) {
+        site.rule_category_names = [];
+        for (const rule of rules) {
+          if (!site[rule.rule_category_name]) {
+            site[rule.rule_category_name] = [];
+          }
           site[rule.rule_category_name].push(rule);
+          if (!site.rule_category_names.some((name: string) => name === rule.rule_category_name)) {
+            site.rule_category_names.push(rule.rule_category_name)
+          }
           delete rule.rule_category_name;
         }
 
