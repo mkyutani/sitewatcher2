@@ -436,7 +436,7 @@ export const channelRepository = {
       return null;
     }
   },
-  async getResourcesByDevice(id: string, device_name: string, timestamp: string | null) {
+  async getResourcesByDevice(id: string, device_name: string, timestamp: string | null, logging: boolean) {
     const context = {
       name: "channelRepository.getResourcesByDevice"
     };
@@ -470,11 +470,13 @@ export const channelRepository = {
         })();
 
         if (!timestamp && !latest_timestamp) {
-          context.name = "channelRepository.getResourcesByDevice.setOnlyLogOnInitialCall";
-          const updated_timestamps = await sql `
-            insert into channel_device_log (device, timestamp)
-            values (${channel_device_id}, to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MISSUS'))
-          `
+          if (logging) {
+            context.name = "channelRepository.getResourcesByDevice.setOnlyLogOnInitialCall";
+            const updated_timestamps = await sql `
+              insert into channel_device_log (device, timestamp)
+              values (${channel_device_id}, to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MISSUS'))
+            `
+          }
           return [];
         }
 
@@ -514,11 +516,13 @@ export const channelRepository = {
         }
 
         if (!timestamp && latest_timestamp !== null) {
-          context.name = "channelRepository.getResourcesByDevice.setLatestTimestamp";
-          const updated_timestamps = await sql `
-            insert into channel_device_log (device, timestamp)
-            values (${channel_device_id}, to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MISSUS'))
-          `
+          if (logging) {
+            context.name = "channelRepository.getResourcesByDevice.setLatestTimestamp";
+            const updated_timestamps = await sql `
+              insert into channel_device_log (device, timestamp)
+              values (${channel_device_id}, to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MISSUS'))
+            `
+          }
         }
 
         return history_items;
