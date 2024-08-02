@@ -65,7 +65,7 @@ export const siteController = {
     const result = await siteService.delete(id);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(Object.keys(result).length > 0, 404, "");
-    ctx.response.body = null;
+    ctx.response.body = result;
   },
   async registerResource(ctx:RouterContext<string>) {
     const { id } = helpers.getQuery(ctx, { mergeParams: true });
