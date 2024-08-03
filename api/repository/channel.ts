@@ -75,12 +75,16 @@ export const channelRepository = {
       }
 
       context.name = "channelRepository.get.getTimestamps";
-      channel.timestamps = await sql `
+      const timestamps = await sql `
         select distinct timestamp
         from channel_history
         where channel = ${id}
         order by timestamp
       `
+      channel.timestamps = [];
+      for (const timestamp of timestamps) {
+        channel.timestamps.push(timestamp.timestamp);
+      }
 
       return channel;
     } catch (error) {
