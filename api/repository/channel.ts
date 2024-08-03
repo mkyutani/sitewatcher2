@@ -43,12 +43,36 @@ export const channelRepository = {
       `
 
       context.name = "channelRepository.get.getDevices";
-      channel.devices = await sql `
+      const devices = await sql `
         select
           name, interface, apikey, tag, template, created, updated
         from channel_device
         where channel = ${id}
       `
+      channel.devices = {};
+      for (const device of devices) {
+        channel.devices[device.name] = device;
+      }
+
+      context.name = "channelRepository.get.getDeviceLogs";
+      const device_logs = await sql `
+        select
+          cd.name, cdl.timestamp
+        from channel_device_log as cdl
+        inner join channel_device as cd on cd.id = cdl.device
+        where cdl.device in (
+          select id
+          from channel_device
+          where channel = ${id}
+        )
+        order by cdl.timestamp
+      `
+      for (const device_log of device_logs) {
+        if (!channel.devices[device_log.name].timestamps) {
+          channel.devices[device_log.name].timestamps = [];
+        }
+        channel.devices[device_log.name].timestamps.push(device_log.timestamp);
+      }
 
       context.name = "channelRepository.get.getTimestamps";
       channel.timestamps = await sql `
