@@ -516,7 +516,13 @@ export const channelRepository = {
           inner join resource as r on r.id = ch.resource
           inner join site as s on s.id = r.site
           inner join directory as d on d.id = s.directory
+          inner join (
+            select site, min(timestamp) as initial_update_timestamp
+            from resource
+            group by site
+          ) as ir on ir.site = r.site
           where ch.channel = ${id}
+          and ${latest_timestamp} > ir.initial_update_timestamp
           ${timestamp ? sql`
             and ch.timestamp = ${timestamp}
           ` : sql`
