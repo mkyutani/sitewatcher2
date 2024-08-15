@@ -510,7 +510,7 @@ export const channelRepository = {
 
         context.name = "channelRepository.getResourcesByDevice.getLatestResources";
         const history_items = await sql `
-          select ch.channel, c.name as channel_name, ch.resource, ch.uri, s.id as site, s.name as site_name, d.id as directory, d.name as directory_name, ch.timestamp
+          select ch.channel, c.name as channel_name, ch.resource, ch.uri, s.id as site, s.name as site_name, s.uri as site_uri, d.id as directory, d.name as directory_name, ch.timestamp
           from channel_history as ch
           inner join channel as c on c.id = ch.channel
           inner join resource as r on r.id = ch.resource
@@ -544,6 +544,7 @@ export const channelRepository = {
           history_item.kv.push({key: "_uri", value: history_item.uri});
           history_item.kv.push({key: "_site", value: history_item.site});
           history_item.kv.push({key: "_site_name", value: history_item.site_name});
+          history_item.kv.push({key: "_site_uri", value: history_item.site_uri});
           history_item.kv.push({key: "_directory", value: history_item.directory});
           history_item.kv.push({key: "_directory_name", value: history_item.directory_name});
           history_item.kv.push({key: "_timestamp", value: history_item.timestamp});
@@ -575,7 +576,7 @@ export const channelRepository = {
 
     try {
       const history_items = await sql `
-        select ch.channel, c.name as channel_name, ch.resource, ch.uri, s.id as site, s.name as site_name, d.id as directory, d.name as directory_name, ch.timestamp
+        select ch.channel, c.name as channel_name, ch.resource, ch.uri, s.id as site, s.name as site_name, s.uri as site_uri, d.id as directory, d.name as directory_name, ch.timestamp
         from channel_history as ch
         inner join channel as c on c.id = ch.channel
         inner join resource as r on r.id = ch.resource
@@ -602,6 +603,7 @@ export const channelRepository = {
         history_item.kv.push({key: "_uri", value: history_item.uri});
         history_item.kv.push({key: "_site", value: history_item.site});
         history_item.kv.push({key: "_site_name", value: history_item.site_name});
+        history_item.kv.push({key: "_site_uri", value: history_item.site_uri});
         history_item.kv.push({key: "_directory", value: history_item.directory});
         history_item.kv.push({key: "_directory_name", value: history_item.directory_name});
         history_item.kv.push({key: "_timestamp", value: history_item.timestamp});
