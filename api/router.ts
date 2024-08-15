@@ -12,8 +12,8 @@ router.put('/api/v1/directories/:id', directoryController.update);
 router.delete('/api/v1/directories/:id', directoryController.delete);
 
 router.post('/api/v1/sites/:id/rules/:name', siteController.createRule);
-router.put('/api/v1/sites/:id/rules/:name/:weight', siteController.updateRule);
-router.delete('/api/v1/sites/:id/rules/:name/:weight', siteController.deleteRule);
+router.put('/api/v1/sites/:id/rules/:name/:tag', siteController.updateRule);
+router.delete('/api/v1/sites/:id/rules/:name/:tag', siteController.deleteRule);
 router.post('/api/v1/sites/:id/resources', siteController.registerResource);
 router.get('/api/v1/sites/:id/resources', siteController.getAllResources);
 router.post('/api/v1/sites', siteController.create);

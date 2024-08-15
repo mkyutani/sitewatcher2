@@ -10,6 +10,6 @@ export type SiteResourceParam = {
 };
 
 export type SiteRuleParam = {
-  weight: number | null,
+  tag: string | null,
   value: string | null,
 };

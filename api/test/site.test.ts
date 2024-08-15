@@ -513,7 +513,7 @@ Deno.test("Site", async (t) => {
       statuses.push(res.status);
       console.log(`${res.status} ${text}`);
     }
-    assertEquals(statuses.filter(function(n) { return n != 204; }).length, 0);
+    assertEquals(statuses.filter(function(n) { return n != 200; }).length, 0);
   });
 
   await t.step("400: Delete a site with invalid uuid", async () => {

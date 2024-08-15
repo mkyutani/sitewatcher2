@@ -58,11 +58,11 @@ export const siteRepository = {
         context.name = "siteRepository.get.getRules";
         const rules = await sql `
           select
-            sr.id, src.name as rule_category_name, sr.weight, sr.value, sr.created, sr.updated
+            sr.id, src.name as rule_category_name, sr.tag, sr.value, sr.created, sr.updated
           from site_rule as sr
           inner join site_rule_category as src on sr.category = src.id
           where sr.site = ${id}
-          order by src.name, sr.weight
+          order by src.name, sr.tag
         `
 
         site.rule_category_names = [];
@@ -277,13 +277,13 @@ export const siteRepository = {
       name: "siteResourceRepository.createRule"
     };
 
-    const weight = siteRuleParam?.weight;
+    const tag = siteRuleParam?.tag;
     const value = siteRuleParam?.value;
     try {
       const site_rules = await sql `
         insert
-        into site_rule (site, category, weight, value, created, updated)
-        values (${site}, (select id from site_rule_category where name=${name}), ${weight}, ${value}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
+        into site_rule (site, category, tag, value, created, updated)
+        values (${site}, (select id from site_rule_category where name=${name}), ${tag}, ${value}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
         returning id
       `
       return site_rules[0];
@@ -302,22 +302,22 @@ export const siteRepository = {
       return null;
     }
   },
-  async updateRule(site: string, name: string, weight: number, siteRuleParam: SiteRuleParam) {
+  async updateRule(site: string, name: string, tag: string, siteRuleParam: SiteRuleParam) {
     const context = {
       name: "siteResourceRepository.createRule"
     };
 
-    const new_weight = siteRuleParam?.weight;
+    const new_tag = siteRuleParam?.tag;
     const value = siteRuleParam?.value;
     try {
       const site_rules = await sql `
         update site_rule as sr
-        set weight = ${weight ? weight : sql`weight`},
+        set tag = ${tag ? tag : sql`tag`},
           value = ${value ? value : sql`value`},
           updated = current_timestamp at time zone 'UTC'
         from site_rule_category as src
-        where sr.site = ${site} and sr.category = src.id and src.name = ${name} and sr.weight = ${weight}
-        returning sr.id, sr.site, src.name, sr.weight, sr.value, sr.created, sr.updated
+        where sr.site = ${site} and sr.category = src.id and src.name = ${name} and sr.tag = ${tag}
+        returning sr.id, sr.site, src.name, sr.tag, sr.value, sr.created, sr.updated
       `
       if (site_rules.length == 0) {
         return {};
@@ -334,11 +334,11 @@ export const siteRepository = {
           return "Invalid site id";
           }
       }
-      log.error(`${context.name}:${site}.${name}.${weight}:${description}`);
+      log.error(`${context.name}:${site}.${name}.${tag}:${description}`);
       return null;
     }
   },
-  async deleteRule(site: string, name: string, weight: number) {
+  async deleteRule(site: string, name: string, tag: string) {
     const context = {
       name: "siteResourceRepository.createRule"
     };
@@ -347,7 +347,7 @@ export const siteRepository = {
       const site_rules = await sql `
         delete
         from site_rule
-        where site = ${site} and category = (select id from site_rule_category where name = ${name}) and weight = ${weight}
+        where site = ${site} and category = (select id from site_rule_category where name = ${name}) and tag = ${tag}
         returning id
       `
       if (site_rules.length == 0) {
@@ -356,7 +356,7 @@ export const siteRepository = {
       return site_rules[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`${context.name}:${site}.${name}.${weight}:${description}`);
+      log.error(`${context.name}:${site}.${name}.${tag}:${description}`);
       return null;
     }
   }
