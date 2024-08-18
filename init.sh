@@ -23,6 +23,11 @@ fi
 #
 USER=$(id -un)
 GROUP=$(id -gn)
+PG_UID=999
+PG_GID=999
+DENO_UID=1993
+DENO_GID=1993
+MODE=775
 ENV_FILE=.env
 VOLUMES=volumes
 
@@ -95,11 +100,12 @@ create_directory() {
 
 echo -n "Creating site directories ..."
 CREATED=0
-create_directory "${VOLUMES}" 775 ${USER} ${GROUP}
-create_directory "${VOLUMES}/deno-dir.${TARGET}" 775 1993 1993
-create_directory "${VOLUMES}/pg" 775 999 999
-create_directory "${VOLUMES}/pg/data" 775 999 999
-create_directory "${VOLUMES}/pg/initdb" 775 999 999
+create_directory "${VOLUMES}" ${MODE} ${USER} ${GROUP}
+create_directory "${VOLUMES}/deno-dir.${TARGET}" ${MODE} ${DENO_UID} ${DENO_GID}
+create_directory "${VOLUMES}/pg" ${MODE} ${PG_UID} ${PG_GID}
+create_directory "${VOLUMES}/pg/home" ${MODE} ${PG_UID} ${PG_GID}
+create_directory "${VOLUMES}/pg/data" ${MODE} ${PG_UID} ${PG_GID}
+create_directory "${VOLUMES}/pg/initdb" ${MODE} ${PG_UID} ${PG_GID}
 if [ ${CREATED} = 1 ]; then
     echo " created."
 else
