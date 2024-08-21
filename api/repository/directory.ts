@@ -31,6 +31,32 @@ export const directoryRepository = {
         where s.directory = ${directory.id}
       `
 
+      context.name = "directoryRepository.get.getRules";
+      for (let i = 0; i < directory.sites.length; i++) {
+        const site = directory.sites[i];
+        context.name = "siteRepository.get.getRules";
+        const rules = await sql `
+          select
+            sr.id, src.name as rule_category_name, sr.tag, sr.value, sr.created, sr.updated
+          from site_rule as sr
+          inner join site_rule_category as src on sr.category = src.id
+          where sr.site = ${site['id']}
+          order by src.name, sr.tag
+        `
+
+        site.rule_category_names = [];
+        for (const rule of rules) {
+          if (!site[rule.rule_category_name]) {
+            site[rule.rule_category_name] = [];
+          }
+          site[rule.rule_category_name].push(rule);
+          if (!site.rule_category_names.some((name: string) => name === rule.rule_category_name)) {
+            site.rule_category_names.push(rule.rule_category_name)
+          }
+          delete rule.rule_category_name;
+        }
+      }
+
       return directory;
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}`
