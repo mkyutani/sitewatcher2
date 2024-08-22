@@ -39,7 +39,7 @@ export const directoryRepository = {
           select
             sr.id, src.name as rule_category_name, sr.tag, sr.value, sr.created, sr.updated
           from site_rule as sr
-          inner join site_rule_category as src on sr.category = src.id
+          inner join rule_category as src on sr.category = src.id
           where sr.site = ${site['id']}
           order by src.name, sr.tag
         `

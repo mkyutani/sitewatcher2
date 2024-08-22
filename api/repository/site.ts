@@ -58,23 +58,23 @@ export const siteRepository = {
         context.name = "siteRepository.get.getRules";
         const rules = await sql `
           select
-            sr.id, src.name as rule_category_name, sr.tag, sr.value, sr.created, sr.updated
+            sr.id, src.name as category_name, sr.tag, sr.value, sr.created, sr.updated
           from site_rule as sr
-          inner join site_rule_category as src on sr.category = src.id
+          inner join rule_category as src on sr.category = src.id
           where sr.site = ${id}
           order by src.name, sr.tag
         `
 
         site.rule_category_names = [];
         for (const rule of rules) {
-          if (!site[rule.rule_category_name]) {
-            site[rule.rule_category_name] = [];
+          if (!site[rule.category_name]) {
+            site[rule.category_name] = [];
           }
-          site[rule.rule_category_name].push(rule);
-          if (!site.rule_category_names.some((name: string) => name === rule.rule_category_name)) {
-            site.rule_category_names.push(rule.rule_category_name)
+          site[rule.category_name].push(rule);
+          if (!site.rule_category_names.some((name: string) => name === rule.category_name)) {
+            site.rule_category_names.push(rule.category_name)
           }
-          delete rule.rule_category_name;
+          delete rule.category_name;
         }
 
         return site;
@@ -283,7 +283,7 @@ export const siteRepository = {
       const site_rules = await sql `
         insert
         into site_rule (site, category, tag, value, created, updated)
-        values (${site}, (select id from site_rule_category where name=${name}), ${tag}, ${value}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
+        values (${site}, (select id from rule_category where name=${name}), ${tag}, ${value}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
         returning id
       `
       return site_rules[0];
@@ -315,7 +315,7 @@ export const siteRepository = {
         set tag = ${tag ? tag : sql`tag`},
           value = ${value ? value : sql`value`},
           updated = current_timestamp at time zone 'UTC'
-        from site_rule_category as src
+        from rule_category as src
         where sr.site = ${site} and sr.category = src.id and src.name = ${name} and sr.tag = ${tag}
         returning sr.id, sr.site, src.name, sr.tag, sr.value, sr.created, sr.updated
       `
@@ -347,7 +347,7 @@ export const siteRepository = {
       const site_rules = await sql `
         delete
         from site_rule
-        where site = ${site} and category = (select id from site_rule_category where name = ${name}) and tag = ${tag}
+        where site = ${site} and category = (select id from rule_category where name = ${name}) and tag = ${tag}
         returning id
       `
       if (site_rules.length == 0) {

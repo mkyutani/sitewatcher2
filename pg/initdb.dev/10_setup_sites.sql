@@ -25,7 +25,7 @@ create table if not exists site_rule_category (
   primary key(id),
   unique(name)
 );
-insert into site_rule_category (id, name, description)
+insert into rule_category (id, name, description)
 values
   (1, 'include', 'includes site resources'),
   (2, 'exclude', 'excludes site resources'),
@@ -34,7 +34,7 @@ values
 create table if not exists site_rule (
   id uuid default gen_random_uuid() not null,
   site uuid not null references site on delete cascade,
-  category int not null references site_rule_category on delete cascade,
+  category int not null references rule_category on delete cascade,
   tag varchar(256) not null,
   value varchar(4096) not null,
   created timestamp not null,
