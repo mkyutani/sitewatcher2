@@ -1,4 +1,4 @@
-import { DirectoryParam } from "../model/directory.ts";
+import { DirectoryParam, DirectoryRuleParam } from "../model/directory.ts";
 import { directoryRepository } from "../repository/directory.ts";
 
 export const directoryService = {
@@ -16,5 +16,14 @@ export const directoryService = {
   },
   async delete(id: string) {
     return await directoryRepository.delete(id);
+  },
+  async createRule(id: string, name: string, {...reqBody}: DirectoryRuleParam) {
+    return await directoryRepository.createRule(id, name, reqBody);
+  },
+  async updateRule(id: string, name: string, tag: string, {...reqBody}: DirectoryRuleParam) {
+    return await directoryRepository.updateRule(id, name, tag, reqBody);
+  },
+  async deleteRule(id: string, name: string, tag: string) {
+    return await directoryRepository.deleteRule(id, name, tag);
   }
 }

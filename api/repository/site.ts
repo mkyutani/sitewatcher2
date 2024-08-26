@@ -41,12 +41,11 @@ export const siteRepository = {
 
     try {
       const site = await sql.begin(async sql => {
-        context.name = "siteRepository.get.getSites";
+        context.name = "siteRepository.get.getSite";
         const sites = await sql `
           select
-            s.id, s.uri, s.name, s.directory, d.name as directory_name, s.created, s.updated
+            s.id, s.uri, s.name, s.directory, s.created, s.updated
           from site as s
-          inner join directory as d on s.directory = d.id
           where s.id = ${id}
         `
         if (sites.length == 0) {
@@ -54,6 +53,22 @@ export const siteRepository = {
         }
 
         const site = sites[0];
+
+        context.name = "siteRepository.get.getDirectory";
+        const directory_id = site.directory;
+        delete site.directory;
+
+        const directories = await sql `
+          select
+            id, name, created, updated
+          from directory
+          where id = ${directory_id}
+        `
+        if (directories.length == 0) {
+          return {};
+        }
+  
+        site.directory = directories[0];
 
         context.name = "siteRepository.get.getRules";
         const rules = await sql `
@@ -75,6 +90,28 @@ export const siteRepository = {
             site.rule_category_names.push(rule.category_name)
           }
           delete rule.category_name;
+        }
+
+        context.name = "siteRepository.get.getDirectoryRules";
+        const directoryRules = await sql `
+          select
+            dr.id, drc.name as rule_category_name, dr.tag, dr.value, dr.created, dr.updated
+          from directory_rule as dr
+          inner join rule_category as drc on dr.category = drc.id
+          where dr.directory = ${directory_id}
+          order by drc.name, dr.tag
+        `
+  
+        site.directory.rule_category_names = [];
+        for (const rule of directoryRules) {
+          if (!site.directory[rule.rule_category_name]) {
+            site.directory[rule.rule_category_name] = [];
+          }
+          site.directory[rule.rule_category_name].push(rule);
+          if (!site.directory.rule_category_names.some((name: string) => name === rule.rule_category_name)) {
+            site.directory.rule_category_names.push(rule.rule_category_name)
+          }
+          delete rule.rule_category_name;
         }
 
         return site;

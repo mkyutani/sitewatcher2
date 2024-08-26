@@ -31,6 +31,18 @@ values
   (2, 'exclude', 'excludes site resources'),
   (3, 'property_template', 'site resource property template');
 
+create table if not exists directory_rule (
+  id uuid default gen_random_uuid() not null,
+  directory uuid not null references directory on delete cascade,
+  category int not null references rule_category on delete cascade,
+  tag varchar(256) not null,
+  value varchar(4096) not null,
+  created timestamp not null,
+  updated timestamp not null,
+  primary key(id),
+  unique(directory, category, tag)
+);
+
 create table if not exists site_rule (
   id uuid default gen_random_uuid() not null,
   site uuid not null references site on delete cascade,

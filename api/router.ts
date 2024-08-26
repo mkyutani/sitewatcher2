@@ -5,6 +5,9 @@ import { channelController } from "./controller/channel.ts";
 
 const router = new Router();
 
+router.post('/api/v1/directories/:id/rules/:name', directoryController.createRule);
+router.put('/api/v1/directories/:id/rules/:name/:tag', directoryController.updateRule);
+router.delete('/api/v1/directories/:id/rules/:name/:tag', directoryController.deleteRule);
 router.post('/api/v1/directories', directoryController.create);
 router.get('/api/v1/directories/:id', directoryController.get);
 router.get('/api/v1/directories', directoryController.list);

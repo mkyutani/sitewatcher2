@@ -1,6 +1,6 @@
 import sql from "./db.ts"
 import { log } from "../deps.ts";
-import { DirectoryParam } from "../model/directory.ts";
+import { DirectoryParam, DirectoryRuleParam } from "../model/directory.ts";
 
 export const directoryRepository = {
   async get(id: string) {
@@ -31,10 +31,32 @@ export const directoryRepository = {
         where s.directory = ${directory.id}
       `
 
-      context.name = "directoryRepository.get.getRules";
+      context.name = "directoryRepository.get.getDirectoryRules";
+      const rules = await sql `
+        select
+          dr.id, drc.name as rule_category_name, dr.tag, dr.value, dr.created, dr.updated
+        from directory_rule as dr
+        inner join rule_category as drc on dr.category = drc.id
+        where dr.directory = ${directory['id']}
+        order by drc.name, dr.tag
+      `
+
+      directory.rule_category_names = [];
+      for (const rule of rules) {
+        if (!directory[rule.rule_category_name]) {
+          directory[rule.rule_category_name] = [];
+        }
+        directory[rule.rule_category_name].push(rule);
+        if (!directory.rule_category_names.some((name: string) => name === rule.rule_category_name)) {
+          directory.rule_category_names.push(rule.rule_category_name)
+        }
+        delete rule.rule_category_name;
+      }
+
+      context.name = "directoryRepository.get.getSiteRules";
       for (let i = 0; i < directory.sites.length; i++) {
         const site = directory.sites[i];
-        context.name = "siteRepository.get.getRules";
+        context.name = "directoryRepository.get.getRules";
         const rules = await sql `
           select
             sr.id, src.name as rule_category_name, sr.tag, sr.value, sr.created, sr.updated
@@ -159,6 +181,94 @@ export const directoryRepository = {
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       log.error(`${context.name}:${id}:${description}`);
+      return null;
+    }
+  },
+  async createRule(directory: string, name: string, directoryRuleParam: DirectoryRuleParam) {
+    const context = {
+      name: "directoryRepository.createRule"
+    };
+
+    const tag = directoryRuleParam?.tag;
+    const value = directoryRuleParam?.value;
+    try {
+      const directory_rules = await sql `
+        insert
+        into directory_rule (directory, category, tag, value, created, updated)
+        values (${directory}, (select id from rule_category where name=${name}), ${tag}, ${value}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
+        returning id
+      `
+      return directory_rules[0];
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      if (error instanceof sql.PostgresError) {
+        log.warning(`${context.name}:PG${error.code}:${error.message}`);
+        switch (parseInt(error.code, 10)) {
+        case 23505:
+          return "Duplicated";
+        case 23503:
+          return "Invalid site id";
+        }
+      }
+      log.error(`${context.name}:${description}`);
+      return null;
+    }
+  },
+  async updateRule(directory: string, name: string, tag: string, directoryRuleParam: DirectoryRuleParam) {
+    const context = {
+      name: "directoryRepository.createRule"
+    };
+
+    const new_tag = directoryRuleParam?.tag;
+    const value = directoryRuleParam?.value;
+    try {
+      const directory_rules = await sql `
+        update directory_rule as dr
+        set tag = ${new_tag ? new_tag : sql`tag`},
+          value = ${value ? value : sql`value`},
+          updated = current_timestamp at time zone 'UTC'
+        from rule_category as drc
+        where dr.directory = ${directory} and dr.category = drc.id and drc.name = ${name} and dr.tag = ${tag}
+        returning dr.id, dr.directory, drc.name, dr.tag, dr.value, dr.created, dr.updated
+      `
+      if (directory_rules.length == 0) {
+        return {};
+      }
+      return directory_rules[0];
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      if (error instanceof sql.PostgresError) {
+        log.warning(`${context.name}:PG${error.code}:${error.message}`);
+        switch (parseInt(error.code, 10)) {
+        case 23505:
+          return "Duplicated";
+        case 23503:
+          return "Invalid site id";
+          }
+      }
+      log.error(`${context.name}:${directory}.${name}.${tag}:${description}`);
+      return null;
+    }
+  },
+  async deleteRule(directory: string, name: string, tag: string) {
+    const context = {
+      name: "directoryRepository.createRule"
+    };
+
+    try {
+      const directory_rules = await sql `
+        delete
+        from directory_rule
+        where directory = ${directory} and category = (select id from rule_category where name = ${name}) and tag = ${tag}
+        returning id
+      `
+      if (directory_rules.length == 0) {
+        return {};
+      }
+      return directory_rules[0];
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      log.error(`${context.name}:${directory}.${name}.${tag}:${description}`);
       return null;
     }
   }
