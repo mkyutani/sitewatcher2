@@ -3,6 +3,5 @@ export type DirectoryParam = {
 };
 
 export type DirectoryRuleParam = {
-  tag: string | null,
   value: string | null,
 };

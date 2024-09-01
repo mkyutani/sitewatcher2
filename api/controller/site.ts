@@ -99,8 +99,8 @@ export const siteController = {
     ctx.assert(typeof result !== "string", 400, result);
     ctx.response.body = result;
   },
-  async createRule(ctx:RouterContext<string>) {
-    const { id, name } = helpers.getQuery(ctx, { mergeParams: true });
+  async createOrUpdateRule(ctx:RouterContext<string>) {
+    const { id, category, tag } = helpers.getQuery(ctx, { mergeParams: true });
     ctx.assert(isUuid(id), 400, "Invalid id");
     const reqBodyRaw = await ctx.request.body();
     ctx.assert(reqBodyRaw.type === "json", 415, "Invalid content");
@@ -111,37 +111,16 @@ export const siteController = {
       ctx.assert(false, 400, "Invalid JSON");
     }
     ctx.assert(reqBody, 400, "No data");
-    ctx.assert(reqBody.tag, 400, "Tag is missing");
     ctx.assert(reqBody.value, 400, "Value is missing");
-    const result = await siteService.createRule(id, name, reqBody as SiteRuleParam);
-    ctx.assert(result, 500, "Unknown");
-    ctx.assert(typeof result !== "string", 400, result);
-    ctx.response.body = result;
-  },
-  async updateRule(ctx:RouterContext<string>) {
-    const { id, name, tag } = helpers.getQuery(ctx, { mergeParams: true });
-    ctx.assert(isUuid(id), 400, "Invalid id");
-    const reqBodyRaw = await ctx.request.body();
-    ctx.assert(reqBodyRaw.type === "json", 415, "Invalid content");
-    let reqBody;
-    try {
-      reqBody = await reqBodyRaw.value;
-    } catch (error) {
-      ctx.assert(false, 400, "Invalid JSON");
-    }
-    ctx.assert(reqBody, 400, "No data");
-    if (reqBody.tag) {
-      ctx.assert(!isNaN(reqBody.tag), 400, "Invalid tag");
-    }
-    const result = await siteService.updateRule(id, name, tag, reqBody as SiteRuleParam);
+    const result = await siteService.createOrUpdateRule(id, category, tag, reqBody as SiteRuleParam);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result);
     ctx.response.body = result;
   },
   async deleteRule(ctx:RouterContext<string>) {
-    const { id, name, tag } = helpers.getQuery(ctx, { mergeParams: true });
+    const { id, category, tag } = helpers.getQuery(ctx, { mergeParams: true });
     ctx.assert(isUuid(id), 400, "Invalid id");
-    const result = await siteService.deleteRule(id, name, tag);
+    const result = await siteService.deleteRule(id, category, tag);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result);
     ctx.response.body = null;

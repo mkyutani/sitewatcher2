@@ -10,6 +10,5 @@ export type SiteResourceParam = {
 };
 
 export type SiteRuleParam = {
-  tag: string | null,
   value: string | null,
 };

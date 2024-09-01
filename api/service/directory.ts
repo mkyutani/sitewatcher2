@@ -17,13 +17,10 @@ export const directoryService = {
   async delete(id: string) {
     return await directoryRepository.delete(id);
   },
-  async createRule(id: string, name: string, {...reqBody}: DirectoryRuleParam) {
-    return await directoryRepository.createRule(id, name, reqBody);
+  async createOrUpdateRule(id: string, category: string, tag: string, {...reqBody}: DirectoryRuleParam) {
+    return await directoryRepository.createOrUpdateRule(id, category, tag, reqBody);
   },
-  async updateRule(id: string, name: string, tag: string, {...reqBody}: DirectoryRuleParam) {
-    return await directoryRepository.updateRule(id, name, tag, reqBody);
-  },
-  async deleteRule(id: string, name: string, tag: string) {
-    return await directoryRepository.deleteRule(id, name, tag);
+  async deleteRule(id: string, category: string, tag: string) {
+    return await directoryRepository.deleteRule(id, category, tag);
   }
 }

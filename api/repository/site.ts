@@ -309,52 +309,22 @@ export const siteRepository = {
       return null;
     }
   },
-  async createRule(site: string, name: string, siteRuleParam: SiteRuleParam) {
+  async createOrUpdateRule(site: string, category: string, tag: string, siteRuleParam: SiteRuleParam) {
     const context = {
-      name: "siteResourceRepository.createRule"
+      name: "siteResourceRepository.createOrUpdateRule"
     };
 
-    const tag = siteRuleParam?.tag;
     const value = siteRuleParam?.value;
     try {
       const site_rules = await sql `
         insert
         into site_rule (site, category, tag, value, created, updated)
-        values (${site}, (select id from rule_category where name=${name}), ${tag}, ${value}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
-        returning id
-      `
-      return site_rules[0];
-    } catch (error) {
-      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      if (error instanceof sql.PostgresError) {
-        log.warning(`${context.name}:PG${error.code}:${error.message}`);
-        switch (parseInt(error.code, 10)) {
-        case 23505:
-          return "Duplicated";
-        case 23503:
-          return "Invalid site id";
-        }
-      }
-      log.error(`${context.name}:${description}`);
-      return null;
-    }
-  },
-  async updateRule(site: string, name: string, tag: string, siteRuleParam: SiteRuleParam) {
-    const context = {
-      name: "siteResourceRepository.createRule"
-    };
-
-    const new_tag = siteRuleParam?.tag;
-    const value = siteRuleParam?.value;
-    try {
-      const site_rules = await sql `
-        update site_rule as sr
-        set tag = ${tag ? tag : sql`tag`},
-          value = ${value ? value : sql`value`},
+        values (${site}, (select id from rule_category where name=${category}), ${tag}, ${value}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
+        on conflict (site, category, tag)
+        do update
+        set value = ${value ? value : sql`value`},
           updated = current_timestamp at time zone 'UTC'
-        from rule_category as src
-        where sr.site = ${site} and sr.category = src.id and src.name = ${name} and sr.tag = ${tag}
-        returning sr.id, sr.site, src.name, sr.tag, sr.value, sr.created, sr.updated
+        returning id, site, ${category} as category_name, tag, value, created, updated
       `
       if (site_rules.length == 0) {
         return {};
@@ -365,17 +335,17 @@ export const siteRepository = {
       if (error instanceof sql.PostgresError) {
         log.warning(`${context.name}:PG${error.code}:${error.message}`);
         switch (parseInt(error.code, 10)) {
-        case 23505:
-          return "Duplicated";
         case 23503:
           return "Invalid site id";
-          }
+        case 23502:
+          return "Invalid category name";
+        }
       }
-      log.error(`${context.name}:${site}.${name}.${tag}:${description}`);
+      log.error(`${context.name}:${site}.${category}.${tag}:${description}`);
       return null;
     }
   },
-  async deleteRule(site: string, name: string, tag: string) {
+  async deleteRule(site: string, category: string, tag: string) {
     const context = {
       name: "siteResourceRepository.createRule"
     };
@@ -384,7 +354,7 @@ export const siteRepository = {
       const site_rules = await sql `
         delete
         from site_rule
-        where site = ${site} and category = (select id from rule_category where name = ${name}) and tag = ${tag}
+        where site = ${site} and category = (select id from rule_category where name = ${category}) and tag = ${tag}
         returning id
       `
       if (site_rules.length == 0) {
@@ -393,7 +363,7 @@ export const siteRepository = {
       return site_rules[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`${context.name}:${site}.${name}.${tag}:${description}`);
+      log.error(`${context.name}:${site}.${category}.${tag}:${description}`);
       return null;
     }
   }
