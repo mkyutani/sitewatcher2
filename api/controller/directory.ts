@@ -1,7 +1,7 @@
-import { RouterContext, helpers, log } from "../deps.ts";
+import { RouterContext, helpers } from "../deps.ts";
 import { DirectoryParam, DirectoryRuleParam } from "../model/directory.ts";
 import { directoryService } from "../service/directory.ts";
-import { convertToBoolean, isUuid } from "../util.ts";
+import { isUuid } from "../util.ts";
 
 export const directoryController = {
   async create(ctx:RouterContext<string>) {
@@ -63,8 +63,9 @@ export const directoryController = {
     ctx.response.body = result;
   },
   async createOrUpdateRule(ctx:RouterContext<string>) {
-    const { id, category, tag } = helpers.getQuery(ctx, { mergeParams: true });
+    const { id, category, weight } = helpers.getQuery(ctx, { mergeParams: true });
     ctx.assert(isUuid(id), 400, "Invalid id");
+    ctx.assert(!isNaN(weight), 400, "Weight must be a number");
     const reqBodyRaw = await ctx.request.body();
     ctx.assert(reqBodyRaw.type === "json", 415, "Invalid content");
     let reqBody;
@@ -74,16 +75,16 @@ export const directoryController = {
       ctx.assert(false, 400, "Invalid JSON");
     }
     ctx.assert(reqBody, 400, "No data");
-    ctx.assert(reqBody.value, 400, "Value is missing");
-    const result = await directoryService.createOrUpdateRule(id, category, tag, reqBody as DirectoryRuleParam);
+    const result = await directoryService.createOrUpdateRule(id, category, weight, reqBody as DirectoryRuleParam);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result);
     ctx.response.body = result;
   },
   async deleteRule(ctx:RouterContext<string>) {
-    const { id, category, tag } = helpers.getQuery(ctx, { mergeParams: true });
+    const { id, category, weight } = helpers.getQuery(ctx, { mergeParams: true });
     ctx.assert(isUuid(id), 400, "Invalid id");
-    const result = await directoryService.deleteRule(id, category, tag);
+    ctx.assert(!isNaN(weight), 400, "Weight must be a number");
+    const result = await directoryService.deleteRule(id, category, weight);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result);
     ctx.response.body = null;

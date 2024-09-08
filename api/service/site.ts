@@ -23,10 +23,10 @@ export const siteService = {
   async getAllResources(site: string) {
     return await siteRepository.getAllResources(site);
   },
-  async createOrUpdateRule(id: string, category: string, tag: string, {...reqBody}: SiteRuleParam) {
-    return await siteRepository.createOrUpdateRule(id, category, tag, reqBody);
+  async createOrUpdateRule(id: string, category: string, weight: number, {...reqBody}: SiteRuleParam) {
+    return await siteRepository.createOrUpdateRule(id, category, weight, reqBody);
   },
-  async deleteRule(id: string, category: string, tag: string) {
-    return await siteRepository.deleteRule(id, category, tag);
+  async deleteRule(id: string, category: string, weight: number) {
+    return await siteRepository.deleteRule(id, category, weight);
   }
 }

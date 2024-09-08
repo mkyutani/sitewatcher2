@@ -1,7 +1,7 @@
 import { RouterContext, helpers } from "../deps.ts";
 import { SiteParam, SiteResourceParam, SiteRuleParam } from "../model/site.ts";
 import { siteService } from "../service/site.ts";
-import { convertToBoolean, convertToJson, isUuid } from "../util.ts";
+import { isUuid } from "../util.ts";
 
 export const siteController = {
   async create(ctx:RouterContext<string>) {
@@ -100,8 +100,10 @@ export const siteController = {
     ctx.response.body = result;
   },
   async createOrUpdateRule(ctx:RouterContext<string>) {
-    const { id, category, tag } = helpers.getQuery(ctx, { mergeParams: true });
+    const { id, category, weight } = helpers.getQuery(ctx, { mergeParams: true });
     ctx.assert(isUuid(id), 400, "Invalid id");
+    const weight_number = parseInt(weight);
+    ctx.assert(!isNaN(weight_number), 400, "Weight must be a number");
     const reqBodyRaw = await ctx.request.body();
     ctx.assert(reqBodyRaw.type === "json", 415, "Invalid content");
     let reqBody;
@@ -111,16 +113,17 @@ export const siteController = {
       ctx.assert(false, 400, "Invalid JSON");
     }
     ctx.assert(reqBody, 400, "No data");
-    ctx.assert(reqBody.value, 400, "Value is missing");
-    const result = await siteService.createOrUpdateRule(id, category, tag, reqBody as SiteRuleParam);
+    const result = await siteService.createOrUpdateRule(id, category, weight_number, reqBody as SiteRuleParam);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result);
     ctx.response.body = result;
   },
   async deleteRule(ctx:RouterContext<string>) {
-    const { id, category, tag } = helpers.getQuery(ctx, { mergeParams: true });
+    const { id, category, weight } = helpers.getQuery(ctx, { mergeParams: true });
     ctx.assert(isUuid(id), 400, "Invalid id");
-    const result = await siteService.deleteRule(id, category, tag);
+    const weight_number = parseInt(weight);
+    ctx.assert(!isNaN(weight_number), 400, "Weight must be a number");
+    const result = await siteService.deleteRule(id, category, weight_number);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result);
     ctx.response.body = null;

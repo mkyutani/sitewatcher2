@@ -34,15 +34,19 @@ export const directoryRepository = {
       context.name = "directoryRepository.get.getDirectoryRules";
       const rules = await sql `
         select
-          dr.id, drc.name as rule_category_name, dr.tag, dr.value, dr.created, dr.updated
+          dr.id, drc.name as rule_category_name, dr.weight, dr.op, dr.dst, dr.src, dr.value, dr.created, dr.updated
         from directory_rule as dr
         inner join rule_category as drc on dr.category = drc.id
         where dr.directory = ${directory['id']}
-        order by drc.name, dr.tag
+        order by drc.name, dr.weight
       `
 
       directory.rule_category_names = [];
       for (const rule of rules) {
+        if (!rule.op) delete rule.op;
+        if (!rule.dst) delete rule.dst;
+        if (!rule.src) delete rule.src;
+        if (!rule.value) delete rule.value;
         if (!directory[rule.rule_category_name]) {
           directory[rule.rule_category_name] = [];
         }
@@ -59,15 +63,19 @@ export const directoryRepository = {
         context.name = "directoryRepository.get.getRules";
         const rules = await sql `
           select
-            sr.id, src.name as rule_category_name, sr.tag, sr.value, sr.created, sr.updated
+            sr.id, src.name as rule_category_name, sr.weight, sr.op, sr.dst, sr.src, sr.value, sr.created, sr.updated
           from site_rule as sr
           inner join rule_category as src on sr.category = src.id
           where sr.site = ${site['id']}
-          order by src.name, sr.tag
+          order by src.name, sr.weight
         `
 
         site.rule_category_names = [];
         for (const rule of rules) {
+          if (!rule.op) delete rule.op;
+          if (!rule.dst) delete rule.dst;
+          if (!rule.src) delete rule.src;
+          if (!rule.value) delete rule.value;
           if (!site[rule.rule_category_name]) {
             site[rule.rule_category_name] = [];
           }
@@ -184,22 +192,29 @@ export const directoryRepository = {
       return null;
     }
   },
-  async createOrUpdateRule(directory: string, category: string, tag: string, directoryRuleParam: DirectoryRuleParam) {
+  async createOrUpdateRule(directory: string, category: string, weight: number, directoryRuleParam: DirectoryRuleParam) {
     const context = {
       name: "directoryResourceRepository.createOrUpdateRule"
     };
 
-    const value = directoryRuleParam?.value;
+    const op = directoryRuleParam.op ? directoryRuleParam.op : null;
+    const src = directoryRuleParam.src ? directoryRuleParam.src : null;
+    const dst = directoryRuleParam.dst ? directoryRuleParam.dst : null;
+    const value = directoryRuleParam.value ? directoryRuleParam.value : null;
     try {
       const directory_rules = await sql `
         insert
-        into directory_rule (directory, category, tag, value, created, updated)
-        values (${directory}, (select id from rule_category where name=${category}), ${tag}, ${value}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
-        on conflict (directory, category, tag)
+        into directory_rule (directory, category, weight, op, src, dst, value, created, updated)
+        values (${directory}, (select id from rule_category where name=${category}), ${weight}, ${op}, ${src}, ${dst}, ${value}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
+        on conflict (directory, category, weight)
         do update
-        set value = ${value ? value : sql`value`},
+        set
+          op = ${op},
+          src = ${src},
+          dst = ${dst},
+          value = ${value},
           updated = current_timestamp at time zone 'UTC'
-        returning id, directory, ${category} as category_name, tag, value, created, updated
+        returning id, directory, ${category} as category_name, weight, op, src, dst, value, created, updated
       `
       if (directory_rules.length == 0) {
         return {};
@@ -216,11 +231,11 @@ export const directoryRepository = {
           return "Invalid category name";
         }
       }
-      log.error(`${context.name}:${directory}.${category}.${tag}:${description}`);
+      log.error(`${context.name}:${directory}.${category}.${weight}:${description}`);
       return null;
     }
   },
-  async deleteRule(directory: string, category: string, tag: string) {
+  async deleteRule(directory: string, category: string, weight: number) {
     const context = {
       name: "directoryRepository.createRule"
     };
@@ -229,7 +244,7 @@ export const directoryRepository = {
       const directory_rules = await sql `
         delete
         from directory_rule
-        where directory = ${directory} and category = (select id from rule_category where name = ${category}) and tag = ${tag}
+        where directory = ${directory} and category = (select id from rule_category where name = ${category}) and weight = ${weight}
         returning id
       `
       if (directory_rules.length == 0) {
@@ -238,7 +253,7 @@ export const directoryRepository = {
       return directory_rules[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`${context.name}:${directory}.${category}.${tag}:${description}`);
+      log.error(`${context.name}:${directory}.${category}.${weight}:${description}`);
       return null;
     }
   }

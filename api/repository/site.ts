@@ -67,21 +67,25 @@ export const siteRepository = {
         if (directories.length == 0) {
           return {};
         }
-  
+
         site.directory = directories[0];
 
         context.name = "siteRepository.get.getRules";
         const rules = await sql `
           select
-            sr.id, src.name as category_name, sr.tag, sr.value, sr.created, sr.updated
+            sr.id, src.name as category_name, sr.weight, sr.op, sr.dst, sr.src, sr.value, sr.created, sr.updated
           from site_rule as sr
           inner join rule_category as src on sr.category = src.id
           where sr.site = ${id}
-          order by src.name, sr.tag
+          order by src.name, sr.weight
         `
 
         site.rule_category_names = [];
         for (const rule of rules) {
+          if (!rule.op) delete rule.op;
+          if (!rule.dst) delete rule.dst;
+          if (!rule.src) delete rule.src;
+          if (!rule.value) delete rule.value;
           if (!site[rule.category_name]) {
             site[rule.category_name] = [];
           }
@@ -95,15 +99,19 @@ export const siteRepository = {
         context.name = "siteRepository.get.getDirectoryRules";
         const directoryRules = await sql `
           select
-            dr.id, drc.name as rule_category_name, dr.tag, dr.value, dr.created, dr.updated
+            dr.id, drc.name as rule_category_name, dr.weight, dr.op, dr.dst, dr.src, dr.value, dr.created, dr.updated
           from directory_rule as dr
           inner join rule_category as drc on dr.category = drc.id
           where dr.directory = ${directory_id}
-          order by drc.name, dr.tag
+          order by drc.name, dr.weight
         `
   
         site.directory.rule_category_names = [];
         for (const rule of directoryRules) {
+          if (!rule.op) delete rule.op;
+          if (!rule.dst) delete rule.dst;
+          if (!rule.src) delete rule.src;
+          if (!rule.value) delete rule.value;
           if (!site.directory[rule.rule_category_name]) {
             site.directory[rule.rule_category_name] = [];
           }
@@ -309,22 +317,29 @@ export const siteRepository = {
       return null;
     }
   },
-  async createOrUpdateRule(site: string, category: string, tag: string, siteRuleParam: SiteRuleParam) {
+  async createOrUpdateRule(site: string, category: string, weight: number, siteRuleParam: SiteRuleParam) {
     const context = {
       name: "siteResourceRepository.createOrUpdateRule"
     };
 
-    const value = siteRuleParam?.value;
+    const op = siteRuleParam.op ? siteRuleParam.op : null;
+    const src = siteRuleParam.src ? siteRuleParam.src : null;
+    const dst = siteRuleParam.dst ? siteRuleParam.dst : null;
+    const value = siteRuleParam.value ? siteRuleParam.value : null;
     try {
       const site_rules = await sql `
         insert
-        into site_rule (site, category, tag, value, created, updated)
-        values (${site}, (select id from rule_category where name=${category}), ${tag}, ${value}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
-        on conflict (site, category, tag)
+        into site_rule (site, category, weight, op, src, dst, value, created, updated)
+        values (${site}, (select id from rule_category where name=${category}), ${weight}, ${op}, ${src}, ${dst}, ${value}, current_timestamp at time zone 'UTC', current_timestamp at time zone 'UTC')
+        on conflict (site, category, weight)
         do update
-        set value = ${value ? value : sql`value`},
+        set
+          op = ${op},
+          src = ${src},
+          dst = ${dst},
+          value = ${value},
           updated = current_timestamp at time zone 'UTC'
-        returning id, site, ${category} as category_name, tag, value, created, updated
+        returning id, site, ${category} as category_name, weight, op, src, dst, value, created, updated
       `
       if (site_rules.length == 0) {
         return {};
@@ -341,11 +356,11 @@ export const siteRepository = {
           return "Invalid category name";
         }
       }
-      log.error(`${context.name}:${site}.${category}.${tag}:${description}`);
+      log.error(`${context.name}:${site}.${category}.${weight}:${description}`);
       return null;
     }
   },
-  async deleteRule(site: string, category: string, tag: string) {
+  async deleteRule(site: string, category: string, weight: number) {
     const context = {
       name: "siteResourceRepository.createRule"
     };
@@ -354,7 +369,7 @@ export const siteRepository = {
       const site_rules = await sql `
         delete
         from site_rule
-        where site = ${site} and category = (select id from rule_category where name = ${category}) and tag = ${tag}
+        where site = ${site} and category = (select id from rule_category where name = ${category}) and weight = ${weight}
         returning id
       `
       if (site_rules.length == 0) {
@@ -363,7 +378,7 @@ export const siteRepository = {
       return site_rules[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`${context.name}:${site}.${category}.${tag}:${description}`);
+      log.error(`${context.name}:${site}.${category}.${weight}:${description}`);
       return null;
     }
   }

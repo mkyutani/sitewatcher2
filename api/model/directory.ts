@@ -3,5 +3,8 @@ export type DirectoryParam = {
 };
 
 export type DirectoryRuleParam = {
+  op: string | null,
+  dst: string | null,
+  src: string | null,
   value: string | null,
 };

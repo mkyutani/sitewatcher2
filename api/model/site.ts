@@ -10,5 +10,8 @@ export type SiteResourceParam = {
 };
 
 export type SiteRuleParam = {
+  op: string | null,
+  dst: string | null,
+  src: string | null,
   value: string | null,
 };
