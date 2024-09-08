@@ -43,7 +43,7 @@ create table if not exists directory_rule (
   created timestamp not null,
   updated timestamp not null,
   primary key(id),
-  unique(directory, category, tag)
+  unique(directory, category, weight)
 );
 
 create table if not exists site_rule (
