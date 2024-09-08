@@ -18,7 +18,7 @@ create table if not exists site (
   unique(uri)
 );
 
-create table if not exists site_rule_category (
+create table if not exists rule_category (
   id int not null,
   name varchar(256) not null,
   description varchar(4096) not null,

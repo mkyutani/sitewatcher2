@@ -18,7 +18,7 @@ create table if not exists site (
   unique(uri)
 );
 
-create table if not exists site_rule_category (
+create table if not exists rule_category (
   id int not null,
   name varchar(256) not null,
   description varchar(4096) not null,
@@ -35,8 +35,11 @@ create table if not exists directory_rule (
   id uuid default gen_random_uuid() not null,
   directory uuid not null references directory on delete cascade,
   category int not null references rule_category on delete cascade,
-  tag varchar(256) not null,
-  value varchar(4096) not null,
+  weight int not null,
+  op varchar(256),
+  src varchar(256),
+  dst varchar(256),
+  value varchar(4096),
   created timestamp not null,
   updated timestamp not null,
   primary key(id),
@@ -47,12 +50,15 @@ create table if not exists site_rule (
   id uuid default gen_random_uuid() not null,
   site uuid not null references site on delete cascade,
   category int not null references rule_category on delete cascade,
-  tag varchar(256) not null,
-  value varchar(4096) not null,
+  weight int not null,
+  op varchar(256),
+  src varchar(256),
+  dst varchar(256),
+  value varchar(4096),
   created timestamp not null,
   updated timestamp not null,
   primary key(id),
-  unique(site, category, tag)
+  unique(site, category, weight)
 );
 
 create table if not exists resource (
