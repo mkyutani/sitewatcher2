@@ -538,16 +538,6 @@ export const channelRepository = {
             from resource_property as r
             where r.resource = ${history_item.resource}
           `
-          history_item.kv.push({key: "_channel", value: history_item.channel});
-          history_item.kv.push({key: "_channel_name", value: history_item.channel_name});
-          history_item.kv.push({key: "_resource", value: history_item.resource});
-          history_item.kv.push({key: "_uri", value: history_item.uri});
-          history_item.kv.push({key: "_site", value: history_item.site});
-          history_item.kv.push({key: "_site_name", value: history_item.site_name});
-          history_item.kv.push({key: "_site_uri", value: history_item.site_uri});
-          history_item.kv.push({key: "_directory", value: history_item.directory});
-          history_item.kv.push({key: "_directory_name", value: history_item.directory_name});
-          history_item.kv.push({key: "_timestamp", value: history_item.timestamp});
         }
 
         if (!timestamp && latest_timestamp !== null) {
@@ -597,16 +587,6 @@ export const channelRepository = {
           from resource_property as r
           where r.resource = ${history_item.resource}
         `
-        history_item.kv.push({key: "_channel", value: history_item.channel});
-        history_item.kv.push({key: "_channel_name", value: history_item.channel_name});
-        history_item.kv.push({key: "_resource", value: history_item.resource});
-        history_item.kv.push({key: "_uri", value: history_item.uri});
-        history_item.kv.push({key: "_site", value: history_item.site});
-        history_item.kv.push({key: "_site_name", value: history_item.site_name});
-        history_item.kv.push({key: "_site_uri", value: history_item.site_uri});
-        history_item.kv.push({key: "_directory", value: history_item.directory});
-        history_item.kv.push({key: "_directory_name", value: history_item.directory_name});
-        history_item.kv.push({key: "_timestamp", value: history_item.timestamp});
       }
 
       return history_items;
