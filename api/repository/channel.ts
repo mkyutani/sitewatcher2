@@ -493,7 +493,11 @@ export const channelRepository = {
               where device = ${channel_device_id}
             `
 
-            return latest_device_log[0].timestamp;
+            if (latest_device_log.length === 0) {
+              return null;
+            } else {
+              return latest_device_log[0].timestamp;
+            }
           }
         })();
 
@@ -522,10 +526,10 @@ export const channelRepository = {
             group by site
           ) as ir on ir.site = r.site
           where ch.channel = ${id}
-          and ${latest_timestamp} > ir.initial_update_timestamp
           ${timestamp ? sql`
             and ch.timestamp = ${timestamp}
           ` : sql`
+            and ${latest_timestamp} > ir.initial_update_timestamp
             and ch.timestamp > ${latest_timestamp}
             order by ch.timestamp desc
           `}
@@ -540,7 +544,7 @@ export const channelRepository = {
           `
         }
 
-        if (!timestamp && latest_timestamp !== null) {
+        if (!timestamp && latest_timestamp !== null && history_items.length > 0) {
           if (logging) {
             context.name = "channelRepository.getResourcesByDevice.setLatestTimestamp";
             const updated_timestamps = await sql `
