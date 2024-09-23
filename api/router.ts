@@ -19,6 +19,8 @@ router.put('/api/v1/sites/:id/rules/:category/:weight', siteController.createOrU
 router.delete('/api/v1/sites/:id/rules/:category/:weight', siteController.deleteRule);
 router.post('/api/v1/sites/:id/resources', siteController.registerResource);
 router.get('/api/v1/sites/:id/resources', siteController.getAllResources);
+router.put('/api/v1/sites/:id/resources', siteController.updateResource);
+router.delete('/api/v1/sites/:id/resources', siteController.deleteResource);
 router.post('/api/v1/sites', siteController.create);
 router.get('/api/v1/sites/:id', siteController.get);
 router.get('/api/v1/sites', siteController.list);

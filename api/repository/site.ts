@@ -275,12 +275,118 @@ export const siteRepository = {
       if (error instanceof sql.PostgresError) {
         switch (parseInt(error.code, 10)) {
         case 23505:
-          return {}
+          return "Duplicated"
         case 23503:
-          return "Invalid directory id";
+          return "Invalid site id";
         }
       }
       log.error(`${context.name}:${description}`);
+      return null;
+    }
+  },
+  async updateResource(site: string, siteResourceParam: SiteResourceParam) {
+    const context = {
+      name: "siteResourceRepository.updateResource"
+    };
+
+    const uri = siteResourceParam?.uri;
+    const properties = siteResourceParam?.properties;
+
+    try {
+      context.name = "siteResourceRepository.updateResource.map"
+      const properties_kv = Object.keys(properties).map(key => {
+        return {
+          key: key,
+          value: properties[key]
+        };
+      });
+
+      context.name = "siteResourceRepository.updateResource.startTransaction"
+      const resource = await sql.begin(async sql => {
+        context.name = "siteResourceRepository.updateResource.getCurrentTimestamp"
+        const timestamps = await sql`
+          select to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MISSUS') as timestamp
+        `
+        const timestamp = timestamps[0].timestamp;
+
+        context.name = "siteResourceRepository.updateResource.selectResource"
+        const updated_resources = await sql`
+          select id, uri, site
+          from resource
+          where site = ${site} and uri = ${uri}
+        `
+        const updated_resource = updated_resources[0];
+
+        context.name = `siteResourceRepository.updateResource.deleteProperties`
+        await sql`
+          delete
+          from resource_property
+          where resource = ${updated_resource.id}
+        `
+
+        context.name = `siteResourceRepository.updateResource.insertProperties`
+        properties_kv.push({ key: "timestamp", value: timestamp });
+        properties_kv.forEach(async (property) => {
+          await sql`
+            insert
+            into resource_property (resource, key, value)
+            values
+              (${updated_resource.id}, ${property.key}, ${property.value})
+          `
+        });
+
+        context.name = `siteResourceRepository.updateResource.getSiteName`
+        const site_names = await sql`
+          select name
+          from site
+          where id = ${updated_resource.site}
+        `
+        const site_name = site_names[0]
+
+        return {
+          id: updated_resource.id,
+          uri: updated_resource.uri,
+          site: updated_resource.site,
+          site_name: site_name.name,
+          timestamp: timestamp,
+          properties: properties_kv
+        };
+      });
+
+      return resource;
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      if (error instanceof sql.PostgresError) {
+        switch (parseInt(error.code, 10)) {
+        case 23505:
+          return "Duplicated";
+        }
+      }
+      log.error(`${context.name}:${description}`);
+      return null;
+    }
+  },
+  async deleteResource(site: string, siteResourceParam: SiteResourceParam) {
+    const context = {
+      name: "siteResourceRepository.deleteResource"
+    };
+
+    const uri = siteResourceParam?.uri;
+
+    try {
+      const resources = await sql `
+        delete
+        from resource
+        where site = ${site} and uri = ${uri}
+        returning site, uri
+      `
+      if (resources.length == 0) {
+        return {};
+      }
+      return resources[0];
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      log.error(`${context.name}:${site}:${description}`);
       return null;
     }
   },

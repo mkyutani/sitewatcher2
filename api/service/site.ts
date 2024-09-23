@@ -20,6 +20,12 @@ export const siteService = {
   async registerResource(site: string, {...reqBody}: SiteResourceParam) {
     return await siteRepository.registerResource(site, reqBody as SiteResourceParam);
   },
+  async updateResource(site: string, {...reqBody}: SiteResourceParam) {
+    return await siteRepository.updateResource(site, reqBody as SiteResourceParam);
+  },
+  async deleteResource(site: string, {...reqBody}: SiteResourceParam) {
+    return await siteRepository.deleteResource(site, reqBody as SiteResourceParam);
+  },
   async getAllResources(site: string) {
     return await siteRepository.getAllResources(site);
   },
