@@ -82,10 +82,10 @@ export const siteRepository = {
 
         site.rule_category_names = [];
         for (const rule of rules) {
-          if (!rule.op) delete rule.op;
+          if (!rule.op) rule.op = "";
           if (!rule.dst) delete rule.dst;
           if (!rule.src) delete rule.src;
-          if (!rule.value) delete rule.value;
+          if (!rule.value) rule.value = "";
           if (!site[rule.category_name]) {
             site[rule.category_name] = [];
           }
