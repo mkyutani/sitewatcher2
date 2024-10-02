@@ -432,9 +432,9 @@ export const channelRepository = {
     try {
       const history_items = await sql `
         insert into channel_history (channel, uri, resource, timestamp)
-          select u.channel, u.uri, u.resource, to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MISSUS')
+          select u.channel, u.uri, u.resource, to_char(current_timestamp at time zone 'UTC', 'YYYYMMDDHH24MISSUS') as timestamp
           from (
-            select s.channel, r.uri, s.site, s.site_name, r.id as resource
+            select s.channel, r.uri, s.site, s.site_name, r.id as resource, r.timestamp as timestamp
             from (
               select cd.channel, s1.id, s1.id as site, s1.name as site_name, cd.priority
               from channel_directory as cd
@@ -449,11 +449,19 @@ export const channelRepository = {
             inner join resource as r on r.site = s.id
             order by s.priority
           ) as u
-        where not exists (
-          select uri
-          from channel_history as ch
-          where u.uri = ch.uri
-        )
+          where not exists (
+            select uri
+            from channel_history as ch
+            where u.uri = ch.uri
+          )
+          and u.timestamp > (
+            select timestamp
+            from channel_history
+            where channel = ${id}
+            group by timestamp
+            order by timestamp desc
+            limit 1
+          )
         on conflict do nothing
         returning channel, uri, resource, timestamp
       `
