@@ -458,6 +458,8 @@ export const channelRepository = {
             select timestamp
             from channel_history
             where channel = ${id}
+            union
+            select '00000000000000000000' as timestamp
             group by timestamp
             order by timestamp desc
             limit 1
