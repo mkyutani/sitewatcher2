@@ -27,9 +27,11 @@ create table if not exists rule_category (
 );
 insert into rule_category (id, name, description)
 values
-  (1, 'include', 'includes site resources'),
-  (2, 'exclude', 'excludes site resources'),
-  (3, 'property_template', 'site resource property template');
+  (1, 'property_template', 'site resource property template'),
+  (101, 'include', 'includes site resources'),
+  (102, 'exclude', 'excludes site resources'),
+  (103, 'start', 'starts site resources'),
+  (104, 'stop', 'stops site resources');
 
 create table if not exists directory_rule (
   id uuid default gen_random_uuid() not null,
