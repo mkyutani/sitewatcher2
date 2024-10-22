@@ -452,7 +452,8 @@ export const channelRepository = {
           where not exists (
             select uri
             from channel_history as ch
-            where u.uri = ch.uri
+            where ch.channel = ${id}
+            and u.uri = ch.uri
           )
           and u.timestamp > (
             select timestamp
