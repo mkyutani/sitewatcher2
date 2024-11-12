@@ -538,7 +538,7 @@ export const channelRepository = {
           ) as ir on ir.site = r.site
           where ch.channel = ${id}
           ${timestamp ? sql`
-            and ch.timestamp = ${timestamp}
+            and ch.timestamp like ${timestamp + '%'}
           ` : sql`
             and ${latest_timestamp} > ir.initial_update_timestamp
             and ch.timestamp > ${latest_timestamp}
@@ -589,7 +589,7 @@ export const channelRepository = {
         inner join directory as d on d.id = s.directory
         where c.id = ${id}
         ${timestamp ? sql`
-          and ch.timestamp = ${timestamp}
+          and ch.timestamp like ${timestamp + '%'}
         ` : sql`
           order by ch.timestamp desc
         `}
