@@ -34,5 +34,8 @@ export const siteService = {
   },
   async deleteRule(id: string, category: string, weight: number) {
     return await siteRepository.deleteRule(id, category, weight);
+  },
+  async deleteRules(id: string, category: string) {
+    return await siteRepository.deleteRules(id, category);
   }
 }

@@ -237,7 +237,7 @@ export const directoryRepository = {
   },
   async deleteRule(directory: string, category: string, weight: number) {
     const context = {
-      name: "directoryRepository.createRule"
+      name: "directoryRepository.deleteRule"
     };
 
     try {
@@ -254,6 +254,28 @@ export const directoryRepository = {
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
       log.error(`${context.name}:${directory}.${category}.${weight}:${description}`);
+      return null;
+    }
+  },
+  async deleteRules(directory: string, category: string) {
+    const context = {
+      name: "directoryRepository.deleteRules"
+    };
+
+    try {
+      const directory_rules = await sql `
+        delete
+        from directory_rule
+        where directory = ${directory} and category = (select id from rule_category where name = ${category})
+        returning id
+      `
+      if (directory_rules.length == 0) {
+        return {};
+      }
+      return directory_rules;
+    } catch (error) {
+      const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
+      log.error(`${context.name}:${directory}.${category}:${description}`);
       return null;
     }
   }

@@ -174,5 +174,13 @@ export const siteController = {
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result);
     ctx.response.body = null;
+  },
+  async deleteRules(ctx:RouterContext<string>) {
+    const { id, category } = helpers.getQuery(ctx, { mergeParams: true });
+    ctx.assert(isUuid(id), 400, "Invalid id");
+    const result = await siteService.deleteRules(id, category);
+    ctx.assert(result, 500, "Unknown");
+    ctx.assert(typeof result !== "string", 400, result);
+    ctx.response.body = null;
   }
 }
