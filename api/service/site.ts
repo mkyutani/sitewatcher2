@@ -32,8 +32,8 @@ export const siteService = {
   async createOrUpdateRule(id: string, category: string, weight: number, {...reqBody}: SiteRuleParam) {
     return await siteRepository.createOrUpdateRule(id, category, weight, reqBody);
   },
-  async deleteRule(id: string, category: string, weight: number) {
-    return await siteRepository.deleteRule(id, category, weight);
+  async deleteRule(id: string, category: string, min: number, max: number) {
+    return await siteRepository.deleteRule(id, category, min, max);
   },
   async deleteRules(id: string, category: string) {
     return await siteRepository.deleteRules(id, category);

@@ -235,7 +235,7 @@ export const directoryRepository = {
       return null;
     }
   },
-  async deleteRule(directory: string, category: string, weight: number) {
+  async deleteRule(directory: string, category: string, min: number, max: number) {
     const context = {
       name: "directoryRepository.deleteRule"
     };
@@ -244,7 +244,9 @@ export const directoryRepository = {
       const directory_rules = await sql `
         delete
         from directory_rule
-        where directory = ${directory} and category = (select id from rule_category where name = ${category}) and weight = ${weight}
+        where directory = ${directory} and category = (select id from rule_category where name = ${category})
+        ${min > 0 ? sql`and weight >= ${min}`: sql``}
+        ${max > 0 ? sql`and weight <= ${max}`: sql``}
         returning id
       `
       if (directory_rules.length == 0) {
@@ -253,7 +255,7 @@ export const directoryRepository = {
       return directory_rules[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`${context.name}:${directory}.${category}.${weight}:${description}`);
+      log.error(`${context.name}:${directory}.${category}.${min}-${max}:${description}`);
       return null;
     }
   },

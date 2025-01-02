@@ -1,7 +1,7 @@
 import { RouterContext, helpers } from "../deps.ts";
 import { SiteParam, SiteResourceParam, SiteRuleParam } from "../model/site.ts";
 import { siteService } from "../service/site.ts";
-import { isUuid } from "../util.ts";
+import { getRange, isUuid } from "../util.ts";
 
 export const siteController = {
   async create(ctx:RouterContext<string>) {
@@ -166,11 +166,14 @@ export const siteController = {
     ctx.response.body = result;
   },
   async deleteRule(ctx:RouterContext<string>) {
-    const { id, category, weight } = helpers.getQuery(ctx, { mergeParams: true });
+    const { id, category, range } = helpers.getQuery(ctx, { mergeParams: true });
     ctx.assert(isUuid(id), 400, "Invalid id");
-    const weight_number = parseInt(weight);
-    ctx.assert(!isNaN(weight_number), 400, "Weight must be a number");
-    const result = await siteService.deleteRule(id, category, weight_number);
+    const range_value = getRange(range);
+    ctx.assert(range_value, 400, "Invalid range");
+    const min = range_value[0];
+    const max = range_value[1];
+    ctx.assert(min > 0 || max > 0, 400, "Invalid range");
+    const result = await siteService.deleteRule(id, category, min, max);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result);
     ctx.response.body = null;

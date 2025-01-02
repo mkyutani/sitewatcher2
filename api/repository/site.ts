@@ -1,6 +1,7 @@
 import sql from "./db.ts"
 import { log } from "../deps.ts";
 import { SiteParam, SiteResourceParam, SiteRuleParam } from "../model/site.ts";
+import { getRange } from "../util.ts";
 
 export const siteRepository = {
   async create(siteParam: SiteParam) {
@@ -466,7 +467,7 @@ export const siteRepository = {
       return null;
     }
   },
-  async deleteRule(site: string, category: string, weight: number) {
+  async deleteRule(site: string, category: string, min: number, max: number) {
     const context = {
       name: "siteResourceRepository.deleteRule"
     };
@@ -475,7 +476,9 @@ export const siteRepository = {
       const site_rules = await sql `
         delete
         from site_rule
-        where site = ${site} and category = (select id from rule_category where name = ${category}) and weight = ${weight}
+        where site = ${site} and category = (select id from rule_category where name = ${category})
+        ${min > 0 ? sql`and weight >= ${min}`: sql``}
+        ${max > 0 ? sql`and weight <= ${max}`: sql``}
         returning id
       `
       if (site_rules.length == 0) {
@@ -484,7 +487,7 @@ export const siteRepository = {
       return site_rules[0];
     } catch (error) {
       const description = (error instanceof sql.PostgresError) ? `PG${error.code}:${error.message}` : `${error.name}:${error.message}` 
-      log.error(`${context.name}:${site}.${category}.${weight}:${description}`);
+      log.error(`${context.name}:${site}.${category}.${min}-${max}:${description}`);
       return null;
     }
   },

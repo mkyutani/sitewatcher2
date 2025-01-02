@@ -20,8 +20,8 @@ export const directoryService = {
   async createOrUpdateRule(id: string, category: string,  weight: number, {...reqBody}: DirectoryRuleParam) {
     return await directoryRepository.createOrUpdateRule(id, category, weight, reqBody);
   },
-  async deleteRule(id: string, category: string,  weight: number) {
-    return await directoryRepository.deleteRule(id, category, weight);
+  async deleteRule(id: string, category: string, min: number, max: number) {
+    return await siteRepository.deleteRule(id, category, min, max);
   },
   async deleteRules(id: string, category: string) {
     return await directoryRepository.deleteRules(id, category);

@@ -7,7 +7,7 @@ const router = new Router();
 
 router.post('/api/v1/directories/:id/rules/:category/:weight', directoryController.createOrUpdateRule);
 router.put('/api/v1/directories/:id/rules/:category/:weight', directoryController.createOrUpdateRule);
-router.delete('/api/v1/directories/:id/rules/:category/:weight', directoryController.deleteRule);
+router.delete('/api/v1/directories/:id/rules/:category/:range', directoryController.deleteRule);
 router.delete('/api/v1/directories/:id/rules/:category', directoryController.deleteRules);
 router.post('/api/v1/directories', directoryController.create);
 router.get('/api/v1/directories/:id', directoryController.get);
@@ -17,7 +17,7 @@ router.delete('/api/v1/directories/:id', directoryController.delete);
 
 router.post('/api/v1/sites/:id/rules/:category/:weight', siteController.createOrUpdateRule);
 router.put('/api/v1/sites/:id/rules/:category/:weight', siteController.createOrUpdateRule);
-router.delete('/api/v1/sites/:id/rules/:category/:weight', siteController.deleteRule);
+router.delete('/api/v1/sites/:id/rules/:category/:range', siteController.deleteRule);
 router.delete('/api/v1/sites/:id/rules/:category', siteController.deleteRules);
 router.post('/api/v1/sites/:id/resources', siteController.registerResource);
 router.get('/api/v1/sites/:id/resources', siteController.getAllResources);

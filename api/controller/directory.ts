@@ -1,7 +1,7 @@
 import { RouterContext, helpers } from "../deps.ts";
 import { DirectoryParam, DirectoryRuleParam } from "../model/directory.ts";
 import { directoryService } from "../service/directory.ts";
-import { isUuid } from "../util.ts";
+import { getRange, isUuid } from "../util.ts";
 
 export const directoryController = {
   async create(ctx:RouterContext<string>) {
@@ -81,10 +81,14 @@ export const directoryController = {
     ctx.response.body = result;
   },
   async deleteRule(ctx:RouterContext<string>) {
-    const { id, category, weight } = helpers.getQuery(ctx, { mergeParams: true });
+    const { id, category, range } = helpers.getQuery(ctx, { mergeParams: true });
     ctx.assert(isUuid(id), 400, "Invalid id");
-    ctx.assert(!isNaN(weight), 400, "Weight must be a number");
-    const result = await directoryService.deleteRule(id, category, weight);
+    const range_value = getRange(range);
+    ctx.assert(range_value, 400, "Invalid range");
+    const min = range_value[0];
+    const max = range_value[1];
+    ctx.assert(min > 0 || max > 0, 400, "Invalid range");
+    const result = await directoryService.deleteRule(id, category, min, max);
     ctx.assert(result, 500, "Unknown");
     ctx.assert(typeof result !== "string", 400, result);
     ctx.response.body = null;

@@ -21,6 +21,17 @@ export const convertToBoolean = function(value: boolean | string | null): boolea
   else return null;
 }
 
+export const getRange = function(value: string | null): number[] {
+  if (typeof value === "undefined") return [0, 0];
+  if (value === null) return [0, 0];
+  else {
+    const range = value.split("-").map(Number);
+    if (range.length == 2) return range;
+    else if (range.length == 1) return [range[0], range[0]];
+    else return [0, 0];
+  }
+}
+
 export const isUuid = function(value: string | null): boolean {
   if (typeof value === "undefined") return false;
   if (value === null) return false;
