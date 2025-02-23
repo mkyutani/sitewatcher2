@@ -553,6 +553,9 @@ export const channelRepository = {
             from resource_property as r
             where r.resource = ${history_item.resource}
           `
+          history_item.kv.push({"key": "_channel", "value": history_item["channel"]});
+          history_item.kv.push({"key": "_channel_name", "value": history_item["channel_name"]});
+          history_item.kv.push({"key": "_resource", "value": history_item["resource"]});
         }
 
         if (!timestamp && latest_timestamp !== null && history_items.length > 0) {
@@ -602,6 +605,9 @@ export const channelRepository = {
           from resource_property as r
           where r.resource = ${history_item.resource}
         `
+        history_item.kv.push({"key": "_channel", "value": history_item["channel"]});
+        history_item.kv.push({"key": "_channel_name", "value": history_item["channel_name"]});
+        history_item.kv.push({"key": "_resource", "value": history_item["resource"]});
       }
 
       return history_items;

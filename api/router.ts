@@ -2,6 +2,7 @@ import { directoryController } from "./controller/directory.ts";
 import { Router } from "./deps.ts"
 import { siteController } from "./controller/site.ts";
 import { channelController } from "./controller/channel.ts";
+import { resourceController } from "./controller/resource.ts";
 
 const router = new Router();
 
@@ -35,11 +36,11 @@ router.delete('/api/v1/channels/:id/directories/:dir', channelController.deleteD
 router.post('/api/v1/channels/:id/sites/:site', channelController.addSite);
 router.put('/api/v1/channels/:id/sites/:site', channelController.updateSite);
 router.delete('/api/v1/channels/:id/sites/:site', channelController.deleteSite);
+router.post('/api/v1/channels/:id/devices/:dev/resources', channelController.getResourcesByDevice);
+router.get('/api/v1/channels/:id/devices/:dev/resources', channelController.getResourcesByDeviceWithoutLog);
 router.post('/api/v1/channels/:id/devices/:dev', channelController.addDevice);
 router.put('/api/v1/channels/:id/devices/:dev', channelController.updateDevice);
 router.delete('/api/v1/channels/:id/devices/:dev', channelController.deleteDevice);
-router.post('/api/v1/channels/:id/resources/:dev', channelController.getResourcesByDevice);
-router.get('/api/v1/channels/:id/resources/:dev', channelController.getResourcesByDeviceWithoutLog);
 router.post('/api/v1/channels/:id/resources', channelController.collectResources);
 router.get('/api/v1/channels/:id/resources', channelController.getResources);
 router.post('/api/v1/channels', channelController.create);
@@ -47,5 +48,7 @@ router.get('/api/v1/channels/:id', channelController.get);
 router.get('/api/v1/channels', channelController.list);
 router.put('/api/v1/channels/:id', channelController.update);
 router.delete('/api/v1/channels/:id', channelController.delete);
+
+router.get('/api/v1/resources/:id', resourceController.get);
 
 export { router }
