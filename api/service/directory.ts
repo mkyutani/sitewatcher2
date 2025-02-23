@@ -21,7 +21,7 @@ export const directoryService = {
     return await directoryRepository.createOrUpdateRule(id, category, weight, reqBody);
   },
   async deleteRule(id: string, category: string, min: number, max: number) {
-    return await siteRepository.deleteRule(id, category, min, max);
+    return await directoryRepository.deleteRule(id, category, min, max);
   },
   async deleteRules(id: string, category: string) {
     return await directoryRepository.deleteRules(id, category);
