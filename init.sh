@@ -23,18 +23,13 @@ fi
 #
 USER=$(id -un)
 GROUP=$(id -gn)
-PG_UID=$(grep postgres /etc/passwd | cut -d: -f3)
-PG_GID=$(grep postgres /etc/group | cut -d: -f3)
-DENO_UID=$(grep deno /etc/passwd | cut -d: -f3)
-DENO_GID=$(grep deno /etc/group | cut -d: -f3)
-MODE=777
+PG_UID=999
+PG_GID=999
+DENO_UID=1993
+DENO_GID=1993
+MODE=744
 ENV_FILE=.env
 VOLUMES=volumes
-
-if [ -z "$PG_UID" ] || [ -z "$PG_GID" ] || [ -z "$DENO_UID" ] || [ -z "$DENO_GID" ]; then
-    echo "User/group for postgres or deno is missing" >>/dev/stderr
-    exit 1
-fi
 
 #
 # clean
