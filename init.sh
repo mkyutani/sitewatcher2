@@ -23,13 +23,18 @@ fi
 #
 USER=$(id -un)
 GROUP=$(id -gn)
-PG_UID=999
-PG_GID=999
-DENO_UID=1993
-DENO_GID=1993
-MODE=775
+PG_UID=$(grep postgres /etc/passwd | cut -d: -f3)
+PG_GID=$(grep postgres /etc/group | cut -d: -f3)
+DENO_UID=$(grep deno /etc/passwd | cut -d: -f3)
+DENO_GID=$(grep deno /etc/group | cut -d: -f3)
+MODE=777
 ENV_FILE=.env
 VOLUMES=volumes
+
+if [ -z "$PG_UID" ] || [ -z "$PG_GID" ] || [ -z "$DENO_UID" ] || [ -z "$DENO_GID" ]; then
+    echo "User/group for postgres or deno is missing" >>/dev/stderr
+    exit 1
+fi
 
 #
 # clean
@@ -38,11 +43,11 @@ VOLUMES=volumes
 if [ "$TARGET" == "clean" ]; then
     if [ -e ${ENV_FILE} ]; then
         rm -f ${ENV_FILE}
-        echo ${ENV_FILE} removed.
+        echo ${ENV_FILE} removed. >>/dev/stderr
     fi
     if [ -e ${VOLUMES} ]; then
         rm -fr ${VOLUMES}
-        echo ${VOLUMES} removed.
+        echo ${VOLUMES} removed. >>/dev/stderr
     fi
     exit 1
 fi
@@ -50,7 +55,7 @@ fi
 #
 # .env
 #
-echo -n "Preparing ${ENV_FILE} ..."
+echo -n "Preparing ${ENV_FILE} ..." >>/dev/stderr
 
 CREATED=1
 if [ -e ${ENV_FILE} ]; then
@@ -76,9 +81,9 @@ echo "TARGET=${TARGET}" >>${ENV_FILE}
 cp -f ./${ENV_FILE} api/${ENV_FILE}
 
 if [ ${CREATED} = 1 ]; then
-    echo " created."
+    echo " created." >>/dev/stderr
 else
-    echo " overwritten."
+    echo " overwritten." >>/dev/stderr
 fi
 
 #
@@ -93,12 +98,12 @@ create_directory() {
     if [ ! -e "${dir}" ]; then
         mkdir "${dir}" -m "${mode}"
         chown "${user}:${group}" "${dir}"
-        echo -n " ${dir}/"
+        echo -n " ${dir}/" >>/dev/stderr
         CREATED=1
     fi
 }
 
-echo -n "Creating site directories ..."
+echo -n "Creating site directories ..." >>/dev/stderr
 CREATED=0
 create_directory "${VOLUMES}" ${MODE} ${USER} ${GROUP}
 create_directory "${VOLUMES}/deno-dir.${TARGET}" ${MODE} ${DENO_UID} ${DENO_GID}
@@ -107,7 +112,7 @@ create_directory "${VOLUMES}/pg/home" ${MODE} ${PG_UID} ${PG_GID}
 create_directory "${VOLUMES}/pg/data" ${MODE} ${PG_UID} ${PG_GID}
 create_directory "${VOLUMES}/pg/initdb" ${MODE} ${PG_UID} ${PG_GID}
 if [ ${CREATED} = 1 ]; then
-    echo " created."
+    echo " created." >>/dev/stderr
 else
-    echo " already exist."
+    echo " already exist." >>/dev/stderr
 fi
