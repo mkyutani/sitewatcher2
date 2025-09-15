@@ -33,98 +33,36 @@ servers:
       server:
         default: 'api'
         description: サーバー名
-        examples:
-          production: 
-            summary: 本番サーバー
-            value: 'api'
-          staging:
-            summary: ステージングサーバー
-            value: 'staging-api'
-          development:
-            summary: 開発サーバー
-            value: 'dev-api'
       domain:
         default: 'sitewatcher2.example.com'
         description: ドメイン名
-        examples:
-          example:
-            summary: Example domain
-            value: 'sitewatcher2.example.com'
-          localhost:
-            summary: Local HTTPS
-            value: 'localhost:8443'
   - url: http://{server}.{domain}
     description: SiteWatcher2 Server (HTTP)
     variables:
       server:
         default: 'api'
         description: サーバー名
-        examples:
-          development:
-            summary: 開発サーバー
-            value: 'dev-api'
-          localhost:
-            summary: ローカルサーバー
-            value: 'localhost:8089'
       domain:
         default: 'sitewatcher2.example.com'
         description: ドメイン名
-        examples:
-          example:
-            summary: Example domain
-            value: 'sitewatcher2.example.com'
-          localhost:
-            summary: Local HTTP
-            value: 'localhost:8089'
   - url: 'https://{host}:{port}'
     description: カスタムHTTPSサーバー
     variables:
       host:
         default: 'api.sitewatcher2.example.com'
         description: ホスト名
-        examples:
-          production:
-            summary: 本番ホスト
-            value: 'api.sitewatcher2.example.com'
-          localhost:
-            summary: ローカルホスト
-            value: 'localhost'
-          custom:
-            summary: カスタムホスト
-            value: 'api.mycompany.com'
       port:
         default: '443'
         description: HTTPSポート番号
-        examples:
-          standard:
-            summary: HTTPS標準ポート
-            value: '443'
-          custom:
-            summary: HTTPSカスタムポート
-            value: '8443'
   - url: 'http://{host}:{port}'
     description: カスタムHTTPサーバー
     variables:
       host:
         default: 'localhost'
         description: ホスト名
-        examples:
-          localhost:
-            summary: ローカルホスト
-            value: 'localhost'
-          development:
-            summary: 開発ホスト
-            value: 'dev-api.sitewatcher2.example.com'
       port:
         default: '8089'
         description: HTTPポート番号
-        examples:
-          development:
-            summary: 開発ポート
-            value: '8089'
-          standard:
-            summary: HTTP標準ポート
-            value: '80'
 
 tags:
   - name: directories
