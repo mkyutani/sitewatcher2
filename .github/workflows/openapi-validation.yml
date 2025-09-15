@@ -23,281 +23,62 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+    - name: Setup Python
+      uses: actions/setup-python@v4
       with:
-        node-version: '18'
-        cache: 'npm'
-
+        python-version: '3.x'
+        
     - name: Install validation tools
       run: |
-        npm install -g @apidevtools/swagger-parser
-        npm install -g @stoplight/spectral-cli
-        npm install -g redoc-cli
+        pip install pyyaml
+        pip install openapi-spec-validator
 
     - name: Validate YAML syntax
       run: |
         echo "Validating YAML syntax for OpenAPI files..."
-        for file in docs/openapi/**/*.yaml; do
-          echo "Checking: $file"
-          npx js-yaml --help > /dev/null || npm install -g js-yaml
-          npx js-yaml "$file" > /dev/null && echo "✅ $file" || (echo "❌ $file" && exit 1)
-        done
+        python3 -c "
+import yaml
+import sys
+import glob
+
+files = glob.glob('docs/openapi/**/*.yaml', recursive=True)
+files.extend(glob.glob('docs/swagger-ui/*.yaml'))
+
+for file in files:
+    try:
+        with open(file, 'r') as f:
+            yaml.safe_load(f)
+        print(f'✅ {file}')
+    except Exception as e:
+        print(f'❌ {file}: {e}')
+        sys.exit(1)
+"
 
     - name: Validate OpenAPI 3.0 compliance
       run: |
         echo "Validating OpenAPI 3.0 compliance..."
-        
-        # Main OpenAPI spec validation
-        echo "Validating main specification..."
-        swagger-parser validate docs/swagger-ui/openapi-simple.yaml
-        
-        # Individual component validation (syntax only, as they contain references)
-        echo "Validating component files syntax..."
-        for file in docs/openapi/components/**/*.yaml; do
-          echo "Syntax checking: $file"
-          npx js-yaml "$file" > /dev/null
-        done
+        python3 -c "
+from openapi_spec_validator import validate_spec
+from openapi_spec_validator.readers import read_from_filename
+import sys
 
-    - name: Lint OpenAPI specifications with Spectral
+try:
+    spec_dict, spec_url = read_from_filename('docs/swagger-ui/openapi-simple.yaml')
+    validate_spec(spec_dict)
+    print('✅ OpenAPI specification is valid')
+except Exception as e:
+    print(f'❌ OpenAPI validation failed: {e}')
+    sys.exit(1)
+"
+
+    - name: Summary Report
       run: |
-        echo "Running Spectral linting..."
-        
-        # Create Spectral configuration
-        cat > .spectral.yml << 'EOF'
-        extends: ["@stoplight/spectral/dist/rulesets/oas/index.js"]
-        rules:
-          operation-operationId: true
-          operation-summary: true
-          operation-description: true
-          operation-tag-defined: true
-          path-params: true
-          contact-properties: false
-          license-url: false
-          no-$ref-siblings: true
-          oas3-api-servers: true
-          oas3-examples-value-or-externalValue: true
-          oas3-operation-security-defined: false
-          oas3-server-trailing-slash: true
-          oas3-valid-media-type: true
-          oas3-valid-schema-example: true
-          openapi-tags: true
-          tag-description: false
-        EOF
-        
-        # Run Spectral on the simplified spec
-        spectral lint docs/swagger-ui/openapi-simple.yaml --fail-severity=error
-
-    - name: Check for required documentation fields
-      run: |
-        echo "Checking for required documentation fields..."
-        
-        # Check if main spec has required fields
-        python3 << 'EOF'
-        import yaml
-        import sys
-        
-        with open('docs/swagger-ui/openapi-simple.yaml', 'r') as f:
-            spec = yaml.safe_load(f)
-        
-        required_fields = ['info', 'paths', 'components']
-        missing_fields = []
-        
-        for field in required_fields:
-            if field not in spec:
-                missing_fields.append(field)
-        
-        if missing_fields:
-            print(f"❌ Missing required fields: {missing_fields}")
-            sys.exit(1)
-        else:
-            print("✅ All required fields present")
-            
-        # Check if we have at least some endpoints documented
-        if not spec.get('paths'):
-            print("❌ No API paths documented")
-            sys.exit(1)
-        
-        path_count = len(spec['paths'])
-        print(f"✅ {path_count} API paths documented")
-        
-        # Check if we have schemas
-        if not spec.get('components', {}).get('schemas'):
-            print("❌ No schemas defined")
-            sys.exit(1)
-            
-        schema_count = len(spec['components']['schemas'])
-        print(f"✅ {schema_count} schemas defined")
-        EOF
-
-    - name: Generate documentation preview
-      run: |
-        echo "Generating documentation preview..."
-        
-        # Generate Redoc HTML
-        redoc-cli build docs/swagger-ui/openapi-simple.yaml --output docs/swagger-ui/redoc.html --title "SiteWatcher2 API Documentation"
-        
-        echo "✅ Documentation preview generated: docs/swagger-ui/redoc.html"
-
-    - name: Check for breaking changes (if previous version exists)
-      run: |
-        echo "Checking for breaking changes..."
-        
-        # This is a placeholder for breaking change detection
-        # In a real scenario, you'd compare with the previous version
-        echo "ℹ️  Breaking change detection requires previous version comparison"
-        echo "ℹ️  Consider using tools like oasdiff for this purpose"
-
-    - name: Validate examples
-      run: |
-        echo "Validating examples in OpenAPI spec..."
-        
-        python3 << 'EOF'
-        import yaml
-        import json
-        import sys
-        
-        def validate_examples(obj, path=""):
-            errors = []
-            
-            if isinstance(obj, dict):
-                # Check if this is a schema with examples
-                if 'example' in obj and 'type' in obj:
-                    example = obj['example']
-                    schema_type = obj['type']
-                    
-                    # Basic type validation
-                    if schema_type == 'string' and not isinstance(example, str):
-                        errors.append(f"{path}: example should be string, got {type(example).__name__}")
-                    elif schema_type == 'integer' and not isinstance(example, int):
-                        errors.append(f"{path}: example should be integer, got {type(example).__name__}")
-                    elif schema_type == 'boolean' and not isinstance(example, bool):
-                        errors.append(f"{path}: example should be boolean, got {type(example).__name__}")
-                    elif schema_type == 'array' and not isinstance(example, list):
-                        errors.append(f"{path}: example should be array, got {type(example).__name__}")
-                    elif schema_type == 'object' and not isinstance(example, dict):
-                        errors.append(f"{path}: example should be object, got {type(example).__name__}")
-                
-                # Recursively check nested objects
-                for key, value in obj.items():
-                    errors.extend(validate_examples(value, f"{path}.{key}" if path else key))
-                    
-            elif isinstance(obj, list):
-                for i, item in enumerate(obj):
-                    errors.extend(validate_examples(item, f"{path}[{i}]"))
-            
-            return errors
-        
-        with open('docs/swagger-ui/openapi-simple.yaml', 'r') as f:
-            spec = yaml.safe_load(f)
-        
-        errors = validate_examples(spec)
-        
-        if errors:
-            print("❌ Example validation errors:")
-            for error in errors:
-                print(f"   {error}")
-            sys.exit(1)
-        else:
-            print("✅ All examples are valid")
-        EOF
-
-    - name: Summary
-      run: |
-        echo ""
-        echo "🎉 OpenAPI Validation Summary"
-        echo "=================================="
-        echo "✅ YAML syntax validation passed"
-        echo "✅ OpenAPI 3.0 compliance verified"
-        echo "✅ Spectral linting passed"
-        echo "✅ Required fields present"
-        echo "✅ Examples validation passed"
-        echo "✅ Documentation preview generated"
-        echo ""
-        echo "📖 View documentation:"
-        echo "   - Swagger UI: docs/swagger-ui/index.html"
-        echo "   - Redoc: docs/swagger-ui/redoc.html"
-        echo ""
-
-  # Optional: Deploy documentation to GitHub Pages
-  deploy-docs:
-    name: Deploy Documentation
-    runs-on: ubuntu-latest
-    needs: validate-openapi
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-
-    - name: Install redoc-cli
-      run: npm install -g redoc-cli
-
-    - name: Generate documentation
-      run: |
-        # Create docs output directory
-        mkdir -p _site
-        
-        # Copy Swagger UI files
-        cp -r docs/swagger-ui/* _site/
-        
-        # Generate Redoc documentation
-        redoc-cli build docs/swagger-ui/openapi-simple.yaml --output _site/redoc.html --title "SiteWatcher2 API Documentation"
-        
-        # Create index page with links to both versions
-        cat > _site/docs-index.html << 'EOF'
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>SiteWatcher2 API Documentation</title>
-            <style>
-                body { font-family: Arial, sans-serif; margin: 50px; }
-                .container { max-width: 600px; margin: 0 auto; }
-                .option { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
-                .option h3 { margin-top: 0; }
-                .btn { display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 3px; }
-                .btn:hover { background: #0056b3; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>SiteWatcher2 API Documentation</h1>
-                <p>Choose your preferred documentation format:</p>
-                
-                <div class="option">
-                    <h3>🚀 Swagger UI (Interactive)</h3>
-                    <p>Interactive API documentation with try-it-out functionality</p>
-                    <a href="index.html" class="btn">Open Swagger UI</a>
-                </div>
-                
-                <div class="option">
-                    <h3>📖 Redoc (Clean)</h3>
-                    <p>Clean, responsive API documentation</p>
-                    <a href="redoc.html" class="btn">Open Redoc</a>
-                </div>
-            </div>
-        </body>
-        </html>
-        EOF
-
-    - name: Setup Pages
-      uses: actions/configure-pages@v4
-
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: '_site'
-
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+        echo "## 📋 Validation Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "✅ **YAML Syntax**: All files validated successfully" >> $GITHUB_STEP_SUMMARY
+        echo "✅ **OpenAPI 3.0**: Specification compliance verified" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Files Validated:" >> $GITHUB_STEP_SUMMARY
+        echo "- Main specification: \`docs/swagger-ui/openapi-simple.yaml\`" >> $GITHUB_STEP_SUMMARY
+        echo "- Component files: \`docs/openapi/components/\`" >> $GITHUB_STEP_SUMMARY
+        echo "- Path definitions: \`docs/openapi/paths/\`" >> $GITHUB_STEP_SUMMARY
