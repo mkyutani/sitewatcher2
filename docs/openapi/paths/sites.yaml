@@ -1,0 +1,324 @@
+# Sites API paths
+
+/api/v1/sites:
+  get:
+    tags:
+      - sites
+    summary: サイト一覧取得
+    description: 全てのサイトを取得します
+    operationId: listSites
+    responses:
+      '200':
+        description: サイト一覧
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/site.yaml#/SiteListResponse'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+  post:
+    tags:
+      - sites
+    summary: サイト作成
+    description: 新しいサイトを作成します
+    operationId: createSite
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/site.yaml#/SiteCreateRequest'
+    responses:
+      '201':
+        description: 作成されたサイト
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/site.yaml#/Site'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '415':
+        description: Unsupported Media Type
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+/api/v1/sites/{id}:
+  parameters:
+    - $ref: '../components/parameters/common.yaml#/SiteIdParam'
+
+  get:
+    tags:
+      - sites
+    summary: サイト取得
+    description: 指定されたIDのサイトを取得します
+    operationId: getSite
+    responses:
+      '200':
+        description: サイト詳細
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/site.yaml#/Site'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+  put:
+    tags:
+      - sites
+    summary: サイト更新
+    description: 指定されたIDのサイトを更新します
+    operationId: updateSite
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/site.yaml#/SiteUpdateRequest'
+    responses:
+      '200':
+        description: 更新されたサイト
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/site.yaml#/Site'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '415':
+        description: Unsupported Media Type
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+  delete:
+    tags:
+      - sites
+    summary: サイト削除
+    description: 指定されたIDのサイトを削除します
+    operationId: deleteSite
+    responses:
+      '204':
+        description: 削除成功
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+/api/v1/sites/{id}/resources:
+  parameters:
+    - $ref: '../components/parameters/common.yaml#/SiteIdParam'
+
+  get:
+    tags:
+      - sites
+      - resources
+    summary: サイトリソース一覧取得
+    description: 指定されたサイトの全リソースを取得します
+    operationId: getSiteResources
+    responses:
+      '200':
+        description: サイトリソース一覧
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/site.yaml#/SiteResourceListResponse'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+  post:
+    tags:
+      - sites
+      - resources
+    summary: サイトリソース登録
+    description: 指定されたサイトにリソースを登録します
+    operationId: registerSiteResource
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/site.yaml#/SiteResourceCreateRequest'
+    responses:
+      '201':
+        description: 登録されたリソース
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/site.yaml#/SiteResource'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+  put:
+    tags:
+      - sites
+      - resources
+    summary: サイトリソース更新
+    description: 指定されたサイトのリソースを更新します
+    operationId: updateSiteResource
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/site.yaml#/SiteResourceUpdateRequest'
+    responses:
+      '200':
+        description: 更新されたリソース
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/site.yaml#/SiteResource'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+  delete:
+    tags:
+      - sites
+      - resources
+    summary: サイトリソース削除
+    description: 指定されたサイトのリソースを削除します
+    operationId: deleteSiteResource
+    requestBody:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              uri:
+                type: string
+                format: uri
+                description: 削除するリソースのURI
+                example: "https://example.com/resource"
+    responses:
+      '204':
+        description: 削除成功
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+/api/v1/sites/{id}/rules/{category}/{weight}:
+  parameters:
+    - $ref: '../components/parameters/common.yaml#/SiteIdParam'
+    - $ref: '../components/parameters/common.yaml#/CategoryParam'
+    - $ref: '../components/parameters/common.yaml#/WeightParam'
+
+  post:
+    tags:
+      - sites
+      - rules
+    summary: サイトルール作成
+    description: 指定されたサイトにルールを作成します
+    operationId: createSiteRule
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/site.yaml#/SiteRuleCreateRequest'
+    responses:
+      '201':
+        description: 作成されたルール
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/site.yaml#/SiteRule'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+  put:
+    tags:
+      - sites
+      - rules
+    summary: サイトルール更新
+    description: 指定されたサイトのルールを更新します
+    operationId: updateSiteRule
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/site.yaml#/SiteRuleCreateRequest'
+    responses:
+      '200':
+        description: 更新されたルール
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/site.yaml#/SiteRule'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+/api/v1/sites/{id}/rules/{category}/{range}:
+  parameters:
+    - $ref: '../components/parameters/common.yaml#/SiteIdParam'
+    - $ref: '../components/parameters/common.yaml#/CategoryParam'
+    - $ref: '../components/parameters/common.yaml#/RangeParam'
+
+  delete:
+    tags:
+      - sites
+      - rules
+    summary: サイトルール範囲削除
+    description: 指定された重み範囲のサイトルールを削除します
+    operationId: deleteSiteRuleRange
+    responses:
+      '204':
+        description: 削除成功
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+/api/v1/sites/{id}/rules/{category}:
+  parameters:
+    - $ref: '../components/parameters/common.yaml#/SiteIdParam'
+    - $ref: '../components/parameters/common.yaml#/CategoryParam'
+
+  delete:
+    tags:
+      - sites
+      - rules
+    summary: サイトルールカテゴリ削除
+    description: 指定されたカテゴリの全サイトルールを削除します
+    operationId: deleteSiteRuleCategory
+    responses:
+      '204':
+        description: 削除成功
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'

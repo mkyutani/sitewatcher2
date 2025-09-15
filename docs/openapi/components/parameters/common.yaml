@@ -1,0 +1,70 @@
+# 共通パラメータ定義
+
+IdParam:
+  name: id
+  in: path
+  required: true
+  description: リソースのUUID
+  schema:
+    type: string
+    format: uuid
+    example: "123e4567-e89b-12d3-a456-426614174000"
+
+DirectoryIdParam:
+  name: id
+  in: path
+  required: true
+  description: ディレクトリのUUID
+  schema:
+    type: string
+    format: uuid
+    example: "123e4567-e89b-12d3-a456-426614174000"
+
+SiteIdParam:
+  name: id
+  in: path
+  required: true
+  description: サイトのUUID
+  schema:
+    type: string
+    format: uuid
+    example: "123e4567-e89b-12d3-a456-426614174000"
+
+ChannelIdParam:
+  name: id
+  in: path
+  required: true
+  description: チャンネルのUUID
+  schema:
+    type: string
+    format: uuid
+    example: "123e4567-e89b-12d3-a456-426614174000"
+
+CategoryParam:
+  name: category
+  in: path
+  required: true
+  description: ルールのカテゴリ
+  schema:
+    type: string
+    example: "filter"
+
+WeightParam:
+  name: weight
+  in: path
+  required: true
+  description: ルールの重み（優先度）
+  schema:
+    type: integer
+    minimum: 0
+    example: 100
+
+RangeParam:
+  name: range
+  in: path
+  required: true
+  description: ルールの重み範囲（例: "100-200"）
+  schema:
+    type: string
+    pattern: '^\d+-\d+$'
+    example: "100-200"

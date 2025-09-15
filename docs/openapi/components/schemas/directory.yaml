@@ -1,0 +1,77 @@
+# Directory関連のスキーマ定義
+
+Directory:
+  type: object
+  required:
+    - id
+    - name
+  properties:
+    id:
+      $ref: './common.yaml#/UUID'
+    name:
+      type: string
+      description: ディレクトリ名
+      example: "ニュースサイト"
+      maxLength: 255
+    created_at:
+      $ref: './common.yaml#/Timestamp'
+    updated_at:
+      $ref: './common.yaml#/Timestamp'
+
+DirectoryCreateRequest:
+  type: object
+  required:
+    - name
+  properties:
+    name:
+      type: string
+      description: ディレクトリ名
+      example: "ニュースサイト"
+      maxLength: 255
+
+DirectoryUpdateRequest:
+  type: object
+  properties:
+    name:
+      type: string
+      description: ディレクトリ名
+      example: "ニュースサイト（更新）"
+      maxLength: 255
+
+DirectoryListResponse:
+  type: array
+  items:
+    $ref: '#/Directory'
+
+DirectoryRule:
+  allOf:
+    - $ref: './common.yaml#/Rule'
+    - type: object
+      properties:
+        directory_id:
+          $ref: './common.yaml#/UUID'
+
+DirectoryRuleCreateRequest:
+  type: object
+  required:
+    - op
+  properties:
+    op:
+      type: string
+      description: 操作の種類
+      example: "include"
+    dst:
+      type: string
+      nullable: true
+      description: 操作の対象
+      example: "title"
+    src:
+      type: string
+      nullable: true
+      description: 操作のソース
+      example: "xpath"
+    value:
+      type: string
+      nullable: true
+      description: 操作の値
+      example: "//h1[@class='title']"

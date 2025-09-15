@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SiteWatcher2 API Documentation</title>
+  <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.10.3/swagger-ui.css" />
+  <style>
+    html {
+      box-sizing: border-box;
+      overflow: -moz-scrollbars-vertical;
+      overflow-y: scroll;
+    }
+    *, *:before, *:after {
+      box-sizing: inherit;
+    }
+    body {
+      margin:0;
+      background: #fafafa;
+    }
+    .swagger-ui .topbar {
+      background-color: #1f4e79;
+    }
+    .swagger-ui .topbar .download-url-wrapper input[type=text] {
+      border: 2px solid #89bf04;
+    }
+    .swagger-ui .topbar .download-url-wrapper .download-url-button {
+      background: #89bf04;
+      color: white;
+      border: 2px solid #89bf04;
+    }
+  </style>
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  
+  <script src="https://unpkg.com/swagger-ui-dist@5.10.3/swagger-ui-bundle.js"></script>
+  <script src="https://unpkg.com/swagger-ui-dist@5.10.3/swagger-ui-standalone-preset.js"></script>
+  <script>
+    // Swagger UI設定
+    window.onload = function() {
+      const ui = SwaggerUIBundle({
+        url: './openapi-simple.yaml',
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIStandalonePreset
+        ],
+        plugins: [
+          SwaggerUIBundle.plugins.DownloadUrl
+        ],
+        layout: "StandaloneLayout",
+        validatorUrl: null,
+        docExpansion: "list",
+        defaultModelsExpandDepth: 1,
+        defaultModelExpandDepth: 1,
+        showRequestHeaders: true,
+        showCommonExtensions: true,
+        tryItOutEnabled: true,
+        // サーバーURL手動入力を有効化
+        showServerSelectBox: true,
+        showServerVariables: true,
+        displayOperationId: true,
+        requestInterceptor: function(request) {
+          // APIリクエストの前処理
+          console.log('Request:', request);
+          
+          // CORS対応のヘッダーを追加
+          request.headers = request.headers || {};
+          request.headers['Content-Type'] = 'application/json';
+          request.headers['Accept'] = 'application/json';
+          
+          // クレデンシャルモードを設定
+          request.credentials = 'same-origin';
+          
+          return request;
+        },
+        responseInterceptor: function(response) {
+          // APIレスポンスの後処理
+          console.log('Response:', response);
+          return response;
+        }
+      });
+
+      // カスタム設定
+      window.ui = ui;
+    };
+  </script>
+</body>
+</html>

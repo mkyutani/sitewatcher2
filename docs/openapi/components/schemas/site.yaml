@@ -1,0 +1,170 @@
+# Site関連のスキーマ定義
+
+Site:
+  type: object
+  required:
+    - id
+    - uri
+    - name
+    - directory_id
+  properties:
+    id:
+      $ref: './common.yaml#/UUID'
+    uri:
+      type: string
+      format: uri
+      description: サイトのURI
+      example: "https://example.com"
+    name:
+      type: string
+      description: サイト名
+      example: "Example Site"
+      maxLength: 255
+    directory_id:
+      $ref: './common.yaml#/UUID'
+    created_at:
+      $ref: './common.yaml#/Timestamp'
+    updated_at:
+      $ref: './common.yaml#/Timestamp'
+
+SiteCreateRequest:
+  type: object
+  required:
+    - uri
+    - name
+    - directory
+  properties:
+    uri:
+      type: string
+      format: uri
+      description: サイトのURI
+      example: "https://example.com"
+    name:
+      type: string
+      description: サイト名
+      example: "Example Site"
+      maxLength: 255
+    directory:
+      $ref: './common.yaml#/UUID'
+
+SiteUpdateRequest:
+  type: object
+  properties:
+    uri:
+      type: string
+      format: uri
+      description: サイトのURI
+      example: "https://example.com"
+    name:
+      type: string
+      description: サイト名
+      example: "Example Site（更新）"
+      maxLength: 255
+    directory:
+      $ref: './common.yaml#/UUID'
+
+SiteListResponse:
+  type: array
+  items:
+    $ref: '#/Site'
+
+SiteResource:
+  type: object
+  required:
+    - uri
+    - properties
+  properties:
+    id:
+      $ref: './common.yaml#/UUID'
+    site_id:
+      $ref: './common.yaml#/UUID'
+    uri:
+      type: string
+      format: uri
+      description: リソースのURI
+      example: "https://example.com/resource"
+    name:
+      type: string
+      description: リソース名
+      example: "Resource Name"
+    properties:
+      type: object
+      description: リソースのプロパティ（任意のJSONオブジェクト）
+      additionalProperties: true
+      example:
+        title: "リソースタイトル"
+        content: "リソースの内容"
+    created_at:
+      $ref: './common.yaml#/Timestamp'
+    updated_at:
+      $ref: './common.yaml#/Timestamp'
+
+SiteResourceCreateRequest:
+  type: object
+  required:
+    - uri
+    - properties
+  properties:
+    uri:
+      type: string
+      format: uri
+      description: リソースのURI
+      example: "https://example.com/resource"
+    properties:
+      type: object
+      description: リソースのプロパティ
+      additionalProperties: true
+      example:
+        title: "リソースタイトル"
+        content: "リソースの内容"
+
+SiteResourceUpdateRequest:
+  type: object
+  properties:
+    uri:
+      type: string
+      format: uri
+      description: リソースのURI
+      example: "https://example.com/resource"
+    properties:
+      type: object
+      description: リソースのプロパティ
+      additionalProperties: true
+
+SiteResourceListResponse:
+  type: array
+  items:
+    $ref: '#/SiteResource'
+
+SiteRule:
+  allOf:
+    - $ref: './common.yaml#/Rule'
+    - type: object
+      properties:
+        site_id:
+          $ref: './common.yaml#/UUID'
+
+SiteRuleCreateRequest:
+  type: object
+  required:
+    - op
+  properties:
+    op:
+      type: string
+      description: 操作の種類
+      example: "include"
+    dst:
+      type: string
+      nullable: true
+      description: 操作の対象
+      example: "title"
+    src:
+      type: string
+      nullable: true
+      description: 操作のソース
+      example: "xpath"
+    value:
+      type: string
+      nullable: true
+      description: 操作の値
+      example: "//h1[@class='title']"

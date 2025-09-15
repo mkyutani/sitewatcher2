@@ -1,0 +1,118 @@
+openapi: 3.0.3
+info:
+  title: SiteWatcher2 API
+  description: |
+    SiteWatcher2は、Webサイトのリソース監視・管理を行うためのREST APIです。
+    
+    ## 主な機能
+    - ディレクトリ管理（階層構造でのサイト分類）
+    - サイト管理（監視対象サイトの登録・管理）
+    - チャンネル管理（監視結果の配信先管理）
+    - リソース管理（サイトから取得したリソースの管理）
+    - ルール管理（監視・処理ルールの設定）
+    
+    ## データモデル
+    - Directory: サイトを分類するディレクトリ
+    - Site: 監視対象のWebサイト
+    - Channel: 監視結果の配信チャンネル
+    - Resource: サイトから取得されるリソース
+    
+  version: 1.0.0
+  contact:
+    name: SiteWatcher2 API Support
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8089
+    description: Development server
+  - url: http://localhost:{port}
+    description: Local development server (configurable port)
+    variables:
+      port:
+        default: '8089'
+        description: API server port
+
+paths:
+  # Directories API
+  /api/v1/directories:
+    $ref: './paths/directories.yaml#/~1api~1v1~1directories'
+  /api/v1/directories/{id}:
+    $ref: './paths/directories.yaml#/~1api~1v1~1directories~1{id}'
+  /api/v1/directories/{id}/rules/{category}/{weight}:
+    $ref: './paths/directories.yaml#/~1api~1v1~1directories~1{id}~1rules~1{category}~1{weight}'
+  /api/v1/directories/{id}/rules/{category}/{range}:
+    $ref: './paths/directories.yaml#/~1api~1v1~1directories~1{id}~1rules~1{category}~1{range}'
+  /api/v1/directories/{id}/rules/{category}:
+    $ref: './paths/directories.yaml#/~1api~1v1~1directories~1{id}~1rules~1{category}'
+
+  # Sites API
+  /api/v1/sites:
+    $ref: './paths/sites.yaml#/~1api~1v1~1sites'
+  /api/v1/sites/{id}:
+    $ref: './paths/sites.yaml#/~1api~1v1~1sites~1{id}'
+  /api/v1/sites/{id}/resources:
+    $ref: './paths/sites.yaml#/~1api~1v1~1sites~1{id}~1resources'
+  /api/v1/sites/{id}/rules/{category}/{weight}:
+    $ref: './paths/sites.yaml#/~1api~1v1~1sites~1{id}~1rules~1{category}~1{weight}'
+  /api/v1/sites/{id}/rules/{category}/{range}:
+    $ref: './paths/sites.yaml#/~1api~1v1~1sites~1{id}~1rules~1{category}~1{range}'
+  /api/v1/sites/{id}/rules/{category}:
+    $ref: './paths/sites.yaml#/~1api~1v1~1sites~1{id}~1rules~1{category}'
+
+  # Channels API
+  /api/v1/channels:
+    $ref: './paths/channels.yaml#/~1api~1v1~1channels'
+  /api/v1/channels/{id}:
+    $ref: './paths/channels.yaml#/~1api~1v1~1channels~1{id}'
+  /api/v1/channels/{id}/directories/{dir}:
+    $ref: './paths/channels.yaml#/~1api~1v1~1channels~1{id}~1directories~1{dir}'
+  /api/v1/channels/{id}/sites/{site}:
+    $ref: './paths/channels.yaml#/~1api~1v1~1channels~1{id}~1sites~1{site}'
+  /api/v1/channels/{id}/devices/{dev}:
+    $ref: './paths/channels.yaml#/~1api~1v1~1channels~1{id}~1devices~1{dev}'
+  /api/v1/channels/{id}/devices/{dev}/resources:
+    $ref: './paths/channels.yaml#/~1api~1v1~1channels~1{id}~1devices~1{dev}~1resources'
+  /api/v1/channels/{id}/resources:
+    $ref: './paths/channels.yaml#/~1api~1v1~1channels~1{id}~1resources'
+
+  # Resources API
+  /api/v1/resources/{id}:
+    $ref: './paths/resources.yaml#/~1api~1v1~1resources~1{id}'
+
+components:
+  securitySchemes:
+    # 将来的な認証方式の定義（現在は認証なし）
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API Key authentication (not currently implemented)
+  
+  parameters:
+    # 共通パラメータの定義
+    $ref: './components/parameters/common.yaml'
+  
+  responses:
+    # 共通レスポンスの定義
+    $ref: './components/responses/common.yaml'
+  
+  schemas:
+    # データスキーマの定義
+    $ref: './components/schemas/common.yaml'
+
+# 現在は認証なしで動作
+security: []
+
+tags:
+  - name: directories
+    description: ディレクトリ管理操作
+  - name: sites
+    description: サイト管理操作
+  - name: channels
+    description: チャンネル管理操作
+  - name: resources
+    description: リソース管理操作
+  - name: rules
+    description: ルール管理操作

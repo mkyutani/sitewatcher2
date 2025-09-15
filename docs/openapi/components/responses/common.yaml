@@ -1,0 +1,71 @@
+# 共通レスポンス定義
+
+BadRequest:
+  description: リクエストが不正です
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          error:
+            type: string
+            example: "Invalid JSON"
+          message:
+            type: string
+            example: "リクエストの形式が正しくありません"
+
+Unauthorized:
+  description: 認証が必要です
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          error:
+            type: string
+            example: "Unauthorized"
+          message:
+            type: string
+            example: "認証が必要です"
+
+NotFound:
+  description: リソースが見つかりません
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          error:
+            type: string
+            example: "Not Found"
+          message:
+            type: string
+            example: "指定されたリソースが見つかりません"
+
+InternalServerError:
+  description: サーバー内部エラー
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          error:
+            type: string
+            example: "Internal Server Error"
+          message:
+            type: string
+            example: "サーバー内部でエラーが発生しました"
+
+UnprocessableEntity:
+  description: リクエストの内容に問題があります
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          error:
+            type: string
+            example: "Unprocessable Entity"
+          message:
+            type: string
+            example: "リクエストの内容を処理できません"

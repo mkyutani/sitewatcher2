@@ -1,0 +1,221 @@
+# Directories API paths
+
+/api/v1/directories:
+  get:
+    tags:
+      - directories
+    summary: ディレクトリ一覧取得
+    description: 全てのディレクトリを取得します
+    operationId: listDirectories
+    responses:
+      '200':
+        description: ディレクトリ一覧
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/directory.yaml#/DirectoryListResponse'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+  post:
+    tags:
+      - directories
+    summary: ディレクトリ作成
+    description: 新しいディレクトリを作成します
+    operationId: createDirectory
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/directory.yaml#/DirectoryCreateRequest'
+    responses:
+      '201':
+        description: 作成されたディレクトリ
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/directory.yaml#/Directory'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '415':
+        description: Unsupported Media Type
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/common.yaml#/ErrorResponse'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+/api/v1/directories/{id}:
+  parameters:
+    - $ref: '../components/parameters/common.yaml#/DirectoryIdParam'
+
+  get:
+    tags:
+      - directories
+    summary: ディレクトリ取得
+    description: 指定されたIDのディレクトリを取得します
+    operationId: getDirectory
+    responses:
+      '200':
+        description: ディレクトリ詳細
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/directory.yaml#/Directory'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+  put:
+    tags:
+      - directories
+    summary: ディレクトリ更新
+    description: 指定されたIDのディレクトリを更新します
+    operationId: updateDirectory
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/directory.yaml#/DirectoryUpdateRequest'
+    responses:
+      '200':
+        description: 更新されたディレクトリ
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/directory.yaml#/Directory'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '415':
+        description: Unsupported Media Type
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+  delete:
+    tags:
+      - directories
+    summary: ディレクトリ削除
+    description: 指定されたIDのディレクトリを削除します
+    operationId: deleteDirectory
+    responses:
+      '204':
+        description: 削除成功
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+/api/v1/directories/{id}/rules/{category}/{weight}:
+  parameters:
+    - $ref: '../components/parameters/common.yaml#/DirectoryIdParam'
+    - $ref: '../components/parameters/common.yaml#/CategoryParam'
+    - $ref: '../components/parameters/common.yaml#/WeightParam'
+
+  post:
+    tags:
+      - directories
+      - rules
+    summary: ディレクトリルール作成
+    description: 指定されたディレクトリにルールを作成します
+    operationId: createDirectoryRule
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/directory.yaml#/DirectoryRuleCreateRequest'
+    responses:
+      '201':
+        description: 作成されたルール
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/directory.yaml#/DirectoryRule'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+  put:
+    tags:
+      - directories
+      - rules
+    summary: ディレクトリルール更新
+    description: 指定されたディレクトリのルールを更新します
+    operationId: updateDirectoryRule
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/directory.yaml#/DirectoryRuleCreateRequest'
+    responses:
+      '200':
+        description: 更新されたルール
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/directory.yaml#/DirectoryRule'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+/api/v1/directories/{id}/rules/{category}/{range}:
+  parameters:
+    - $ref: '../components/parameters/common.yaml#/DirectoryIdParam'
+    - $ref: '../components/parameters/common.yaml#/CategoryParam'
+    - $ref: '../components/parameters/common.yaml#/RangeParam'
+
+  delete:
+    tags:
+      - directories
+      - rules
+    summary: ディレクトリルール範囲削除
+    description: 指定された重み範囲のディレクトリルールを削除します
+    operationId: deleteDirectoryRuleRange
+    responses:
+      '204':
+        description: 削除成功
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+/api/v1/directories/{id}/rules/{category}:
+  parameters:
+    - $ref: '../components/parameters/common.yaml#/DirectoryIdParam'
+    - $ref: '../components/parameters/common.yaml#/CategoryParam'
+
+  delete:
+    tags:
+      - directories
+      - rules
+    summary: ディレクトリルールカテゴリ削除
+    description: 指定されたカテゴリの全ディレクトリルールを削除します
+    operationId: deleteDirectoryRuleCategory
+    responses:
+      '204':
+        description: 削除成功
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'

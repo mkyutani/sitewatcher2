@@ -1,0 +1,85 @@
+# 共通スキーマ定義
+
+UUID:
+  type: string
+  format: uuid
+  description: RFC 4122準拠のUUID
+  example: "123e4567-e89b-12d3-a456-426614174000"
+
+Timestamp:
+  type: string
+  format: date-time
+  description: ISO 8601形式のタイムスタンプ
+  example: "2023-09-15T10:30:00Z"
+
+ErrorResponse:
+  type: object
+  required:
+    - error
+    - message
+  properties:
+    error:
+      type: string
+      description: エラーの種類
+      example: "Bad Request"
+    message:
+      type: string
+      description: エラーの詳細メッセージ
+      example: "リクエストの形式が正しくありません"
+
+PaginationMeta:
+  type: object
+  properties:
+    total:
+      type: integer
+      description: 総アイテム数
+      example: 100
+    page:
+      type: integer
+      description: 現在のページ番号
+      example: 1
+    per_page:
+      type: integer
+      description: 1ページあたりのアイテム数
+      example: 20
+    total_pages:
+      type: integer
+      description: 総ページ数
+      example: 5
+
+# ルール関連の共通スキーマ
+Rule:
+  type: object
+  required:
+    - category
+    - weight
+    - op
+  properties:
+    category:
+      type: string
+      description: ルールのカテゴリ
+      example: "filter"
+    weight:
+      type: integer
+      minimum: 0
+      description: ルールの重み（優先度）
+      example: 100
+    op:
+      type: string
+      description: 操作の種類
+      example: "include"
+    dst:
+      type: string
+      nullable: true
+      description: 操作の対象
+      example: "title"
+    src:
+      type: string
+      nullable: true
+      description: 操作のソース
+      example: "xpath"
+    value:
+      type: string
+      nullable: true
+      description: 操作の値
+      example: "//h1[@class='title']"

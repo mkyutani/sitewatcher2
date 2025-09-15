@@ -1,0 +1,467 @@
+# Channels API paths
+
+/api/v1/channels:
+  get:
+    tags:
+      - channels
+    summary: チャンネル一覧取得
+    description: 全てのチャンネルを取得します
+    operationId: listChannels
+    responses:
+      '200':
+        description: チャンネル一覧
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/channel.yaml#/ChannelListResponse'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+  post:
+    tags:
+      - channels
+    summary: チャンネル作成
+    description: 新しいチャンネルを作成します
+    operationId: createChannel
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/channel.yaml#/ChannelCreateRequest'
+    responses:
+      '201':
+        description: 作成されたチャンネル
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/channel.yaml#/Channel'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '415':
+        description: Unsupported Media Type
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+/api/v1/channels/{id}:
+  parameters:
+    - $ref: '../components/parameters/common.yaml#/ChannelIdParam'
+
+  get:
+    tags:
+      - channels
+    summary: チャンネル取得
+    description: 指定されたIDのチャンネルを取得します
+    operationId: getChannel
+    responses:
+      '200':
+        description: チャンネル詳細
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/channel.yaml#/Channel'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+  put:
+    tags:
+      - channels
+    summary: チャンネル更新
+    description: 指定されたIDのチャンネルを更新します
+    operationId: updateChannel
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/channel.yaml#/ChannelUpdateRequest'
+    responses:
+      '200':
+        description: 更新されたチャンネル
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/channel.yaml#/Channel'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '415':
+        description: Unsupported Media Type
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+  delete:
+    tags:
+      - channels
+    summary: チャンネル削除
+    description: 指定されたIDのチャンネルを削除します
+    operationId: deleteChannel
+    responses:
+      '204':
+        description: 削除成功
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+/api/v1/channels/{id}/directories/{dir}:
+  parameters:
+    - $ref: '../components/parameters/common.yaml#/ChannelIdParam'
+    - name: dir
+      in: path
+      required: true
+      description: ディレクトリID
+      schema:
+        $ref: '../components/schemas/common.yaml#/UUID'
+
+  post:
+    tags:
+      - channels
+      - directories
+    summary: チャンネルディレクトリ追加
+    description: 指定されたチャンネルにディレクトリを追加します
+    operationId: addChannelDirectory
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/channel.yaml#/ChannelDirectoryRequest'
+    responses:
+      '201':
+        description: 追加されたチャンネルディレクトリ
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/channel.yaml#/ChannelDirectory'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+  put:
+    tags:
+      - channels
+      - directories
+    summary: チャンネルディレクトリ更新
+    description: 指定されたチャンネルディレクトリを更新します
+    operationId: updateChannelDirectory
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/channel.yaml#/ChannelDirectoryRequest'
+    responses:
+      '200':
+        description: 更新されたチャンネルディレクトリ
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/channel.yaml#/ChannelDirectory'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+  delete:
+    tags:
+      - channels
+      - directories
+    summary: チャンネルディレクトリ削除
+    description: 指定されたチャンネルからディレクトリを削除します
+    operationId: deleteChannelDirectory
+    responses:
+      '204':
+        description: 削除成功
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+/api/v1/channels/{id}/sites/{site}:
+  parameters:
+    - $ref: '../components/parameters/common.yaml#/ChannelIdParam'
+    - name: site
+      in: path
+      required: true
+      description: サイトID
+      schema:
+        $ref: '../components/schemas/common.yaml#/UUID'
+
+  post:
+    tags:
+      - channels
+      - sites
+    summary: チャンネルサイト追加
+    description: 指定されたチャンネルにサイトを追加します
+    operationId: addChannelSite
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/channel.yaml#/ChannelSiteRequest'
+    responses:
+      '201':
+        description: 追加されたチャンネルサイト
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/channel.yaml#/ChannelSite'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+  put:
+    tags:
+      - channels
+      - sites
+    summary: チャンネルサイト更新
+    description: 指定されたチャンネルサイトを更新します
+    operationId: updateChannelSite
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/channel.yaml#/ChannelSiteRequest'
+    responses:
+      '200':
+        description: 更新されたチャンネルサイト
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/channel.yaml#/ChannelSite'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+  delete:
+    tags:
+      - channels
+      - sites
+    summary: チャンネルサイト削除
+    description: 指定されたチャンネルからサイトを削除します
+    operationId: deleteChannelSite
+    responses:
+      '204':
+        description: 削除成功
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+/api/v1/channels/{id}/devices/{dev}:
+  parameters:
+    - $ref: '../components/parameters/common.yaml#/ChannelIdParam'
+    - name: dev
+      in: path
+      required: true
+      description: デバイスID
+      schema:
+        type: string
+        example: "device-001"
+
+  post:
+    tags:
+      - channels
+      - devices
+    summary: チャンネルデバイス追加
+    description: 指定されたチャンネルにデバイスを追加します
+    operationId: addChannelDevice
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/channel.yaml#/ChannelDeviceRequest'
+    responses:
+      '201':
+        description: 追加されたチャンネルデバイス
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/channel.yaml#/ChannelDevice'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+  put:
+    tags:
+      - channels
+      - devices
+    summary: チャンネルデバイス更新
+    description: 指定されたチャンネルデバイスを更新します
+    operationId: updateChannelDevice
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/channel.yaml#/ChannelDeviceRequest'
+    responses:
+      '200':
+        description: 更新されたチャンネルデバイス
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/channel.yaml#/ChannelDevice'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+  delete:
+    tags:
+      - channels
+      - devices
+    summary: チャンネルデバイス削除
+    description: 指定されたチャンネルからデバイスを削除します
+    operationId: deleteChannelDevice
+    responses:
+      '204':
+        description: 削除成功
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+/api/v1/channels/{id}/devices/{dev}/resources:
+  parameters:
+    - $ref: '../components/parameters/common.yaml#/ChannelIdParam'
+    - name: dev
+      in: path
+      required: true
+      description: デバイスID
+      schema:
+        type: string
+        example: "device-001"
+
+  get:
+    tags:
+      - channels
+      - devices
+      - resources
+    summary: デバイス別リソース取得（ログなし）
+    description: 指定されたデバイスのリソースをログなしで取得します
+    operationId: getResourcesByDeviceWithoutLog
+    responses:
+      '200':
+        description: デバイス別リソース一覧
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/resource.yaml#/ResourceListResponse'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+  post:
+    tags:
+      - channels
+      - devices
+      - resources
+    summary: デバイス別リソース取得（ログあり）
+    description: 指定されたデバイスのリソースをログありで取得します
+    operationId: getResourcesByDevice
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/channel.yaml#/ChannelResourcesRequest'
+    responses:
+      '200':
+        description: デバイス別リソース一覧
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/resource.yaml#/ResourceListResponse'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+/api/v1/channels/{id}/resources:
+  parameters:
+    - $ref: '../components/parameters/common.yaml#/ChannelIdParam'
+
+  get:
+    tags:
+      - channels
+      - resources
+    summary: チャンネルリソース取得
+    description: 指定されたチャンネルのリソースを取得します
+    operationId: getChannelResources
+    responses:
+      '200':
+        description: チャンネルリソース一覧
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/resource.yaml#/ResourceListResponse'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'
+
+  post:
+    tags:
+      - channels
+      - resources
+    summary: チャンネルリソース収集
+    description: 指定されたチャンネルのリソースを収集します
+    operationId: collectChannelResources
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/channel.yaml#/ChannelResourcesRequest'
+    responses:
+      '200':
+        description: 収集されたリソース一覧
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/resource.yaml#/ResourceListResponse'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'

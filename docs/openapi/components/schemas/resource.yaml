@@ -1,0 +1,42 @@
+# Resource関連のスキーマ定義
+
+Resource:
+  type: object
+  required:
+    - id
+    - site_id
+    - uri
+    - name
+  properties:
+    id:
+      $ref: './common.yaml#/UUID'
+    site_id:
+      $ref: './common.yaml#/UUID'
+    uri:
+      type: string
+      format: uri
+      description: リソースのURI
+      example: "https://example.com/article/123"
+    name:
+      type: string
+      description: リソース名
+      example: "記事タイトル"
+      maxLength: 255
+    properties:
+      type: object
+      description: リソースのプロパティ（任意のJSONオブジェクト）
+      additionalProperties: true
+      example:
+        title: "記事タイトル"
+        content: "記事の内容"
+        author: "著者名"
+        published_at: "2023-09-15T10:30:00Z"
+    created_at:
+      $ref: './common.yaml#/Timestamp'
+    updated_at:
+      $ref: './common.yaml#/Timestamp'
+
+ResourceListResponse:
+  type: array
+  items:
+    $ref: '#/Resource'

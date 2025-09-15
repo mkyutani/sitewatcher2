@@ -1,0 +1,30 @@
+# Resources API paths
+
+/api/v1/resources/{id}:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: リソースのUUID
+      schema:
+        $ref: '../components/schemas/common.yaml#/UUID'
+
+  get:
+    tags:
+      - resources
+    summary: リソース取得
+    description: 指定されたIDのリソースを取得します
+    operationId: getResource
+    responses:
+      '200':
+        description: リソース詳細
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/resource.yaml#/Resource'
+      '400':
+        $ref: '../components/responses/common.yaml#/BadRequest'
+      '404':
+        $ref: '../components/responses/common.yaml#/NotFound'
+      '500':
+        $ref: '../components/responses/common.yaml#/InternalServerError'

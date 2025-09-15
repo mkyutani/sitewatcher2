@@ -1,0 +1,203 @@
+# Channel関連のスキーマ定義
+
+Channel:
+  type: object
+  required:
+    - id
+    - name
+  properties:
+    id:
+      $ref: './common.yaml#/UUID'
+    name:
+      type: string
+      description: チャンネル名
+      example: "Slack通知チャンネル"
+      maxLength: 255
+    created_at:
+      $ref: './common.yaml#/Timestamp'
+    updated_at:
+      $ref: './common.yaml#/Timestamp'
+
+ChannelCreateRequest:
+  type: object
+  required:
+    - name
+  properties:
+    name:
+      type: string
+      description: チャンネル名
+      example: "Slack通知チャンネル"
+      maxLength: 255
+
+ChannelUpdateRequest:
+  type: object
+  properties:
+    name:
+      type: string
+      description: チャンネル名
+      example: "Discord通知チャンネル"
+      maxLength: 255
+
+ChannelListResponse:
+  type: array
+  items:
+    $ref: '#/Channel'
+
+ChannelDirectory:
+  type: object
+  required:
+    - channel_id
+    - directory_id
+  properties:
+    channel_id:
+      $ref: './common.yaml#/UUID'
+    directory_id:
+      $ref: './common.yaml#/UUID'
+    title:
+      type: string
+      nullable: true
+      description: ディレクトリのタイトル
+      example: "重要ニュース"
+    description:
+      type: string
+      nullable: true
+      description: ディレクトリの説明
+      example: "重要なニュースサイトの監視"
+    priority:
+      type: string
+      nullable: true
+      description: 優先度
+      example: "high"
+
+ChannelDirectoryRequest:
+  type: object
+  properties:
+    title:
+      type: string
+      nullable: true
+      description: ディレクトリのタイトル
+      example: "重要ニュース"
+    description:
+      type: string
+      nullable: true
+      description: ディレクトリの説明
+      example: "重要なニュースサイトの監視"
+    priority:
+      type: string
+      nullable: true
+      description: 優先度
+      example: "high"
+
+ChannelSite:
+  type: object
+  required:
+    - channel_id
+    - site_id
+  properties:
+    channel_id:
+      $ref: './common.yaml#/UUID'
+    site_id:
+      $ref: './common.yaml#/UUID'
+    title:
+      type: string
+      nullable: true
+      description: サイトのタイトル
+      example: "ニュースサイト"
+    description:
+      type: string
+      nullable: true
+      description: サイトの説明
+      example: "最新ニュースを監視"
+    priority:
+      type: string
+      nullable: true
+      description: 優先度
+      example: "medium"
+
+ChannelSiteRequest:
+  type: object
+  properties:
+    title:
+      type: string
+      nullable: true
+      description: サイトのタイトル
+      example: "ニュースサイト"
+    description:
+      type: string
+      nullable: true
+      description: サイトの説明
+      example: "最新ニュースを監視"
+    priority:
+      type: string
+      nullable: true
+      description: 優先度
+      example: "medium"
+
+ChannelDevice:
+  type: object
+  required:
+    - channel_id
+    - device_id
+  properties:
+    channel_id:
+      $ref: './common.yaml#/UUID'
+    device_id:
+      type: string
+      description: デバイスID
+      example: "device-001"
+    interface:
+      type: string
+      nullable: true
+      description: インターフェース
+      example: "slack"
+    apikey:
+      type: string
+      nullable: true
+      description: APIキー
+      example: "xoxb-1234567890-abcdefghijk"
+    tag:
+      type: string
+      nullable: true
+      description: タグ
+      example: "production"
+    template:
+      type: string
+      nullable: true
+      description: メッセージテンプレート
+      example: "新しいリソース: {{title}}"
+
+ChannelDeviceRequest:
+  type: object
+  properties:
+    interface:
+      type: string
+      nullable: true
+      description: インターフェース
+      example: "slack"
+    apikey:
+      type: string
+      nullable: true
+      description: APIキー
+      example: "xoxb-1234567890-abcdefghijk"
+    tag:
+      type: string
+      nullable: true
+      description: タグ
+      example: "production"
+    template:
+      type: string
+      nullable: true
+      description: メッセージテンプレート
+      example: "新しいリソース: {{title}}"
+
+ChannelResourcesRequest:
+  type: object
+  properties:
+    since:
+      $ref: './common.yaml#/Timestamp'
+    until:
+      $ref: './common.yaml#/Timestamp'
+    log:
+      type: boolean
+      description: ログを記録するかどうか
+      default: false
