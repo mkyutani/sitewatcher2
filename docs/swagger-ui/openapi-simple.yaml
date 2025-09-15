@@ -1,0 +1,1923 @@
+openapi: 3.0.3
+info:
+  title: SiteWatcher2 API
+  description: |
+    SiteWatcher2は、Webサイトのリソース監視・管理を行うためのREST APIです。
+    
+    ## 主な機能
+    - ディレクトリ管理（階層構造でのサイト分類）
+    - サイト管理（監視対象サイトの登録・管理）
+    - チャンネル管理（監視結果の配信先管理）
+    - リソース管理（サイトから取得したリソースの管理）
+    - ルール管理（監視・処理ルールの設定）
+    
+    ## データモデル
+    - Directory: サイトを分類するディレクトリ
+    - Site: 監視対象のWebサイト
+    - Channel: 監視結果の配信チャンネル
+    - Resource: サイトから取得されるリソース
+    
+  version: 1.0.0
+  contact:
+    name: SiteWatcher2 API Support
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://2fc68185-6be4-41b1-92cc-1bc11e62927d.blackaplysia.com
+    description: SiteWatcher2 Server (Production)
+  - url: https://{server}.{domain}
+    description: SiteWatcher2 Server (HTTPS)
+    variables:
+      server:
+        default: 'api'
+        description: サーバー名
+        examples:
+          production: 
+            summary: 本番サーバー
+            value: 'api'
+          staging:
+            summary: ステージングサーバー
+            value: 'staging-api'
+          development:
+            summary: 開発サーバー
+            value: 'dev-api'
+      domain:
+        default: 'sitewatcher2.example.com'
+        description: ドメイン名
+        examples:
+          example:
+            summary: Example domain
+            value: 'sitewatcher2.example.com'
+          localhost:
+            summary: Local HTTPS
+            value: 'localhost:8443'
+  - url: http://{server}.{domain}
+    description: SiteWatcher2 Server (HTTP)
+    variables:
+      server:
+        default: 'api'
+        description: サーバー名
+        examples:
+          development:
+            summary: 開発サーバー
+            value: 'dev-api'
+          localhost:
+            summary: ローカルサーバー
+            value: 'localhost:8089'
+      domain:
+        default: 'sitewatcher2.example.com'
+        description: ドメイン名
+        examples:
+          example:
+            summary: Example domain
+            value: 'sitewatcher2.example.com'
+          localhost:
+            summary: Local HTTP
+            value: 'localhost:8089'
+  - url: 'https://{host}:{port}'
+    description: カスタムHTTPSサーバー
+    variables:
+      host:
+        default: 'api.sitewatcher2.example.com'
+        description: ホスト名
+        examples:
+          production:
+            summary: 本番ホスト
+            value: 'api.sitewatcher2.example.com'
+          localhost:
+            summary: ローカルホスト
+            value: 'localhost'
+          custom:
+            summary: カスタムホスト
+            value: 'api.mycompany.com'
+      port:
+        default: '443'
+        description: HTTPSポート番号
+        examples:
+          standard:
+            summary: HTTPS標準ポート
+            value: '443'
+          custom:
+            summary: HTTPSカスタムポート
+            value: '8443'
+  - url: 'http://{host}:{port}'
+    description: カスタムHTTPサーバー
+    variables:
+      host:
+        default: 'localhost'
+        description: ホスト名
+        examples:
+          localhost:
+            summary: ローカルホスト
+            value: 'localhost'
+          development:
+            summary: 開発ホスト
+            value: 'dev-api.sitewatcher2.example.com'
+      port:
+        default: '8089'
+        description: HTTPポート番号
+        examples:
+          development:
+            summary: 開発ポート
+            value: '8089'
+          standard:
+            summary: HTTP標準ポート
+            value: '80'
+
+tags:
+  - name: directories
+    description: ディレクトリ管理操作
+  - name: sites
+    description: サイト管理操作
+  - name: channels
+    description: チャンネル管理操作
+  - name: resources
+    description: リソース管理操作
+  - name: rules
+    description: ルール管理操作
+
+paths:
+  /api/v1/directories:
+    get:
+      tags:
+        - directories
+      summary: ディレクトリ一覧取得
+      description: 全てのディレクトリを取得します
+      operationId: listDirectories
+      responses:
+        '200':
+          description: ディレクトリ一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Directory'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - directories
+      summary: ディレクトリ作成
+      description: 新しいディレクトリを作成します
+      operationId: createDirectory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DirectoryCreateRequest'
+      responses:
+        '201':
+          description: 作成されたディレクトリ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Directory'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/directories/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: ディレクトリのUUID
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      tags:
+        - directories
+      summary: ディレクトリ取得
+      description: 指定されたIDのディレクトリを取得します
+      operationId: getDirectory
+      responses:
+        '200':
+          description: ディレクトリ詳細
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Directory'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - directories
+      summary: ディレクトリ更新
+      description: 指定されたIDのディレクトリを更新します
+      operationId: updateDirectory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DirectoryUpdateRequest'
+      responses:
+        '200':
+          description: 更新されたディレクトリ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Directory'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - directories
+      summary: ディレクトリ削除
+      description: 指定されたIDのディレクトリを削除します
+      operationId: deleteDirectory
+      responses:
+        '204':
+          description: 削除成功
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/sites:
+    get:
+      tags:
+        - sites
+      summary: サイト一覧取得
+      description: 全てのサイトを取得します
+      operationId: listSites
+      responses:
+        '200':
+          description: サイト一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Site'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - sites
+      summary: サイト作成
+      description: 新しいサイトを作成します
+      operationId: createSite
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SiteCreateRequest'
+      responses:
+        '201':
+          description: 作成されたサイト
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Site'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/sites/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: サイトのUUID
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      tags:
+        - sites
+      summary: サイト取得
+      description: 指定されたIDのサイトを取得します
+      operationId: getSite
+      responses:
+        '200':
+          description: サイト詳細
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Site'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - sites
+      summary: サイト更新
+      description: 指定されたIDのサイトを更新します
+      operationId: updateSite
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uri:
+                  type: string
+                  format: uri
+                  description: サイトのURI
+                  example: "https://example.com"
+                name:
+                  type: string
+                  description: サイト名
+                  example: "Example Site（更新）"
+                  maxLength: 255
+                directory:
+                  type: string
+                  format: uuid
+                  description: ディレクトリのUUID
+                  example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        '200':
+          description: 更新されたサイト
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Site'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - sites
+      summary: サイト削除
+      description: 指定されたIDのサイトを削除します
+      operationId: deleteSite
+      responses:
+        '204':
+          description: 削除成功
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/sites/{id}/resources:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: サイトのUUID
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      tags:
+        - sites
+        - resources
+      summary: サイトリソース一覧取得
+      description: 指定されたサイトの全リソースを取得します
+      operationId: getSiteResources
+      responses:
+        '200':
+          description: サイトリソース一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SiteResource'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - sites
+        - resources
+      summary: サイトリソース登録
+      description: 指定されたサイトにリソースを登録します
+      operationId: registerSiteResource
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SiteResourceCreateRequest'
+      responses:
+        '201':
+          description: 登録されたリソース
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SiteResource'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - sites
+        - resources
+      summary: サイトリソース更新
+      description: 指定されたサイトのリソースを更新します
+      operationId: updateSiteResource
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SiteResourceUpdateRequest'
+      responses:
+        '200':
+          description: 更新されたリソース
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SiteResource'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - sites
+        - resources
+      summary: サイトリソース削除
+      description: 指定されたサイトのリソースを削除します
+      operationId: deleteSiteResource
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uri:
+                  type: string
+                  format: uri
+                  description: 削除するリソースのURI
+                  example: "https://example.com/resource"
+      responses:
+        '204':
+          description: 削除成功
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/directories/{id}/rules/{category}/{weight}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: ディレクトリのUUID
+        schema:
+          type: string
+          format: uuid
+      - name: category
+        in: path
+        required: true
+        description: ルールのカテゴリ
+        schema:
+          type: string
+          example: "filter"
+      - name: weight
+        in: path
+        required: true
+        description: ルールの重み（優先度）
+        schema:
+          type: integer
+          minimum: 0
+          example: 100
+
+    post:
+      tags:
+        - directories
+        - rules
+      summary: ディレクトリルール作成
+      description: 指定されたディレクトリにルールを作成します
+      operationId: createDirectoryRule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RuleRequest'
+      responses:
+        '201':
+          description: 作成されたルール
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - directories
+        - rules
+      summary: ディレクトリルール更新
+      description: 指定されたディレクトリのルールを更新します
+      operationId: updateDirectoryRule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RuleRequest'
+      responses:
+        '200':
+          description: 更新されたルール
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/directories/{id}/rules/{category}/{range}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: ディレクトリのUUID
+        schema:
+          type: string
+          format: uuid
+      - name: category
+        in: path
+        required: true
+        description: ルールのカテゴリ
+        schema:
+          type: string
+          example: "filter"
+      - name: range
+        in: path
+        required: true
+        description: ルールの重み範囲（例：100-200）
+        schema:
+          type: string
+          pattern: '^\d+-\d+$'
+          example: "100-200"
+
+    delete:
+      tags:
+        - directories
+        - rules
+      summary: ディレクトリルール範囲削除
+      description: 指定された重み範囲のディレクトリルールを削除します
+      operationId: deleteDirectoryRuleRange
+      responses:
+        '204':
+          description: 削除成功
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/directories/{id}/rules/{category}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: ディレクトリのUUID
+        schema:
+          type: string
+          format: uuid
+      - name: category
+        in: path
+        required: true
+        description: ルールのカテゴリ
+        schema:
+          type: string
+          example: "filter"
+
+    delete:
+      tags:
+        - directories
+        - rules
+      summary: ディレクトリルールカテゴリ削除
+      description: 指定されたカテゴリの全ディレクトリルールを削除します
+      operationId: deleteDirectoryRuleCategory
+      responses:
+        '204':
+          description: 削除成功
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/sites/{id}/rules/{category}/{weight}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: サイトのUUID
+        schema:
+          type: string
+          format: uuid
+      - name: category
+        in: path
+        required: true
+        description: ルールのカテゴリ
+        schema:
+          type: string
+          example: "filter"
+      - name: weight
+        in: path
+        required: true
+        description: ルールの重み（優先度）
+        schema:
+          type: integer
+          minimum: 0
+          example: 100
+
+    post:
+      tags:
+        - sites
+        - rules
+      summary: サイトルール作成
+      description: 指定されたサイトにルールを作成します
+      operationId: createSiteRule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RuleRequest'
+      responses:
+        '201':
+          description: 作成されたルール
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - sites
+        - rules
+      summary: サイトルール更新
+      description: 指定されたサイトのルールを更新します
+      operationId: updateSiteRule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RuleRequest'
+      responses:
+        '200':
+          description: 更新されたルール
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/sites/{id}/rules/{category}/{range}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: サイトのUUID
+        schema:
+          type: string
+          format: uuid
+      - name: category
+        in: path
+        required: true
+        description: ルールのカテゴリ
+        schema:
+          type: string
+          example: "filter"
+      - name: range
+        in: path
+        required: true
+        description: ルールの重み範囲（例：100-200）
+        schema:
+          type: string
+          pattern: '^\d+-\d+$'
+          example: "100-200"
+
+    delete:
+      tags:
+        - sites
+        - rules
+      summary: サイトルール範囲削除
+      description: 指定された重み範囲のサイトルールを削除します
+      operationId: deleteSiteRuleRange
+      responses:
+        '204':
+          description: 削除成功
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/sites/{id}/rules/{category}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: サイトのUUID
+        schema:
+          type: string
+          format: uuid
+      - name: category
+        in: path
+        required: true
+        description: ルールのカテゴリ
+        schema:
+          type: string
+          example: "filter"
+
+    delete:
+      tags:
+        - sites
+        - rules
+      summary: サイトルールカテゴリ削除
+      description: 指定されたカテゴリの全サイトルールを削除します
+      operationId: deleteSiteRuleCategory
+      responses:
+        '204':
+          description: 削除成功
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/channels:
+    get:
+      tags:
+        - channels
+      summary: チャンネル一覧取得
+      description: 全てのチャンネルを取得します
+      operationId: listChannels
+      responses:
+        '200':
+          description: チャンネル一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Channel'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - channels
+      summary: チャンネル作成
+      description: 新しいチャンネルを作成します
+      operationId: createChannel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelCreateRequest'
+      responses:
+        '201':
+          description: 作成されたチャンネル
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Channel'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/channels/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: チャンネルのUUID
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      tags:
+        - channels
+      summary: チャンネル取得
+      description: 指定されたIDのチャンネルを取得します
+      operationId: getChannel
+      responses:
+        '200':
+          description: チャンネル詳細
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Channel'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - channels
+      summary: チャンネル更新
+      description: 指定されたIDのチャンネルを更新します
+      operationId: updateChannel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelUpdateRequest'
+      responses:
+        '200':
+          description: 更新されたチャンネル
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Channel'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - channels
+      summary: チャンネル削除
+      description: 指定されたIDのチャンネルを削除します
+      operationId: deleteChannel
+      responses:
+        '204':
+          description: 削除成功
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/channels/{id}/directories/{dir}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: チャンネルのUUID
+        schema:
+          type: string
+          format: uuid
+      - name: dir
+        in: path
+        required: true
+        description: ディレクトリのUUID
+        schema:
+          type: string
+          format: uuid
+
+    post:
+      tags:
+        - channels
+        - directories
+      summary: チャンネルディレクトリ追加
+      description: 指定されたチャンネルにディレクトリを追加します
+      operationId: addChannelDirectory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelDirectoryRequest'
+      responses:
+        '201':
+          description: 追加されたチャンネルディレクトリ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelDirectory'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - channels
+        - directories
+      summary: チャンネルディレクトリ更新
+      description: 指定されたチャンネルディレクトリを更新します
+      operationId: updateChannelDirectory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelDirectoryRequest'
+      responses:
+        '200':
+          description: 更新されたチャンネルディレクトリ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelDirectory'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - channels
+        - directories
+      summary: チャンネルディレクトリ削除
+      description: 指定されたチャンネルからディレクトリを削除します
+      operationId: deleteChannelDirectory
+      responses:
+        '204':
+          description: 削除成功
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/channels/{id}/sites/{site}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: チャンネルのUUID
+        schema:
+          type: string
+          format: uuid
+      - name: site
+        in: path
+        required: true
+        description: サイトのUUID
+        schema:
+          type: string
+          format: uuid
+
+    post:
+      tags:
+        - channels
+        - sites
+      summary: チャンネルサイト追加
+      description: 指定されたチャンネルにサイトを追加します
+      operationId: addChannelSite
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelSiteRequest'
+      responses:
+        '201':
+          description: 追加されたチャンネルサイト
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelSite'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - channels
+        - sites
+      summary: チャンネルサイト更新
+      description: 指定されたチャンネルサイトを更新します
+      operationId: updateChannelSite
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelSiteRequest'
+      responses:
+        '200':
+          description: 更新されたチャンネルサイト
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelSite'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - channels
+        - sites
+      summary: チャンネルサイト削除
+      description: 指定されたチャンネルからサイトを削除します
+      operationId: deleteChannelSite
+      responses:
+        '204':
+          description: 削除成功
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/channels/{id}/devices/{dev}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: チャンネルのUUID
+        schema:
+          type: string
+          format: uuid
+      - name: dev
+        in: path
+        required: true
+        description: デバイスID
+        schema:
+          type: string
+          example: "device-001"
+
+    post:
+      tags:
+        - channels
+        - devices
+      summary: チャンネルデバイス追加
+      description: 指定されたチャンネルにデバイスを追加します
+      operationId: addChannelDevice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelDeviceRequest'
+      responses:
+        '201':
+          description: 追加されたチャンネルデバイス
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelDevice'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - channels
+        - devices
+      summary: チャンネルデバイス更新
+      description: 指定されたチャンネルデバイスを更新します
+      operationId: updateChannelDevice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelDeviceRequest'
+      responses:
+        '200':
+          description: 更新されたチャンネルデバイス
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelDevice'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - channels
+        - devices
+      summary: チャンネルデバイス削除
+      description: 指定されたチャンネルからデバイスを削除します
+      operationId: deleteChannelDevice
+      responses:
+        '204':
+          description: 削除成功
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/channels/{id}/devices/{dev}/resources:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: チャンネルのUUID
+        schema:
+          type: string
+          format: uuid
+      - name: dev
+        in: path
+        required: true
+        description: デバイスID
+        schema:
+          type: string
+          example: "device-001"
+
+    get:
+      tags:
+        - channels
+        - devices
+        - resources
+      summary: デバイス別リソース取得（ログなし）
+      description: 指定されたデバイスのリソースをログなしで取得します
+      operationId: getResourcesByDeviceWithoutLog
+      responses:
+        '200':
+          description: デバイス別リソース一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Resource'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - channels
+        - devices
+        - resources
+      summary: デバイス別リソース取得（ログあり）
+      description: 指定されたデバイスのリソースをログありで取得します
+      operationId: getResourcesByDevice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelResourcesRequest'
+      responses:
+        '200':
+          description: デバイス別リソース一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Resource'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/channels/{id}/resources:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: チャンネルのUUID
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      tags:
+        - channels
+        - resources
+      summary: チャンネルリソース取得
+      description: 指定されたチャンネルのリソースを取得します
+      operationId: getChannelResources
+      responses:
+        '200':
+          description: チャンネルリソース一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Resource'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - channels
+        - resources
+      summary: チャンネルリソース収集
+      description: 指定されたチャンネルのリソースを収集します
+      operationId: collectChannelResources
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelResourcesRequest'
+      responses:
+        '200':
+          description: 収集されたリソース一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Resource'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/resources/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: リソースのUUID
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      tags:
+        - resources
+      summary: リソース取得
+      description: 指定されたIDのリソースを取得します
+      operationId: getResource
+      responses:
+        '200':
+          description: リソース詳細
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    Directory:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ディレクトリのUUID
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        name:
+          type: string
+          description: ディレクトリ名
+          example: "ニュースサイト"
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          description: 作成日時
+          example: "2023-09-15T10:30:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: 更新日時
+          example: "2023-09-15T10:30:00Z"
+
+    DirectoryCreateRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: ディレクトリ名
+          example: "ニュースサイト"
+          maxLength: 255
+
+    DirectoryUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: ディレクトリ名
+          example: "ニュースサイト（更新）"
+          maxLength: 255
+
+    Site:
+      type: object
+      required:
+        - id
+        - uri
+        - name
+        - directory_id
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: サイトのUUID
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        uri:
+          type: string
+          format: uri
+          description: サイトのURI
+          example: "https://example.com"
+        name:
+          type: string
+          description: サイト名
+          example: "Example Site"
+          maxLength: 255
+        directory_id:
+          type: string
+          format: uuid
+          description: ディレクトリのUUID
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        created_at:
+          type: string
+          format: date-time
+          description: 作成日時
+          example: "2023-09-15T10:30:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: 更新日時
+          example: "2023-09-15T10:30:00Z"
+
+    SiteCreateRequest:
+      type: object
+      required:
+        - uri
+        - name
+        - directory
+      properties:
+        uri:
+          type: string
+          format: uri
+          description: サイトのURI
+          example: "https://example.com"
+        name:
+          type: string
+          description: サイト名
+          example: "Example Site"
+          maxLength: 255
+        directory:
+          type: string
+          format: uuid
+          description: ディレクトリのUUID
+          example: "123e4567-e89b-12d3-a456-426614174000"
+
+    SiteResource:
+      type: object
+      required:
+        - id
+        - site_id
+        - uri
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: リソースのUUID
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        site_id:
+          type: string
+          format: uuid
+          description: サイトのUUID
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        uri:
+          type: string
+          format: uri
+          description: リソースのURI
+          example: "https://example.com/resource"
+        name:
+          type: string
+          description: リソース名
+          example: "Resource Name"
+        properties:
+          type: object
+          description: リソースのプロパティ（任意のJSONオブジェクト）
+          additionalProperties: true
+          example:
+            title: "リソースタイトル"
+            content: "リソースの内容"
+        created_at:
+          type: string
+          format: date-time
+          description: 作成日時
+          example: "2023-09-15T10:30:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: 更新日時
+          example: "2023-09-15T10:30:00Z"
+
+    SiteResourceCreateRequest:
+      type: object
+      required:
+        - uri
+        - properties
+      properties:
+        uri:
+          type: string
+          format: uri
+          description: リソースのURI
+          example: "https://example.com/resource"
+        properties:
+          type: object
+          description: リソースのプロパティ
+          additionalProperties: true
+          example:
+            title: "リソースタイトル"
+            content: "リソースの内容"
+
+    SiteResourceUpdateRequest:
+      type: object
+      properties:
+        uri:
+          type: string
+          format: uri
+          description: リソースのURI
+          example: "https://example.com/resource"
+        properties:
+          type: object
+          description: リソースのプロパティ
+          additionalProperties: true
+
+    Channel:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: チャンネルのUUID
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        name:
+          type: string
+          description: チャンネル名
+          example: "Slack通知チャンネル"
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          description: 作成日時
+          example: "2023-09-15T10:30:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: 更新日時
+          example: "2023-09-15T10:30:00Z"
+
+    ChannelCreateRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: チャンネル名
+          example: "Slack通知チャンネル"
+          maxLength: 255
+
+    ChannelUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: チャンネル名
+          example: "Discord通知チャンネル"
+          maxLength: 255
+
+    Rule:
+      type: object
+      required:
+        - category
+        - weight
+        - op
+      properties:
+        category:
+          type: string
+          description: ルールのカテゴリ
+          example: "filter"
+        weight:
+          type: integer
+          minimum: 0
+          description: ルールの重み（優先度）
+          example: 100
+        op:
+          type: string
+          description: 操作の種類
+          example: "include"
+        dst:
+          type: string
+          nullable: true
+          description: 操作の対象
+          example: "title"
+        src:
+          type: string
+          nullable: true
+          description: 操作のソース
+          example: "xpath"
+        value:
+          type: string
+          nullable: true
+          description: 操作の値
+          example: "//h1[@class='title']"
+
+    RuleRequest:
+      type: object
+      required:
+        - op
+      properties:
+        op:
+          type: string
+          description: 操作の種類
+          example: "include"
+        dst:
+          type: string
+          nullable: true
+          description: 操作の対象
+          example: "title"
+        src:
+          type: string
+          nullable: true
+          description: 操作のソース
+          example: "xpath"
+        value:
+          type: string
+          nullable: true
+          description: 操作の値
+          example: "//h1[@class='title']"
+
+    ChannelDirectory:
+      type: object
+      required:
+        - channel_id
+        - directory_id
+      properties:
+        channel_id:
+          type: string
+          format: uuid
+          description: チャンネルのUUID
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        directory_id:
+          type: string
+          format: uuid
+          description: ディレクトリのUUID
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        title:
+          type: string
+          nullable: true
+          description: ディレクトリのタイトル
+          example: "重要ニュース"
+        description:
+          type: string
+          nullable: true
+          description: ディレクトリの説明
+          example: "重要なニュースサイトの監視"
+        priority:
+          type: string
+          nullable: true
+          description: 優先度
+          example: "high"
+
+    ChannelDirectoryRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          nullable: true
+          description: ディレクトリのタイトル
+          example: "重要ニュース"
+        description:
+          type: string
+          nullable: true
+          description: ディレクトリの説明
+          example: "重要なニュースサイトの監視"
+        priority:
+          type: string
+          nullable: true
+          description: 優先度
+          example: "high"
+
+    ChannelSite:
+      type: object
+      required:
+        - channel_id
+        - site_id
+      properties:
+        channel_id:
+          type: string
+          format: uuid
+          description: チャンネルのUUID
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        site_id:
+          type: string
+          format: uuid
+          description: サイトのUUID
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        title:
+          type: string
+          nullable: true
+          description: サイトのタイトル
+          example: "ニュースサイト"
+        description:
+          type: string
+          nullable: true
+          description: サイトの説明
+          example: "最新ニュースを監視"
+        priority:
+          type: string
+          nullable: true
+          description: 優先度
+          example: "medium"
+
+    ChannelSiteRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          nullable: true
+          description: サイトのタイトル
+          example: "ニュースサイト"
+        description:
+          type: string
+          nullable: true
+          description: サイトの説明
+          example: "最新ニュースを監視"
+        priority:
+          type: string
+          nullable: true
+          description: 優先度
+          example: "medium"
+
+    ChannelDevice:
+      type: object
+      required:
+        - channel_id
+        - device_id
+      properties:
+        channel_id:
+          type: string
+          format: uuid
+          description: チャンネルのUUID
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        device_id:
+          type: string
+          description: デバイスID
+          example: "device-001"
+        interface:
+          type: string
+          nullable: true
+          description: インターフェース
+          example: "slack"
+        apikey:
+          type: string
+          nullable: true
+          description: APIキー
+          example: "xoxb-1234567890-abcdefghijk"
+        tag:
+          type: string
+          nullable: true
+          description: タグ
+          example: "production"
+        template:
+          type: string
+          nullable: true
+          description: メッセージテンプレート
+          example: "新しいリソース: {{title}}"
+
+    ChannelDeviceRequest:
+      type: object
+      properties:
+        interface:
+          type: string
+          nullable: true
+          description: インターフェース
+          example: "slack"
+        apikey:
+          type: string
+          nullable: true
+          description: APIキー
+          example: "xoxb-1234567890-abcdefghijk"
+        tag:
+          type: string
+          nullable: true
+          description: タグ
+          example: "production"
+        template:
+          type: string
+          nullable: true
+          description: メッセージテンプレート
+          example: "新しいリソース: {{title}}"
+
+    ChannelResourcesRequest:
+      type: object
+      properties:
+        since:
+          type: string
+          format: date-time
+          description: 開始日時
+          example: "2023-09-15T10:30:00Z"
+        until:
+          type: string
+          format: date-time
+          description: 終了日時
+          example: "2023-09-15T11:30:00Z"
+        log:
+          type: boolean
+          description: ログを記録するかどうか
+          default: false
+
+    Resource:
+      type: object
+      required:
+        - id
+        - site_id
+        - uri
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: リソースのUUID
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        site_id:
+          type: string
+          format: uuid
+          description: サイトのUUID
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        uri:
+          type: string
+          format: uri
+          description: リソースのURI
+          example: "https://example.com/article/123"
+        name:
+          type: string
+          description: リソース名
+          example: "記事タイトル"
+          maxLength: 255
+        properties:
+          type: object
+          description: リソースのプロパティ（任意のJSONオブジェクト）
+          additionalProperties: true
+          example:
+            title: "記事タイトル"
+            content: "記事の内容"
+            author: "著者名"
+            published_at: "2023-09-15T10:30:00Z"
+        created_at:
+          type: string
+          format: date-time
+          description: 作成日時
+          example: "2023-09-15T10:30:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: 更新日時
+          example: "2023-09-15T10:30:00Z"
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: エラーの種類
+          example: "Bad Request"
+        message:
+          type: string
+          description: エラーの詳細メッセージ
+          example: "リクエストの形式が正しくありません"
+
+  responses:
+    BadRequest:
+      description: リクエストが不正です
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Bad Request"
+            message: "Invalid JSON"
+
+    NotFound:
+      description: リソースが見つかりません
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Not Found"
+            message: "指定されたリソースが見つかりません"
+
+    InternalServerError:
+      description: サーバー内部エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Internal Server Error"
+            message: "サーバー内部でエラーが発生しました"
+
+security: []

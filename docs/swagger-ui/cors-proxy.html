@@ -44,8 +44,9 @@
 </head>
 <body>
     <div class="note">
-        <h3>🔧 SiteWatcher2 API Documentation (CORS修正版)</h3>
-        <p><strong>Forbidden エラー解決版</strong> - JavaScript経由でYAMLファイルを直接読み込みます</p>
+        <h3>🚀 SiteWatcher2 API Documentation</h3>
+        <p><strong>CORS対応版</strong> - JavaScript経由でYAMLファイルを直接読み込み、APIサーバーのCORSミドルウェアと連携します</p>
+        <p>外部プロキシサービスに依存しない、セキュアな実装です。</p>
     </div>
     
     <div id="swagger-ui"></div>
@@ -117,20 +118,13 @@
                 showServerVariables: true,
                 displayOperationId: true,
                 requestInterceptor: function(request) {
-                    console.log('Original Request:', request);
-                    
-                    // CORS対応: リモートAPIアクセス時にプロキシを使用
-                    if (request.url && !request.url.includes('localhost') && !request.url.includes('127.0.0.1')) {
-                        console.log('Using CORS proxy for remote API:', request.url);
-                        request.url = 'https://cors-anywhere.herokuapp.com/' + request.url;
-                    }
+                    console.log('Request:', request);
                     
                     // 必要なヘッダーを設定
                     request.headers = request.headers || {};
                     request.headers['Content-Type'] = 'application/json';
                     request.headers['Accept'] = 'application/json';
                     
-                    console.log('Modified Request:', request);
                     return request;
                 },
                 responseInterceptor: function(response) {
