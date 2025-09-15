@@ -36,7 +36,7 @@ jobs:
     - name: Validate YAML syntax
       run: |
         echo "Validating YAML syntax for OpenAPI files..."
-        python3 -c "
+        python3 << 'EOF'
 import yaml
 import sys
 import glob
@@ -52,12 +52,12 @@ for file in files:
     except Exception as e:
         print(f'❌ {file}: {e}')
         sys.exit(1)
-"
+EOF
 
     - name: Validate OpenAPI 3.0 compliance
       run: |
         echo "Validating OpenAPI 3.0 compliance..."
-        python3 -c "
+        python3 << 'EOF'
 from openapi_spec_validator import validate_spec
 from openapi_spec_validator.readers import read_from_filename
 import sys
@@ -69,7 +69,7 @@ try:
 except Exception as e:
     print(f'❌ OpenAPI validation failed: {e}')
     sys.exit(1)
-"
+EOF
 
     - name: Summary Report
       run: |
