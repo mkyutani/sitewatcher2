@@ -63,7 +63,7 @@ RangeParam:
   name: range
   in: path
   required: true
-  description: ルールの重み範囲（例: "100-200"）
+  description: 'ルールの重み範囲（例: "100-200"）'
   schema:
     type: string
     pattern: '^\d+-\d+$'
