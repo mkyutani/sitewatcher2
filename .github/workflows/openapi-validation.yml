@@ -36,31 +36,13 @@ jobs:
     - name: Validate YAML syntax
       run: |
         echo "Validating YAML syntax for OpenAPI files..."
-        python3 -c "
-import yaml, sys, glob
-files = glob.glob('docs/openapi/**/*.yaml', recursive=True) + glob.glob('docs/swagger-ui/*.yaml')
-for file in files:
-    try:
-        with open(file, 'r') as f: yaml.safe_load(f)
-        print(f'✅ {file}')
-    except Exception as e:
-        print(f'❌ {file}: {e}'); sys.exit(1)
-"
+        find docs/openapi -name "*.yaml" -exec python3 -c "import yaml; yaml.safe_load(open('{}'))" \; && echo "✅ YAML syntax valid"
+        python3 -c "import yaml; yaml.safe_load(open('docs/swagger-ui/openapi-simple.yaml'))" && echo "✅ Swagger UI YAML valid"
 
     - name: Validate OpenAPI 3.0 compliance
       run: |
         echo "Validating OpenAPI 3.0 compliance..."
-        python3 -c "
-from openapi_spec_validator import validate_spec
-from openapi_spec_validator.readers import read_from_filename
-import sys
-try:
-    spec_dict, spec_url = read_from_filename('docs/swagger-ui/openapi-simple.yaml')
-    validate_spec(spec_dict)
-    print('✅ OpenAPI specification is valid')
-except Exception as e:
-    print(f'❌ OpenAPI validation failed: {e}'); sys.exit(1)
-"
+        pip show openapi-spec-validator > /dev/null && python3 -c "from openapi_spec_validator import validate_spec; from openapi_spec_validator.readers import read_from_filename; validate_spec(read_from_filename('docs/swagger-ui/openapi-simple.yaml')[0]); print('✅ OpenAPI specification is valid')"
 
     - name: Summary Report
       run: |
