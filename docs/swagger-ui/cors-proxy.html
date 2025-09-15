@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiteWatcher2 API Documentation (CORS修正版)</title>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.10.3/swagger-ui.css" />
+    <style>
+        html {
+            box-sizing: border-box;
+            overflow: -moz-scrollbars-vertical;
+            overflow-y: scroll;
+        }
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+        body {
+            margin:0;
+            background: #fafafa;
+        }
+        .swagger-ui .topbar {
+            background-color: #1f4e79;
+        }
+        .swagger-ui .topbar .download-url-wrapper input[type=text] {
+            border: 2px solid #89bf04;
+        }
+        .swagger-ui .topbar .download-url-wrapper .download-url-button {
+            background: #89bf04;
+            color: #fff;
+        }
+        .note {
+            background: #e8f4fd;
+            border: 1px solid #b3d8f0;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        .note h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="note">
+        <h3>🔧 SiteWatcher2 API Documentation (CORS修正版)</h3>
+        <p><strong>Forbidden エラー解決版</strong> - JavaScript経由でYAMLファイルを直接読み込みます</p>
+    </div>
+    
+    <div id="swagger-ui"></div>
+
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.3/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.3/swagger-ui-standalone-preset.js"></script>
+    
+    <script>
+        window.onload = function() {
+            console.log('Loading OpenAPI specification...');
+            
+            // YAML ファイルを直接fetch
+            fetch('./openapi-simple.yaml')
+                .then(response => {
+                    console.log('Fetch response:', response.status, response.statusText);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+                    }
+                    return response.text();
+                })
+                .then(yamlText => {
+                    console.log('YAML text loaded, length:', yamlText.length);
+                    
+                    // js-yamlライブラリを動的に読み込み
+                    const script = document.createElement('script');
+                    script.src = 'https://unpkg.com/js-yaml@4.1.0/dist/js-yaml.min.js';
+                    script.onload = function() {
+                        try {
+                            const spec = jsyaml.load(yamlText);
+                            console.log('OpenAPI spec parsed successfully');
+                            initSwaggerUI(spec);
+                        } catch (error) {
+                            console.error('Error parsing YAML:', error);
+                            showError('YAML解析エラー: ' + error.message);
+                        }
+                    };
+                    script.onerror = function() {
+                        showError('js-yamlライブラリの読み込みに失敗しました');
+                    };
+                    document.head.appendChild(script);
+                })
+                .catch(error => {
+                    console.error('Error loading YAML file:', error);
+                    showError('YAMLファイルの読み込みエラー: ' + error.message);
+                });
+        };
+
+        function initSwaggerUI(spec) {
+            const ui = SwaggerUIBundle({
+                spec: spec,
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "StandaloneLayout",
+                validatorUrl: null,
+                docExpansion: "list",
+                defaultModelsExpandDepth: 1,
+                defaultModelExpandDepth: 1,
+                showRequestHeaders: true,
+                showCommonExtensions: true,
+                tryItOutEnabled: true,
+                showServerSelectBox: true,
+                showServerVariables: true,
+                displayOperationId: true,
+                requestInterceptor: function(request) {
+                    console.log('Original Request:', request);
+                    
+                    // CORS対応: リモートAPIアクセス時にプロキシを使用
+                    if (request.url && !request.url.includes('localhost') && !request.url.includes('127.0.0.1')) {
+                        console.log('Using CORS proxy for remote API:', request.url);
+                        request.url = 'https://cors-anywhere.herokuapp.com/' + request.url;
+                    }
+                    
+                    // 必要なヘッダーを設定
+                    request.headers = request.headers || {};
+                    request.headers['Content-Type'] = 'application/json';
+                    request.headers['Accept'] = 'application/json';
+                    
+                    console.log('Modified Request:', request);
+                    return request;
+                },
+                responseInterceptor: function(response) {
+                    console.log('Response:', response);
+                    return response;
+                }
+            });
+
+            window.ui = ui;
+            console.log('Swagger UI initialized successfully');
+        }
+
+        function showError(message) {
+            document.getElementById('swagger-ui').innerHTML = 
+                `<div style="padding: 20px; color: red; border: 1px solid red; margin: 20px; border-radius: 4px;">
+                    <h3>⚠️ エラー</h3>
+                    <p>${message}</p>
+                    <p><strong>解決方法:</strong></p>
+                    <ul>
+                        <li>サーバーが正常に起動しているか確認</li>
+                        <li>openapi-simple.yamlファイルが存在するか確認</li>
+                        <li>ブラウザのコンソールでエラー詳細を確認</li>
+                    </ul>
+                </div>`;
+        }
+    </script>
+</body>
+</html>

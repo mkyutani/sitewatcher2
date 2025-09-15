@@ -1,5 +1,6 @@
 import { Application, log } from "./deps.ts";
 import { router } from "./router.ts";
+import { corsMiddleware } from "./middleware/cors.ts";
 import "https://deno.land/std@0.182.0/dotenv/load.ts"; // auto loading .env into environment variables
 
 await log.setup({
@@ -29,6 +30,9 @@ app.addEventListener("listen", ({ hostname, port, secure }) => {
 app.addEventListener("error", (evt) => {
   log.error(`${evt.error.name}: ${evt.error.message}`);
 });
+
+// Add CORS middleware before routes
+app.use(corsMiddleware);
 
 app.use(router.routes());
 app.use(router.allowedMethods());
